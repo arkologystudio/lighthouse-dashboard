@@ -5,7 +5,7 @@ describe('API Utilities', () => {
   describe('mapResult', () => {
     it('transforms successful result data', () => {
       const result: Result<number> = { success: true, data: 5 };
-      const mapped = mapResult(result, n => n * 2);
+      const mapped = mapResult(result, (n: number) => n * 2);
 
       expect(mapped).toEqual({ success: true, data: 10 });
     });
@@ -13,7 +13,7 @@ describe('API Utilities', () => {
     it('passes through error result unchanged', () => {
       const error: ApiError = { message: 'Test error' };
       const result: Result<number> = { success: false, error };
-      const mapped = mapResult(result, n => n * 2);
+      const mapped = mapResult(result, (n: number) => n * 2);
 
       expect(mapped).toEqual({ success: false, error });
     });
@@ -24,7 +24,7 @@ describe('API Utilities', () => {
       const result: Result<number> = { success: true, data: 5 };
       const chained = flatMapResult(
         result,
-        n =>
+        (n: number) =>
           ({
             success: true,
             data: n * 2,
@@ -39,7 +39,7 @@ describe('API Utilities', () => {
       const result: Result<number> = { success: false, error };
       const chained = flatMapResult(
         result,
-        n =>
+        (n: number) =>
           ({
             success: true,
             data: n * 2,
