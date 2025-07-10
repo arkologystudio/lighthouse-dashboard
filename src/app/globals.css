@@ -1,8 +1,34 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap');
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* New integrated color palette */
+  --color-primary: #424769;
+  --color-primary-light: #6b7aa0;
+  --color-primary-dark: #2d3748;
+  --color-accent: #f6ad8a;
+  --color-accent-light: #f9c4a8;
+  
+  /* Background colors */
+  --color-bg-main: #2d3748;
+  --color-bg-secondary: #424769;
+  --color-bg-card: #4a5568;
+  --color-bg-card-hover: #556080;
+  --color-bg-surface: #3a4359;
+  
+  /* Text colors */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #e2e8f0;
+  --color-text-muted: #a0aec0;
+  --color-text-accent: #f6ad8a;
+  --color-text-error: #ff6b6b;
+  
+  /* Border colors */
+  --color-border: #556080;
+  --color-border-light: #6b7aa0;
+  
+  --background: var(--color-bg-main);
+  --foreground: var(--color-text-primary);
 }
 
 @theme inline {
@@ -12,15 +38,1127 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+body {
+  background: var(--color-bg-main);
+  color: var(--color-text-primary);
+  font-family: 'Raleway', Arial, Helvetica, sans-serif;
+  font-weight: 400;
+}
+
+/* Font utilities */
+.font-raleway {
+  font-family: 'Raleway', sans-serif;
+}
+
+/* ==========================================================================
+   LIGHTHOUSE DESIGN SYSTEM
+   ========================================================================== */
+
+/* Typography Hierarchy */
+.lh-title-hero {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-family: 'Raleway', sans-serif;
+}
+
+@media (min-width: 640px) {
+  .lh-title-hero {
+    font-size: 3rem;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (min-width: 768px) {
+  .lh-title-hero {
+    font-size: 3.75rem;
+  }
 }
+
+.lh-title-page {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-family: 'Raleway', sans-serif;
+}
+
+.lh-title-section {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  font-family: 'Raleway', sans-serif;
+}
+
+.lh-title-card {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-family: 'Raleway', sans-serif;
+}
+
+.lh-title-small {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  font-family: 'Raleway', sans-serif;
+}
+
+.lh-title-auth {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-family: 'Raleway', sans-serif;
+}
+
+.lh-title-auth-sub {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  font-family: 'Raleway', sans-serif;
+}
+
+.lh-text-description {
+  color: var(--color-text-muted);
+}
+
+.lh-text-muted {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.lh-text-small {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.lh-text-stat {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-family: 'Raleway', sans-serif;
+}
+
+.lh-text-stat-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Interactive Elements - Cursor Styles */
+.lh-text-link {
+  color: var(--color-accent);
+  transition: color 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.lh-text-link:hover {
+  color: var(--color-accent-light);
+}
+
+.lh-text-error {
+  color: #ff6b6b;
+}
+
+.lh-text-success {
+  color: #51cf66;
+}
+
+/* Layout Classes */
+.lh-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.lh-section-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.lh-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lh-page-header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.lh-grid-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .lh-grid-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .lh-grid-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.lh-grid-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .lh-grid-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.lh-flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lh-flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lh-flex-start {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.lh-flex-icon-text {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Component Classes */
+.lh-card {
+  background-color: var(--color-bg-card);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--color-border);
+  backdrop-filter: blur(10px);
+}
+
+.lh-card-hover {
+  background-color: var(--color-bg-card);
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.lh-card-hover:hover {
+  background-color: var(--color-bg-card-hover);
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+  border-color: var(--color-border-light);
+}
+
+.lh-card-content {
+  padding: 1.5rem;
+}
+
+.lh-card-header {
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.lh-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid;
+}
+
+.lh-badge-gray {
+  background-color: rgba(160, 174, 192, 0.2);
+  color: var(--color-text-muted);
+  border-color: rgba(160, 174, 192, 0.3);
+}
+
+.lh-badge-blue {
+  background-color: rgba(107, 122, 160, 0.2);
+  color: var(--color-primary-light);
+  border-color: rgba(107, 122, 160, 0.3);
+}
+
+.lh-badge-green {
+  background-color: rgba(81, 207, 102, 0.2);
+  color: #51cf66;
+  border-color: rgba(81, 207, 102, 0.3);
+}
+
+.lh-badge-orange {
+  background-color: rgba(246, 173, 138, 0.2);
+  color: var(--color-accent);
+  border-color: rgba(246, 173, 138, 0.3);
+}
+
+.lh-badge-red {
+  background-color: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+  border-color: rgba(255, 107, 107, 0.3);
+}
+
+/* Action Card Background Colors */
+.lh-action-bg-blue {
+  background-color: #3B82F6;
+}
+
+.lh-action-bg-purple {
+  background-color: #8B5CF6;
+}
+
+.lh-action-bg-green {
+  background-color: #10B981;
+}
+
+.lh-action-bg-orange {
+  background-color: #F59E0B;
+}
+
+.lh-action-bg-red {
+  background-color: #EF4444;
+}
+
+.lh-icon-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+.lh-icon-md {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.lh-icon-lg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.lh-icon-xl {
+  width: 2rem;
+  height: 2rem;
+}
+
+.lh-icon-circle {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lh-icon-circle-primary {
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-primary);
+  box-shadow: 0 6px 20px -6px rgba(246, 173, 138, 0.4);
+}
+
+.lh-icon-circle-muted {
+  width: 3rem;
+  height: 3rem;
+  background-color: var(--color-bg-surface);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+}
+
+/* Action Card Icon Container */
+.lh-action-icon-container {
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s;
+}
+
+.lh-action-icon-container:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Welcome Section Gradient Background */
+.lh-welcome-gradient {
+  background: linear-gradient(135deg, #1E3A8A, #3B82F6);
+}
+
+/* Loading States */
+.lh-spinner {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-bottom: 2px solid #1E3A8A;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.lh-spinner-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+.lh-spinner-md {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.lh-spinner-lg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.lh-loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+}
+
+.lh-loading-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+/* Form Classes */
+.lh-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.lh-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lh-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.lh-form-actions-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Form Field Styling */
+.lh-field-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Enhanced form label styling */
+.lh-field-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  font-family: 'Raleway', sans-serif;
+  margin-bottom: 0.375rem;
+}
+
+.lh-field-input {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1.5px solid var(--color-border);
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.lh-field-input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.8;
+}
+
+.lh-field-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(246, 173, 138, 0.1);
+  background-color: var(--color-bg-card);
+}
+
+.lh-field-input:hover {
+  border-color: var(--color-border-light);
+}
+
+/* Error state */
+.lh-field-input-error {
+  border-color: var(--color-text-error);
+  background-color: rgba(255, 107, 107, 0.05);
+}
+
+.lh-field-input-error:focus {
+  border-color: var(--color-text-error);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+}
+
+/* Input with icons */
+.lh-field-input-with-start-icon {
+  padding-left: 2.5rem;
+}
+
+.lh-field-input-with-end-icon {
+  padding-right: 2.5rem;
+}
+
+/* Field icon containers */
+.lh-field-icon-start {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.lh-field-icon-end {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+}
+
+/* Form Field Icons and Buttons */
+.lh-field-icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: color 0.2s ease;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+}
+
+.lh-field-icon-button:hover {
+  color: var(--color-text-secondary);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.lh-field-icon-button:focus {
+  outline: none;
+  color: var(--color-accent);
+}
+
+/* Error and helper text */
+.lh-field-error {
+  font-size: 0.875rem;
+  color: var(--color-text-error);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lh-field-helper {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+/* Relative container for icons */
+.lh-field-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Authentication Layout */
+.lh-auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  background: linear-gradient(135deg, var(--color-bg-main) 0%, var(--color-primary-dark) 50%, var(--color-primary) 100%);
+  position: relative;
+}
+
+.lh-auth-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 40%, rgba(246, 173, 138, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(107, 122, 160, 0.1) 0%, transparent 50%);
+}
+
+@media (min-width: 640px) {
+  .lh-auth-container {
+    padding: 3rem 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lh-auth-container {
+    padding: 2rem;
+  }
+}
+
+.lh-auth-content {
+  max-width: 28rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.lh-auth-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lh-auth-card {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--color-border);
+  backdrop-filter: blur(20px);
+}
+
+/* Dashboard Layout */
+.lh-dashboard-main {
+  flex: 1;
+  padding: 1.5rem 1rem;
+  overflow-y: auto;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--color-bg-main) 0%, var(--color-primary-dark) 100%);
+  position: relative;
+}
+
+.lh-dashboard-main::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 80%, rgba(246, 173, 138, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(107, 122, 160, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+@media (min-width: 640px) {
+  .lh-dashboard-main {
+    padding: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lh-dashboard-main {
+    padding: 2rem;
+  }
+}
+
+.lh-dashboard-content {
+  max-width: 80rem;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.lh-sidebar-nav {
+  flex: 1;
+  padding: 1.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow-y: auto;
+}
+
+/* Sidebar Navigation */
+.lh-sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  margin: 0.125rem 0.5rem;
+  cursor: pointer;
+}
+
+.lh-sidebar-nav-item-active {
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
+  color: var(--color-text-primary);
+  box-shadow: 0 6px 20px -6px rgba(246, 173, 138, 0.4);
+  transform: translateX(4px);
+}
+
+/* Active state for collapsed sidebar */
+.lh-sidebar-collapsed .lh-sidebar-nav-item-active {
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
+  border-radius: 0.75rem;
+  margin: 0.125rem 0.25rem;
+  transform: none;
+}
+
+/* Navigation item centering for collapsed state */
+.lh-sidebar-collapsed .lh-sidebar-nav-item {
+  justify-content: center;
+  padding: 0.75rem 0.5rem;
+  margin: 0.125rem 0.25rem;
+}
+
+/* Collapsed sidebar container styling */
+.lh-sidebar-collapsed .lh-sidebar-nav {
+  padding: 1.5rem 0.25rem;
+}
+
+/* Collapse button styling */
+.lh-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 4rem;
+  padding: 0 1rem;
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-bg-card);
+  flex-shrink: 0;
+}
+
+.lh-sidebar-collapsed .lh-sidebar-header {
+  justify-content: center;
+  padding: 0 0.5rem;
+}
+
+.lh-sidebar-collapse-btn {
+  padding: 0.375rem;
+  border-radius: 0.5rem;
+  color: var(--color-text-muted);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.lh-sidebar-collapse-btn:hover {
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-surface);
+}
+
+/* Profile section styling */
+.lh-sidebar-profile {
+  border-top: 1px solid var(--color-border);
+  padding: 1rem;
+  flex-shrink: 0;
+  background-color: var(--color-bg-card);
+}
+
+/* Sidebar expand hint animation */
+.lh-sidebar-collapsed .lh-sidebar-profile {
+  border-top: 1px solid var(--color-border);
+  padding: 1rem 0.5rem;
+  flex-shrink: 0;
+  background-color: var(--color-bg-card);
+}
+
+/* Subtle pulse animation for expand hint */
+@keyframes subtle-pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.lh-sidebar-collapsed .lh-sidebar-profile button[title="Expand sidebar"] svg {
+  animation: subtle-pulse 3s ease-in-out infinite;
+}
+
+.lh-sidebar-collapsed .lh-sidebar-profile button[title="Expand sidebar"]:hover svg {
+  animation: none;
+  opacity: 1;
+}
+
+.lh-sidebar-nav-item-inactive {
+  color: var(--color-text-secondary);
+}
+
+.lh-sidebar-nav-item-inactive:hover {
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  transform: translateX(2px);
+}
+
+/* Table Styles */
+.lh-table {
+  min-width: 100%;
+}
+
+.lh-table thead {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.lh-table-header {
+  background-color: var(--color-bg-surface);
+}
+
+.lh-table-header-cell {
+  padding: 0.75rem 1.5rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.lh-table tbody {
+  background-color: var(--color-bg-card);
+}
+
+.lh-table tbody tr {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.lh-table-row:hover {
+  background-color: var(--color-bg-surface);
+}
+
+.lh-table-cell {
+  padding: 1rem 1.5rem;
+  white-space: nowrap;
+}
+
+.lh-table-cell-content {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.lh-table-cell-meta {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+/* Empty States */
+.lh-empty-state {
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.lh-empty-state-icon {
+  margin: 0 auto 1rem auto;
+  width: 3rem;
+  height: 3rem;
+  color: var(--color-text-muted);
+}
+
+.lh-empty-state-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.lh-empty-state-description {
+  color: var(--color-text-muted);
+  margin-bottom: 1.5rem;
+}
+
+/* Error States */
+.lh-error-container {
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.lh-error-message {
+  color: #ff6b6b;
+  margin-bottom: 1rem;
+}
+
+/* Alert/Notification Styles */
+.lh-alert {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid;
+  backdrop-filter: blur(10px);
+}
+
+.lh-alert-error {
+  background-color: rgba(255, 107, 107, 0.1);
+  border-color: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+}
+
+.lh-alert-success {
+  background-color: rgba(81, 207, 102, 0.1);
+  border-color: rgba(81, 207, 102, 0.2);
+  color: #51cf66;
+}
+
+.lh-alert-warning {
+  background-color: rgba(246, 173, 138, 0.1);
+  border-color: rgba(246, 173, 138, 0.2);
+  color: var(--color-accent);
+}
+
+.lh-alert-info {
+  background-color: rgba(107, 122, 160, 0.1);
+  border-color: rgba(107, 122, 160, 0.2);
+  color: var(--color-primary-light);
+}
+
+/* Feature Cards */
+.lh-feature-card {
+  text-align: center;
+  transition: box-shadow 0.2s;
+}
+
+.lh-feature-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.lh-feature-icon {
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto 1rem auto;
+  background-color: rgba(30, 58, 138, 0.1);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lh-feature-icon-inner {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #1E3A8A;
+}
+
+/* Hero Section */
+.lh-hero-container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 4rem 1rem;
+}
+
+@media (min-width: 640px) {
+  .lh-hero-container {
+    padding: 6rem 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lh-hero-container {
+    padding: 2rem;
+  }
+}
+
+.lh-hero-content {
+  text-align: center;
+}
+
+.lh-hero-actions {
+  margin-top: 2.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* CTA Section */
+.lh-cta-section {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  position: relative;
+}
+
+.lh-cta-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 40%, rgba(246, 173, 138, 0.1) 0%, transparent 70%);
+}
+
+.lh-cta-container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
+@media (min-width: 640px) {
+  .lh-cta-container {
+    padding: 3rem 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lh-cta-container {
+    padding: 4rem 2rem;
+    flex-direction: row;
+  }
+}
+
+.lh-cta-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--color-text-primary);
+  font-family: 'Raleway', sans-serif;
+}
+
+@media (min-width: 640px) {
+  .lh-cta-title {
+    font-size: 2.25rem;
+  }
+}
+
+.lh-cta-subtitle {
+  display: block;
+  color: var(--color-accent);
+}
+
+/* Responsive Utilities */
+.lh-mobile-only {
+  display: block;
+}
+
+@media (min-width: 1024px) {
+  .lh-mobile-only {
+    display: none;
+  }
+}
+
+.lh-desktop-only {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .lh-desktop-only {
+    display: block;
+  }
+}
+
+.lh-tablet-up {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .lh-tablet-up {
+    display: block;
+  }
+}
+
+/* Transitions */
+.lh-transition {
+  transition: all 0.2s;
+}
+
+.lh-transition-colors {
+  transition: color 0.2s;
+}
+
+.lh-transition-shadow {
+  transition: box-shadow 0.2s;
+}
+
+/* Focus States */
+.lh-focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #1E3A8A, 0 0 0 4px rgba(30, 58, 138, 0.2);
+}
+
+/* Dropdown Improvements */
+.lh-dropdown {
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  backdrop-filter: blur(10px);
+}
+
+/* Dropdown Items */
+.lh-dropdown-item {
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+}
+
+.lh-dropdown-item:hover {
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-primary);
+}
+
+.lh-dropdown-divider {
+  height: 1px;
+  background-color: var(--color-border);
+  margin: 0.25rem 0;
+}
+
+/* General Interactive Elements */
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+a {
+  cursor: pointer;
+}
+
