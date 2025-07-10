@@ -123,127 +123,131 @@ const SitesPage: React.FC = () => {
       </div>
 
       {/* Sites table */}
-      <Card>
-        <CardHeader>
-          <div className="lh-flex-between">
-            <h3 className="lh-title-small">Your Sites ({sites.length})</h3>
-            <Button variant="ghost" size="sm" onClick={refreshSites}>
-              <svg
-                className="lh-icon-sm mr-2"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-              Refresh
-            </Button>
-          </div>
-        </CardHeader>
+      <div className="lh-table-container">
+        <Card>
+          <CardHeader>
+            <div className="lh-flex-between">
+              <h3 className="lh-title-small">Your Sites ({sites.length})</h3>
+              <Button variant="ghost" size="sm" onClick={refreshSites}>
+                <svg
+                  className="lh-icon-sm mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                Refresh
+              </Button>
+            </div>
+          </CardHeader>
 
-        <CardContent className="p-0">
-          {sites.length === 0 ? (
-            <div className="lh-empty-state">
-              <svg
-                className="lh-empty-state-icon"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                />
-              </svg>
-              <h3 className="lh-empty-state-title">No sites yet</h3>
-              <p className="lh-empty-state-description">
-                Get started by adding your first WordPress site.
-              </p>
-              <div className="mt-6">
-                <Button onClick={() => setIsAddModalOpen(true)}>
-                  Add Your First Site
-                </Button>
+          <CardContent className="p-0">
+            {sites.length === 0 ? (
+              <div className="lh-empty-state">
+                <svg
+                  className="lh-empty-state-icon"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  />
+                </svg>
+                <h3 className="lh-empty-state-title">No sites yet</h3>
+                <p className="lh-empty-state-description">
+                  Get started by adding your first WordPress site.
+                </p>
+                <div className="mt-6">
+                  <Button onClick={() => setIsAddModalOpen(true)}>
+                    Add Your First Site
+                  </Button>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="overflow-hidden">
-              <table className="lh-table">
-                <thead className="lh-table-header">
-                  <tr>
-                    <th className="lh-table-header-cell">Site</th>
-                    <th className="lh-table-header-cell">Products</th>
-                    <th className="lh-table-header-cell">Added</th>
-                    <th className="relative px-6 py-3">
-                      <span className="sr-only">Actions</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="lh-table tbody">
-                  {sites.map(site => (
-                    <tr key={site.id} className="lh-table-row">
-                      <td className="lh-table-cell">
-                        <div>
-                          <div className="lh-table-cell-content">
-                            {site.name}
-                          </div>
-                          <div className="lh-table-cell-meta">
-                            <a
-                              href={site.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="lh-text-link"
-                            >
-                              {site.url}
-                            </a>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="lh-table-cell">
-                        <div className="flex flex-wrap gap-2">
-                          {PRODUCTS.map(product => (
-                            <span
-                              key={product.id}
-                              className="lh-badge lh-badge-gray"
-                            >
-                              {product.name}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-                      <td className="lh-table-cell lh-table-cell-meta">
-                        {formatDate(site.created_at)}
-                      </td>
-                      <td className="lh-table-cell text-right text-sm font-medium">
-                        <div className="flex items-center space-x-2">
-                          <Button variant="ghost" size="sm">
-                            Manage Plugins
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(site.id)}
-                            disabled={deletingId === site.id}
-                            style={{ color: 'var(--color-text-error)' }}
-                          >
-                            {deletingId === site.id ? 'Deleting...' : 'Delete'}
-                          </Button>
-                        </div>
-                      </td>
+            ) : (
+              <div className="overflow-hidden">
+                <table className="lh-table">
+                  <thead className="lh-table-header">
+                    <tr>
+                      <th className="lh-table-header-cell">Site</th>
+                      <th className="lh-table-header-cell">Products</th>
+                      <th className="lh-table-header-cell">Added</th>
+                      <th className="relative px-6 py-3">
+                        <span className="sr-only">Actions</span>
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                  </thead>
+                  <tbody className="lh-table tbody">
+                    {sites.map(site => (
+                      <tr key={site.id} className="lh-table-row">
+                        <td className="lh-table-cell">
+                          <div>
+                            <div className="lh-table-cell-content">
+                              {site.name}
+                            </div>
+                            <div className="lh-table-cell-meta">
+                              <a
+                                href={site.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="lh-text-link"
+                              >
+                                {site.url}
+                              </a>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="lh-table-cell">
+                          <div className="flex flex-wrap gap-2">
+                            {PRODUCTS.map(product => (
+                              <span
+                                key={product.id}
+                                className="lh-badge lh-badge-gray"
+                              >
+                                {product.name}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+                        <td className="lh-table-cell lh-table-cell-meta">
+                          {formatDate(site.created_at)}
+                        </td>
+                        <td className="lh-table-cell text-right text-sm font-medium">
+                          <div className="flex items-center space-x-2">
+                            <Button variant="ghost" size="sm">
+                              Manage Plugins
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(site.id)}
+                              disabled={deletingId === site.id}
+                              style={{ color: 'var(--color-text-error)' }}
+                            >
+                              {deletingId === site.id
+                                ? 'Deleting...'
+                                : 'Delete'}
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Add Site Modal */}
       <Modal

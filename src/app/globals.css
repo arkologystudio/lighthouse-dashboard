@@ -170,24 +170,72 @@ body {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .lh-page-container {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lh-page-container {
+    padding: 0 2rem;
+  }
 }
 
 .lh-section-container {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .lh-section-container {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lh-section-container {
+    padding: 0 2rem;
+  }
 }
 
 .lh-page-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+@media (min-width: 640px) {
+  .lh-page-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
 }
 
 .lh-page-header-content {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+}
+
+/* Mobile-friendly button styling in headers */
+.lh-page-header button {
+  width: 100%;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .lh-page-header button {
+    width: auto;
+  }
 }
 
 .lh-grid-cards {
@@ -701,6 +749,19 @@ body {
   margin: 0 auto;
   position: relative;
   z-index: 1;
+  padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .lh-dashboard-content {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lh-dashboard-content {
+    padding: 0 2rem;
+  }
 }
 
 .lh-sidebar-nav {
@@ -844,13 +905,19 @@ body {
 }
 
 .lh-table-header-cell {
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1rem;
   text-align: left;
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+@media (min-width: 768px) {
+  .lh-table-header-cell {
+    padding: 0.75rem 1.5rem;
+  }
 }
 
 .lh-table tbody {
@@ -866,8 +933,41 @@ body {
 }
 
 .lh-table-cell {
-  padding: 1rem 1.5rem;
+  padding: 1rem;
   white-space: nowrap;
+  font-size: 0.875rem;
+}
+
+@media (min-width: 768px) {
+  .lh-table-cell {
+    padding: 1rem 1.5rem;
+  }
+}
+
+/* Mobile table responsiveness */
+@media (max-width: 767px) {
+  .lh-table-cell {
+    white-space: normal;
+    word-break: break-word;
+  }
+  
+  /* Hide less important columns on mobile */
+  .lh-table th:nth-child(3),
+  .lh-table td:nth-child(3) {
+    display: none;
+  }
+  
+  /* Make action buttons stack on mobile */
+  .lh-table-cell .flex.space-x-2 {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+  
+  .lh-table-cell .flex.space-x-2 button {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .lh-table-cell-content {
@@ -881,29 +981,106 @@ body {
   color: var(--color-text-muted);
 }
 
+/* Card mobile improvements */
+@media (max-width: 767px) {
+  .lh-card {
+    margin: 0 0.5rem;
+  }
+  
+  .lh-card-content {
+    padding: 1rem;
+  }
+  
+  .lh-card-header {
+    padding: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .lh-card-content {
+    padding: 1.5rem;
+  }
+  
+  .lh-card-header {
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+  }
+}
+
+/* Mobile flex improvements */
+@media (max-width: 767px) {
+  .lh-flex-between {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .lh-flex-between > *:last-child {
+    width: 100%;
+  }
+  
+  .lh-flex-between button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 /* Empty States */
 .lh-empty-state {
   text-align: center;
-  padding: 3rem 0;
+  padding: 2rem 1rem;
+}
+
+@media (min-width: 768px) {
+  .lh-empty-state {
+    padding: 3rem 0;
+  }
 }
 
 .lh-empty-state-icon {
   margin: 0 auto 1rem auto;
-  width: 3rem;
-  height: 3rem;
+  width: 2.5rem;
+  height: 2.5rem;
   color: var(--color-text-muted);
 }
 
+@media (min-width: 768px) {
+  .lh-empty-state-icon {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
 .lh-empty-state-title {
-  font-size: 1.125rem;
-  font-weight: 500;
   color: var(--color-text-primary);
+  font-size: 1.125rem;
+  font-weight: 600;
   margin-bottom: 0.5rem;
 }
 
 .lh-empty-state-description {
   color: var(--color-text-muted);
-  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Table Container Mobile Overflow */
+.lh-table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 767px) {
+  .lh-table-container {
+    margin: 0 -1rem;
+    border-radius: 0;
+  }
+  
+  .lh-table-container .lh-card {
+    border-radius: 0;
+    margin: 0;
+    border-left: none;
+    border-right: none;
+  }
 }
 
 /* Error States */
@@ -1160,5 +1337,195 @@ button:disabled {
 
 a {
   cursor: pointer;
+}
+
+/* Mobile Header/Topbar Styles */
+.lh-mobile-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  background-color: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .lh-mobile-header {
+    padding: 0 1.5rem;
+    height: 4.5rem;
+  }
+}
+
+/* Hide mobile header on desktop */
+@media (min-width: 1024px) {
+  .lh-mobile-header {
+    display: none !important;
+  }
+}
+
+.lh-mobile-header-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background-color: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.lh-mobile-header-button:hover {
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+  transform: scale(1.05);
+}
+
+.lh-mobile-header-button:active {
+  background-color: var(--color-bg-surface);
+  transform: scale(0.95);
+}
+
+.lh-mobile-header-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.2s ease;
+  flex: 1;
+  justify-content: center;
+  margin: 0 1rem;
+}
+
+.lh-mobile-header-logo:hover {
+  opacity: 0.8;
+}
+
+.lh-mobile-header-logo-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-primary);
+  font-weight: bold;
+  font-size: 1.125rem;
+  box-shadow: 0 4px 12px -2px rgba(246, 173, 138, 0.4);
+}
+
+.lh-mobile-header-logo-text {
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-family: 'Raleway', sans-serif;
+  letter-spacing: -0.025em;
+}
+
+@media (max-width: 375px) {
+  .lh-mobile-header-logo-text {
+    font-size: 1.25rem;
+  }
+  
+  .lh-mobile-header-logo-icon {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1rem;
+  }
+}
+
+.lh-mobile-header-spacer {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+}
+
+/* Mobile Sidebar Improvements */
+@media (max-width: 1023px) {
+  .lh-sidebar-header {
+    height: 4rem;
+    padding: 0 1rem;
+  }
+  
+  .lh-sidebar-nav {
+    padding: 1rem 0.75rem;
+  }
+  
+  .lh-sidebar-nav-item {
+    padding: 1rem;
+    margin: 0.25rem 0;
+    font-size: 1rem;
+    min-height: 3rem;
+  }
+  
+  .lh-sidebar-profile {
+    padding: 1.25rem 1rem;
+  }
+  
+  /* Better touch targets for mobile */
+  .lh-sidebar-nav-item svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  
+  /* Mobile sidebar backdrop improvements */
+  .lh-mobile-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    transition: opacity 0.3s ease;
+  }
+}
+
+/* Sidebar z-index and mobile positioning */
+@media (max-width: 1023px) {
+  .lh-mobile-sidebar {
+    position: fixed;
+    inset-y: 0;
+    left: 0;
+    z-index: 50;
+    width: 16rem;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+  }
+  
+  .lh-mobile-sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+/* Improve mobile header sticky behavior */
+@media (max-width: 1023px) {
+  .lh-dashboard-main {
+    padding-top: 0;
+  }
+}
+
+/* Better mobile spacing for main content */
+@media (max-width: 767px) {
+  .lh-dashboard-content {
+    padding: 1rem 0.75rem;
+  }
+  
+  .lh-section-container {
+    padding: 0 0.75rem;
+  }
+  
+  .lh-page-container {
+    padding: 0 0.75rem;
+  }
 }
 

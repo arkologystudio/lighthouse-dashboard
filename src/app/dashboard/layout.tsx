@@ -46,18 +46,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       {/* Mobile sidebar backdrop */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 z-40 lg:hidden"
+          className="lh-mobile-backdrop lg:hidden"
           onClick={() => setMobileMenuOpen(false)}
-        >
-          <div className="absolute inset-0 bg-black opacity-50" />
-        </div>
+        />
       )}
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? 'w-16 lh-sidebar-collapsed' : 'w-64'} shadow-xl transform lh-transition lg:translate-x-0 ${
+        className={`${sidebarCollapsed ? 'w-16 lh-sidebar-collapsed' : 'w-64'} shadow-xl transform lh-transition lg:translate-x-0 ${
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        } flex-col h-screen flex`}
+        } flex-col h-screen flex lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lh-mobile-sidebar ${mobileMenuOpen ? 'open' : ''}`}
         style={{
           backgroundColor: 'var(--color-bg-card)',
           borderRight: '1px solid var(--color-border)',
@@ -385,17 +383,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         className={`flex-1 flex flex-col lh-transition ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'}`}
       >
         {/* Mobile top bar */}
-        <header
-          className="lh-mobile-only shadow-sm border-b h-16 lh-flex-between px-4"
-          style={{
-            backgroundColor: 'var(--color-bg-card)',
-            borderColor: 'var(--color-border)',
-          }}
-        >
+        <header className="lh-mobile-only lh-mobile-header">
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="p-2 rounded-md lh-transition-colors"
-            style={{ color: 'var(--color-text-muted)' }}
+            className="lh-mobile-header-button"
+            aria-label="Open navigation menu"
           >
             <svg
               className="lh-icon-lg"
@@ -411,15 +403,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               />
             </svg>
           </button>
-          <Link href="/dashboard" className="lh-flex-icon-text">
-            <div className="lh-icon-circle-primary w-8 h-8">
-              <span className="font-bold text-lg">L</span>
+
+          <Link href="/dashboard" className="lh-mobile-header-logo">
+            <div className="lh-mobile-header-logo-icon">
+              <span>L</span>
             </div>
-            <span className="text-xl font-semibold lh-title-section">
-              Lighthouse
-            </span>
+            <span className="lh-mobile-header-logo-text">Lighthouse</span>
           </Link>
-          <div className="w-10" /> {/* Spacer for balance */}
+
+          <div className="lh-mobile-header-spacer" />
         </header>
 
         {/* Main content area */}
