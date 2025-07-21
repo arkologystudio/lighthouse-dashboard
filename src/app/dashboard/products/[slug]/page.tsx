@@ -12,7 +12,6 @@ import { useLicenses } from '../../../../lib/hooks/useLicenses';
 import { usePurchases } from '../../../../lib/hooks/usePurchases';
 import { useDownloads } from '../../../../lib/hooks/useDownloads';
 import { usePricing } from '../../../../lib/hooks/usePricing';
-import { EcosystemProduct, SiteProduct, License } from '../../../../types';
 
 const ProductDetailPage: React.FC = () => {
   const params = useParams();
@@ -28,7 +27,7 @@ const ProductDetailPage: React.FC = () => {
     registerProduct,
     unregisterProduct,
   } = useProducts();
-  const { licenses, getLicenseByProduct } = useLicenses();
+  const { licenses, getLicenseByProduct, refreshLicenses } = useLicenses();
   const { simulatePurchase } = usePurchases();
   const { initiateDownload, downloadFile } = useDownloads();
   const { tiers, getTierByName, getProductPricing } = usePricing();
@@ -47,6 +46,7 @@ const ProductDetailPage: React.FC = () => {
   const [selectedBillingPeriod, setSelectedBillingPeriod] = useState<
     'monthly' | 'annual'
   >('monthly');
+  const [showUpgradeForm, setShowUpgradeForm] = useState(false);
 
   const product = products.find(p => p.slug === slug);
 
@@ -202,8 +202,10 @@ const ProductDetailPage: React.FC = () => {
       toast.dismiss();
       if (result.success) {
         toast.success(`Successfully purchased ${product.name}!`);
-        // Refresh licenses after successful purchase
-        window.location.reload();
+        // Refresh licenses after successful purchase instead of full page reload
+        await refreshLicenses();
+        // Hide upgrade form if it was open
+        setShowUpgradeForm(false);
       } else {
         toast.error(result.error || 'Purchase failed');
       }
@@ -724,13 +726,169 @@ const ProductDetailPage: React.FC = () => {
                       )}
                     </div>
 
-                    <Button
-                      onClick={handleDownloadPlugin}
-                      disabled={isProcessing || license.status !== 'active'}
-                      className="w-full bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      {isProcessing ? 'Downloading...' : 'Download Plugin'}
-                    </Button>
+                    <div className="space-y-3">
+                      <Button
+                        onClick={handleDownloadPlugin}
+                        disabled={isProcessing || license.status !== 'active'}
+                        className="w-full bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        {isProcessing ? 'Downloading...' : 'Download Plugin'}
+                      </Button>
+
+                      <div className="pt-3 border-t border-gray-200">
+                        <h3 className="lh-title-card mb-2">Manage License</h3>
+                        <Button
+                          onClick={() => {
+                            // Set a higher tier as default for upgrade
+                            const upgradeTier =
+                              license.license_type === 'trial'
+                                ? 'standard'
+                                : license.license_type === 'standard'
+                                  ? 'premium'
+                                  : license.license_type === 'premium'
+                                    ? 'enterprise'
+                                    : 'enterprise';
+                            setSelectedLicenseType(upgradeTier as any);
+                            setShowUpgradeForm(true);
+                          }}
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                        >
+                          Upgrade License
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Upgrade Form */}
+                    {showUpgradeForm && (
+                      <div className="mt-6 pt-6 border-t border-gray-200">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-lg font-medium text-gray-900">
+                            Upgrade License
+                          </h3>
+                          <Button
+                            onClick={() => setShowUpgradeForm(false)}
+                            variant="outline"
+                            size="sm"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block lh-table-cell-content mb-2">
+                              New License Type:
+                            </label>
+                            <select
+                              value={selectedLicenseType}
+                              onChange={e =>
+                                setSelectedLicenseType(
+                                  e.target.value as
+                                    | 'trial'
+                                    | 'standard'
+                                    | 'standard_plus'
+                                    | 'premium'
+                                    | 'premium_plus'
+                                    | 'enterprise'
+                                )
+                              }
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg lh-focus-ring"
+                            >
+                              {license.license_type !== 'standard' && (
+                                <option value="standard">
+                                  Standard (
+                                  {getLicenseTypePrice(
+                                    'standard',
+                                    product?.base_price,
+                                    selectedBillingPeriod
+                                  )}
+                                  )
+                                </option>
+                              )}
+                              {license.license_type !== 'standard_plus' && (
+                                <option value="standard_plus">
+                                  Standard+ (
+                                  {getLicenseTypePrice(
+                                    'standard_plus',
+                                    product?.base_price,
+                                    selectedBillingPeriod
+                                  )}
+                                  )
+                                </option>
+                              )}
+                              {license.license_type !== 'premium' && (
+                                <option value="premium">
+                                  Premium (
+                                  {getLicenseTypePrice(
+                                    'premium',
+                                    product?.base_price,
+                                    selectedBillingPeriod
+                                  )}
+                                  )
+                                </option>
+                              )}
+                              {license.license_type !== 'premium_plus' && (
+                                <option value="premium_plus">
+                                  Premium+ (
+                                  {getLicenseTypePrice(
+                                    'premium_plus',
+                                    product?.base_price,
+                                    selectedBillingPeriod
+                                  )}
+                                  )
+                                </option>
+                              )}
+                              {license.license_type !== 'enterprise' && (
+                                <option value="enterprise">
+                                  Enterprise (
+                                  {getLicenseTypePrice(
+                                    'enterprise',
+                                    product?.base_price,
+                                    selectedBillingPeriod
+                                  )}
+                                  )
+                                </option>
+                              )}
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block lh-table-cell-content mb-2">
+                              Billing Period:
+                            </label>
+                            <select
+                              value={selectedBillingPeriod}
+                              onChange={e =>
+                                setSelectedBillingPeriod(
+                                  e.target.value as 'monthly' | 'annual'
+                                )
+                              }
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg lh-focus-ring"
+                            >
+                              <option value="monthly">Monthly</option>
+                              <option value="annual">Annual (10% off)</option>
+                            </select>
+                          </div>
+
+                          <div className="text-sm lh-text-muted">
+                            You will be charged the difference between your
+                            current plan and the new plan.
+                          </div>
+
+                          <Button
+                            onClick={handlePurchasePlugin}
+                            disabled={isProcessing}
+                            className="w-full bg-lighthouse-primary hover:bg-lighthouse-primary/90 text-white"
+                          >
+                            {isProcessing
+                              ? 'Processing...'
+                              : `Upgrade to ${formatLicenseType(selectedLicenseType)}`}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-4">

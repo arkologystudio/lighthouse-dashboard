@@ -160,7 +160,7 @@ export const usePurchases = (): UsePurchasesReturn => {
     try {
       const result = await purchaseApiRequest<{
         purchases: PurchaseHistoryItem[];
-      }>('/purchases/user/history', {}, forceLogout);
+      }>('/purchases/history', {}, forceLogout);
 
       if (result.success && result.data) {
         setPurchaseHistory(result.data.purchases);
@@ -215,12 +215,11 @@ export const usePurchases = (): UsePurchasesReturn => {
     [forceLogout, refreshAvailableProducts, refreshPurchaseHistory]
   );
 
-  // Load data on mount - DISABLED to prevent auth issues
-  // TODO: Enable when purchase API endpoints are properly implemented
-  // useEffect(() => {
-  //   refreshAvailableProducts();
-  //   refreshPurchaseHistory();
-  // }, [refreshAvailableProducts, refreshPurchaseHistory]);
+  // Load data on mount
+  useEffect(() => {
+    refreshAvailableProducts();
+    refreshPurchaseHistory();
+  }, [refreshAvailableProducts, refreshPurchaseHistory]);
 
   return {
     availableProducts,

@@ -118,7 +118,7 @@ export const useLicenses = (): UseLicensesReturn => {
 
     try {
       const result = await licenseApiRequest<{ licenses: License[] }>(
-        '/licenses/user',
+        '/licenses/me',
         {},
         forceLogout
       );
@@ -142,7 +142,7 @@ export const useLicenses = (): UseLicensesReturn => {
   const refreshStats = useCallback(async () => {
     try {
       const result = await licenseApiRequest<{ stats: UserLicenseStats }>(
-        '/licenses/user/stats',
+        '/licenses/me/stats',
         {},
         forceLogout
       );
@@ -186,7 +186,7 @@ export const useLicenses = (): UseLicensesReturn => {
     async (licenseId: string): Promise<License | null> => {
       try {
         const result = await licenseApiRequest<{ license: License }>(
-          `/licenses/user/${licenseId}`,
+          `/licenses/me/${licenseId}`,
           {},
           forceLogout
         );
@@ -213,12 +213,11 @@ export const useLicenses = (): UseLicensesReturn => {
     [licenses]
   );
 
-  // Load licenses and stats on mount - DISABLED to prevent auth issues
-  // TODO: Enable when licensing API endpoints are properly implemented
-  // useEffect(() => {
-  //   refreshLicenses();
-  //   refreshStats();
-  // }, [refreshLicenses, refreshStats]);
+  // Load licenses and stats on mount
+  useEffect(() => {
+    refreshLicenses();
+    refreshStats();
+  }, [refreshLicenses, refreshStats]);
 
   return {
     licenses,
