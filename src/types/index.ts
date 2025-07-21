@@ -77,6 +77,7 @@ export interface EcosystemProduct {
   usage_based: boolean;
   features?: string[];
   limits?: Record<string, any>;
+  extended_documentation?: string;
   created_at: string;
   updated_at: string;
 }
@@ -235,3 +236,253 @@ export interface SearchResponse {
   totalPosts: number;
   totalChunks: number;
 }
+
+// Plugin Licensing Types
+export interface Plugin {
+  id: string;
+  product_id: string;
+  name: string;
+  filename: string;
+  version: string;
+  description?: string;
+  file_path: string;
+  file_size: number;
+  file_hash: string;
+  content_type: string;
+  is_active: boolean;
+  is_public: boolean;
+  release_notes?: string;
+  changelog?: string;
+  max_downloads?: number;
+  created_at: string;
+  updated_at: string;
+  product?: EcosystemProduct;
+}
+
+export interface License {
+  id: string;
+  user_id: string;
+  product_id: string;
+  license_key: string;
+  license_type:
+    | 'trial'
+    | 'standard'
+    | 'standard_plus'
+    | 'premium'
+    | 'premium_plus'
+    | 'enterprise';
+  status: 'active' | 'expired' | 'revoked' | 'suspended';
+  is_active: boolean;
+
+  // Billing information
+  billing_period: 'monthly' | 'annual';
+  amount_paid?: number;
+  currency: string;
+
+  // Validity period
+  issued_at: string;
+  expires_at?: string;
+  last_validated?: string;
+
+  // Feature permissions
+  agent_api_access: boolean;
+  max_sites: number;
+
+  // Usage tracking and limits
+  download_count: number;
+  max_downloads?: number;
+  query_count: number;
+  max_queries?: number;
+  query_period_start: string;
+  query_period_end?: string;
+
+  // Add-ons
+  additional_sites: number;
+  custom_embedding: boolean;
+
+  // Metadata
+  purchase_reference?: string;
+  notes?: string;
+  metadata?: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+
+  // Relationships
+  user?: User;
+  product?: EcosystemProduct;
+}
+
+export interface Download {
+  id: string;
+  user_id: string;
+  product_id: string;
+  license_id: string;
+  download_url?: string;
+  download_token?: string;
+  token_expires?: string;
+  ip_address?: string;
+  user_agent?: string;
+  referer?: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'failed' | 'expired';
+  started_at: string;
+  completed_at?: string;
+  bytes_downloaded?: number;
+  error_message?: string;
+  metadata?: Record<string, any>;
+  created_at: string;
+  user?: User;
+  product?: EcosystemProduct;
+  license?: License;
+}
+
+// License Management Request/Response Types
+export interface ValidateLicenseRequest {
+  license_key: string;
+  product_slug?: string;
+}
+
+export interface ValidateLicenseResponse {
+  valid: boolean;
+  license?: License;
+  message?: string;
+  download_allowed: boolean;
+}
+
+// Purchase Simulation Request/Response Types
+export interface SimulatePurchaseRequest {
+  product_slug: string;
+  license_type?:
+    | 'trial'
+    | 'standard'
+    | 'standard_plus'
+    | 'premium'
+    | 'premium_plus'
+    | 'enterprise';
+  billing_period?: 'monthly' | 'annual';
+  additional_sites?: number;
+  custom_embedding?: boolean;
+  payment_reference?: string;
+}
+
+export interface SimulatePurchaseResponse {
+  success: boolean;
+  license: License;
+  plugin: Plugin;
+  message: string;
+}
+
+// Download Request/Response Types
+export interface InitiateDownloadRequest {
+  product_slug: string;
+  license_key: string;
+}
+
+export interface InitiateDownloadResponse {
+  success: boolean;
+  download_token: string;
+  download_url: string;
+  expires_at: string;
+  plugin: Plugin;
+  message?: string;
+}
+
+// License Statistics Types
+export interface UserLicenseStats {
+  total_licenses: number;
+  active_licenses: number;
+  expired_licenses: number;
+  total_downloads: number;
+  licenses_by_type: Record<string, number>;
+}
+
+// Extended Product types with Plugin information
+export interface EcosystemProductWithPlugins extends EcosystemProduct {
+  plugins: Plugin[];
+  has_downloadable_content: boolean;
+}
+
+// Pricing Tier Types - matching backend pricing system
+export interface PricingTier {
+  id: string;
+  product_id: string;
+  tier_name: string;
+  display_name: string;
+  description: string;
+  monthly_price: number;
+  annual_price: number;
+  max_queries?: number;
+  max_sites: number;
+  agent_api_access: boolean;
+  extra_site_price?: number;
+  overage_price?: number;
+  custom_embedding_markup?: number;
+  features?: string[];
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+  product?: EcosystemProduct;
+}
+
+// Pricing calculation types
+export interface PricingCalculationRequest {
+  license_type:
+    | 'standard'
+    | 'standard_plus'
+    | 'premium'
+    | 'premium_plus'
+    | 'enterprise';
+  billing_period?: 'monthly' | 'annual';
+  additional_sites?: number;
+  custom_embedding?: boolean;
+  query_overage?: number;
+}
+
+export interface PricingCalculationResponse {
+  success: boolean;
+  pricing: {
+    license_type: string;
+    billing_period: string;
+    base_price: number;
+    add_ons: {
+      additional_sites: {
+        count: number;
+        unit_price: number;
+        total_cost: number;
+      };
+      custom_embedding: {
+        enabled: boolean;
+        markup_percentage: number;
+        total_cost: number;
+      };
+      query_overage: {
+        count: number;
+        unit_price: number;
+        total_cost: number;
+      };
+    };
+    total_price: number;
+    annual_savings: number;
+    annual_savings_percentage: number;
+    currency: string;
+  };
+  tier_details: {
+    tier_name: string;
+    display_name: string;
+    max_queries?: number;
+    max_sites: number;
+    agent_api_access: boolean;
+    features: string[];
+  };
+}
+
+// License type definitions
+export type LicenseType =
+  | 'trial'
+  | 'standard'
+  | 'standard_plus'
+  | 'premium'
+  | 'premium_plus'
+  | 'enterprise';
+export type BillingPeriod = 'monthly' | 'annual';
+export type LicenseStatus = 'active' | 'expired' | 'revoked' | 'suspended';

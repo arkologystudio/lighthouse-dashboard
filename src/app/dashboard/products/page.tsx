@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import toast from 'react-hot-toast';
 import { Card, CardHeader, CardContent } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { useSites } from '../../../lib/hooks/useSites';
@@ -143,124 +145,161 @@ const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   return (
-    <Card className="lh-card-hover">
+    <Card className="lh-card-hover group flex flex-col h-full">
       <CardHeader className="pb-4">
-        <div className="lh-flex-between">
-          <div className="lh-flex-icon-text">
-            <div
-              className={`lh-action-icon-container ${getCategoryColor(product.category)}`}
-            >
-              {getProductIcon(product.slug)}
-            </div>
-            <div>
-              <h3 className="lh-title-card">{product.name}</h3>
-              <div className="lh-flex-icon-text mt-1">
-                <span className="lh-badge lh-badge-gray">
-                  {product.category}
-                </span>
-                {product.is_beta && (
-                  <span className="lh-badge lh-badge-orange">Beta</span>
-                )}
-              </div>
-            </div>
-          </div>
+        {/* Price positioned at top-right, title spans full width below */}
+        <div className="flex justify-between items-start mb-3">
+          <div className="flex-1"></div>
           <div className="text-right">
-            <div className="lh-title-card">
+            <div className="lh-title-card text-lg font-semibold">
               {formatPrice(product.base_price)}
             </div>
             <div className="lh-text-small">v{product.version}</div>
           </div>
         </div>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <p className="lh-text-description mb-4 leading-relaxed">
-          {product.description}
-        </p>
 
-        {product.features && product.features.length > 0 && (
-          <div className="mb-6">
-            <h4 className="lh-table-cell-content mb-2">Features:</h4>
-            <ul className="lh-text-muted space-y-1">
-              {product.features.map((feature, index) => (
-                <li key={index} className="lh-flex-icon-text">
-                  <svg
-                    className="lh-icon-sm flex-shrink-0"
-                    style={{ color: '#51cf66' }}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
+        {/* Product info section - icon, title, and badges */}
+        <div className="lh-flex-icon-text">
+          <div
+            className={`lh-action-icon-container ${getCategoryColor(product.category)}`}
+          >
+            {getProductIcon(product.slug)}
           </div>
-        )}
-
-        {sites.length > 0 && (
-          <div className="border-t pt-4">
-            <div className="lh-form-section">
-              <label className="block lh-table-cell-content mb-2">
-                Activate for Site:
-              </label>
-              <select
-                value={selectedSite}
-                onChange={e => setSelectedSite(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg lh-focus-ring"
-              >
-                <option value="">Select a site...</option>
-                {sites.map(site => {
-                  const status = getSiteProductStatus(site.id);
-                  return (
-                    <option key={site.id} value={site.id}>
-                      {site.name} {status.registered ? '(Registered)' : ''}
-                    </option>
-                  );
-                })}
-              </select>
-
-              {selectedSite && (
-                <div className="mt-4">
-                  <Button
-                    onClick={handleAction}
-                    disabled={isProcessing}
-                    className={`w-full ${
-                      getSiteProductStatus(selectedSite).registered
-                        ? 'bg-red-600 hover:bg-red-700 text-white'
-                        : 'bg-lighthouse-primary hover:bg-lighthouse-primary/90 text-white'
-                    }`}
-                  >
-                    {isProcessing
-                      ? 'Processing...'
-                      : getSiteProductStatus(selectedSite).registered
-                        ? 'Deactivate Product'
-                        : 'Activate Product'}
-                  </Button>
-                </div>
+          <div className="flex-1">
+            <Link
+              href={`/dashboard/products/${product.slug}`}
+              className="lh-title-card hover:text-lighthouse-primary transition-colors cursor-pointer block mb-2"
+            >
+              <h3 className="text-xl">{product.name}</h3>
+            </Link>
+            <div className="lh-flex-icon-text">
+              <span className="lh-badge lh-badge-gray">{product.category}</span>
+              {product.is_beta && (
+                <span className="lh-badge lh-badge-orange">Beta</span>
               )}
             </div>
           </div>
-        )}
+        </div>
+      </CardHeader>
 
-        {sites.length === 0 && (
-          <div className="border-t pt-4">
-            <div className="lh-empty-state text-left py-6">
-              <p className="lh-text-muted mb-4">
-                You need to add a site before you can activate products.
-              </p>
-              <Button variant="outline" size="sm" className="w-full">
-                Add Your First Site
-              </Button>
-            </div>
+      <CardContent className="pt-0 flex flex-col flex-1">
+        {/* Description - fixed height to maintain uniformity */}
+        <div className="mb-4 min-h-[3rem]">
+          <p className="lh-text-description leading-relaxed line-clamp-3">
+            {product.description}
+          </p>
+        </div>
+
+        {/* Features section - consistent height */}
+        <div className="mb-6 flex-1">
+          <h4 className="lh-table-cell-content mb-3">Features:</h4>
+          <div className="min-h-[8rem]">
+            {product.features && product.features.length > 0 ? (
+              <ul className="lh-text-muted space-y-2">
+                {product.features.slice(0, 4).map((feature, index) => (
+                  <li key={index} className="lh-flex-icon-text">
+                    <svg
+                      className="lh-icon-sm flex-shrink-0"
+                      style={{ color: '#51cf66' }}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    <span className="text-sm">{feature}</span>
+                  </li>
+                ))}
+                {product.features.length > 4 && (
+                  <li className="lh-text-muted text-sm italic">
+                    +{product.features.length - 4} more features
+                  </li>
+                )}
+              </ul>
+            ) : (
+              <p className="lh-text-muted text-sm italic">No features listed</p>
+            )}
           </div>
-        )}
+        </div>
+
+        {/* Action section - always at bottom */}
+        <div className="mt-auto">
+          {sites.length > 0 ? (
+            <div className="border-t pt-4">
+              <div className="lh-form-section">
+                <label className="block lh-table-cell-content mb-2">
+                  Activate for Site:
+                </label>
+                <select
+                  value={selectedSite}
+                  onChange={e => setSelectedSite(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg lh-focus-ring"
+                >
+                  <option value="">Select a site...</option>
+                  {sites.map(site => {
+                    const status = getSiteProductStatus(site.id);
+                    return (
+                      <option key={site.id} value={site.id}>
+                        {site.name} {status.registered ? '(Registered)' : ''}
+                      </option>
+                    );
+                  })}
+                </select>
+
+                {selectedSite && (
+                  <div className="mt-3">
+                    <Button
+                      onClick={handleAction}
+                      disabled={isProcessing}
+                      className={`w-full ${
+                        getSiteProductStatus(selectedSite).registered
+                          ? 'bg-red-600 hover:bg-red-700 text-white'
+                          : 'bg-lighthouse-primary hover:bg-lighthouse-primary/90 text-white'
+                      }`}
+                    >
+                      {isProcessing
+                        ? 'Processing...'
+                        : getSiteProductStatus(selectedSite).registered
+                          ? 'Deactivate Product'
+                          : 'Activate Product'}
+                    </Button>
+                  </div>
+                )}
+
+                <div className="mt-3">
+                  <Link href={`/dashboard/products/${product.slug}`}>
+                    <Button variant="outline" className="w-full">
+                      View Details
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="border-t pt-4">
+              <div className="lh-empty-state text-left py-4">
+                <p className="lh-text-muted mb-3 text-sm">
+                  You need to add a site before you can activate products.
+                </p>
+                <div className="space-y-2">
+                  <Button variant="outline" size="sm" className="w-full">
+                    Add Your First Site
+                  </Button>
+                  <Link href={`/dashboard/products/${product.slug}`}>
+                    <Button variant="ghost" size="sm" className="w-full">
+                      View Details
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
@@ -275,8 +314,36 @@ const ProductsPage: React.FC = () => {
     error,
     registerProduct,
     unregisterProduct,
+    refreshProducts,
   } = useProducts();
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleRefreshProducts = async () => {
+    toast.loading('Refreshing products...');
+    try {
+      await refreshProducts();
+      toast.dismiss();
+      toast.success('Products refreshed successfully!');
+    } catch (error) {
+      toast.dismiss();
+      toast.error('Failed to refresh products');
+    }
+  };
+
+  // Add keyboard shortcut for refresh (Ctrl/Cmd + R)
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
+        event.preventDefault();
+        handleRefreshProducts();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, []); // Note: handleRefreshProducts should be stable
 
   const handleActivateProduct = async (productSlug: string, siteId: string) => {
     setIsProcessing(true);
@@ -334,8 +401,32 @@ const ProductsPage: React.FC = () => {
             Activate Lighthouse products for your registered sites
           </p>
         </div>
-        <div className="lh-text-muted">
-          {sites.length} {sites.length === 1 ? 'site' : 'sites'} available
+        <div className="flex items-center gap-4">
+          <Button
+            onClick={handleRefreshProducts}
+            disabled={productsLoading}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <svg
+              className={`w-4 h-4 ${productsLoading ? 'animate-spin' : ''}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            {productsLoading ? 'Refreshing...' : 'Refresh'}
+          </Button>
+          <div className="lh-text-muted">
+            {sites.length} {sites.length === 1 ? 'site' : 'sites'} available
+          </div>
         </div>
       </div>
 

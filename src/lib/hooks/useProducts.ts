@@ -132,12 +132,25 @@ export const useProducts = (): UseProductsReturn => {
     try {
       const result = await ecosystemApiRequest<{
         products: EcosystemProduct[];
-      }>('/ecosystem/products', {}, forceLogout);
+      }>(
+        '/ecosystem/products',
+        {
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            Pragma: 'no-cache',
+            Expires: '0',
+          },
+        },
+        forceLogout
+      );
+
       if (result.success && result.data) {
         setProducts(result.data.products);
       } else {
         setError(
-          !result.success ? result.error.message : 'Failed to fetch products'
+          result.success === false
+            ? result.error.message
+            : 'Failed to fetch products'
         );
       }
     } catch (err) {
