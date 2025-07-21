@@ -115,12 +115,16 @@ const HomePage: React.FC = () => {
               {/* AI WordPress Plugins */}
               <Card className="lh-feature-card">
                 <CardContent>
-                  <div className="lh-feature-icon">
+                  <div
+                    className="lh-feature-icon"
+                    style={{ border: '2px solid var(--color-accent)' }}
+                  >
                     <svg
                       className="lh-feature-icon-inner"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
+                      style={{ color: 'var(--color-accent)' }}
                     >
                       <path
                         strokeLinecap="round"
@@ -134,10 +138,9 @@ const HomePage: React.FC = () => {
                     AI WordPress Plugins Made Simple
                   </h3>
                   <p className="lh-text-description">
-                    Install, configure, and update the latest AI-driven
-                    WordPress plugins in seconds. From content generation to
-                    chatbots, harness the power of machine learning without
-                    writing a single line of code.
+                    Install, configure, and update our latest AI-driven
+                    WordPress plugins in seconds. Make your websites AI ready
+                    without writing a single line of code.
                   </p>
                 </CardContent>
               </Card>
@@ -145,12 +148,16 @@ const HomePage: React.FC = () => {
               {/* Agent Discoverability */}
               <Card className="lh-feature-card">
                 <CardContent>
-                  <div className="lh-feature-icon">
+                  <div
+                    className="lh-feature-icon"
+                    style={{ border: '2px solid var(--color-accent)' }}
+                  >
                     <svg
                       className="lh-feature-icon-inner"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
+                      style={{ color: 'var(--color-accent)' }}
                     >
                       <path
                         strokeLinecap="round"
@@ -174,12 +181,16 @@ const HomePage: React.FC = () => {
               {/* Web 4.0 Ready */}
               <Card className="lh-feature-card">
                 <CardContent>
-                  <div className="lh-feature-icon">
+                  <div
+                    className="lh-feature-icon"
+                    style={{ border: '2px solid var(--color-accent)' }}
+                  >
                     <svg
                       className="lh-feature-icon-inner"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
+                      style={{ color: 'var(--color-accent)' }}
                     >
                       <path
                         strokeLinecap="round"
