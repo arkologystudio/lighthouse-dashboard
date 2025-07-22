@@ -515,10 +515,10 @@ const HomePage: React.FC = () => {
                     ></div>
                     <p>
                       <strong style={{ color: 'var(--color-text-primary)' }}>
-                        Semantic Indexing:
+                        AI Discoverability:
                       </strong>{' '}
-                      Use natural language understanding to tag and categorize
-                      content, boosting SEO for AI discovery.
+                      Configure an easy interface to enable AIs to search your
+                      content in machine readable format.
                     </p>
                   </div>
                 </div>
