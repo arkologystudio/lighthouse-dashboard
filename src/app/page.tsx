@@ -30,97 +30,137 @@ const HomePage: React.FC = () => {
   return (
     <div
       className="min-h-screen"
-      style={{
-        background:
-          'linear-gradient(135deg, var(--color-bg-main) 0%, var(--color-primary-dark) 50%, var(--color-primary) 100%)',
-      }}
+      style={{ backgroundColor: 'var(--color-bg-main)' }}
     >
-      {/* Header */}
-      <header
-        className="shadow-sm border-b"
+      {/* Navigation */}
+      <nav
+        className="relative z-50 backdrop-blur-xl border-b"
         style={{
           backgroundColor: 'var(--color-bg-card)',
           borderColor: 'var(--color-border)',
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lh-flex-between py-6">
-            <div className="lh-flex-icon-text">
-              <div className="lh-icon-circle-primary">
-                <span className="font-bold text-lg">L</span>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex items-center justify-between h-20">
+            <div className="flex items-center space-x-3">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{ backgroundColor: 'var(--color-accent)' }}
+              >
+                <span className="font-bold text-white text-lg">L</span>
               </div>
-              <span className="text-xl font-semibold lh-title-section">
+              <span
+                className="text-xl font-semibold"
+                style={{ color: 'var(--color-text-primary)' }}
+              >
                 Lighthouse
               </span>
             </div>
 
-            <div className="lh-flex-icon-text">
-              <Link href="/login">
-                <Button>Dashboard</Button>
-              </Link>
-            </div>
+            <Link href="/login">
+              <Button
+                className="border-0 transition-all duration-300"
+                style={{
+                  backgroundColor: 'var(--color-accent)',
+                  color: 'white',
+                }}
+              >
+                Dashboard
+              </Button>
+            </Link>
           </div>
         </div>
-      </header>
+      </nav>
 
       {/* Hero Section */}
-      <main>
-        <div className="lh-hero-container">
-          <div className="lh-hero-content">
-            <h1 className="lh-title-hero">
-              <span className="block">Lighthouse Dashboard</span>
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+          <div className="space-y-8">
+            <h1
+              className="text-5xl md:text-7xl font-bold leading-tight"
+              style={{ color: 'var(--color-text-primary)' }}
+            >
+              <span style={{ color: 'var(--color-accent)' }}>
+                Lighthouse Studios
+              </span>
             </h1>
 
-            <p className="mt-6 max-w-3xl mx-auto text-xl lh-text-description">
+            <p
+              className="text-xl max-w-3xl mx-auto leading-relaxed"
+              style={{ color: 'var(--color-text-secondary)' }}
+            >
               The ultimate AI-powered portal for upgrading your WordPress sites.
               Plugins & insights to optimize agent discoverability in the age of
               Web 4.0.
             </p>
 
-            <div className="lh-hero-actions">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
               <Link href="/register">
-                <Button size="lg" className="px-8 py-3">
+                <Button
+                  size="lg"
+                  className="text-white border-0 transition-all duration-300 px-8 py-4 text-lg"
+                  style={{ backgroundColor: 'var(--color-accent)' }}
+                >
                   Get Started Free
                 </Button>
               </Link>
               <Link href="#pricing">
-                <Button variant="outline" size="lg" className="px-8 py-3">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="px-8 py-4 text-lg transition-all duration-300"
+                  style={{
+                    borderColor: 'var(--color-border)',
+                    color: 'var(--color-text-secondary)',
+                  }}
+                >
                   View Pricing
                 </Button>
               </Link>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Why Lighthouse Section */}
-        <div
-          className="py-16 relative"
-          style={{ backgroundColor: 'var(--color-bg-secondary)' }}
-        >
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                'radial-gradient(circle at 50% 50%, rgba(246, 173, 138, 0.05) 0%, transparent 70%)',
-            }}
-          />
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="text-center mb-16">
-              <h2 className="lh-title-hero text-3xl font-bold">
-                Why Lighthouse?
-              </h2>
-            </div>
+      {/* Why Lighthouse Section */}
+      <section
+        className="relative py-24"
+        style={{ backgroundColor: 'var(--color-bg-secondary)' }}
+      >
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2
+              className="text-3xl font-bold mb-4"
+              style={{ color: 'var(--color-text-primary)' }}
+            >
+              Why Choose Lighthouse?
+            </h2>
+            <div
+              className="w-24 h-1 mx-auto rounded-full"
+              style={{ backgroundColor: 'var(--color-accent)' }}
+            ></div>
+          </div>
 
-            <div className="mt-16 lh-grid-cards">
-              {/* AI WordPress Plugins */}
-              <Card className="lh-feature-card">
-                <CardContent>
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* AI WordPress Plugins */}
+            <div className="group relative">
+              <div
+                className="relative rounded-2xl p-8 transition-all duration-300 border"
+                style={{
+                  backgroundColor: 'var(--color-bg-card)',
+                  borderColor: 'var(--color-border)',
+                }}
+              >
+                <div>
                   <div
-                    className="lh-feature-icon"
-                    style={{ border: '2px solid var(--color-accent)' }}
+                    className="w-16 h-16 rounded-xl flex items-center justify-center mb-6"
+                    style={{
+                      backgroundColor: 'rgba(246, 173, 138, 0.1)',
+                      border: '1px solid rgba(246, 173, 138, 0.2)',
+                    }}
                   >
                     <svg
-                      className="lh-feature-icon-inner"
+                      className="w-8 h-8"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -134,30 +174,47 @@ const HomePage: React.FC = () => {
                       />
                     </svg>
                   </div>
-                  <h3 className="lh-title-small mb-2">
+                  <h3
+                    className="text-xl font-semibold mb-4"
+                    style={{ color: 'var(--color-text-primary)' }}
+                  >
                     AI WordPress Plugins Made Simple
                   </h3>
-                  <p className="lh-text-description">
+                  <p
+                    className="leading-relaxed"
+                    style={{ color: 'var(--color-text-secondary)' }}
+                  >
                     Install, configure, and update our latest AI-driven
                     WordPress plugins in seconds. Make your websites AI ready
                     without writing a single line of code.
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
+            </div>
 
-              {/* Agent Discoverability */}
-              <Card className="lh-feature-card">
-                <CardContent>
+            {/* Agent Discoverability */}
+            <div className="group relative">
+              <div
+                className="relative rounded-2xl p-8 transition-all duration-300 border"
+                style={{
+                  backgroundColor: 'var(--color-bg-card)',
+                  borderColor: 'var(--color-border)',
+                }}
+              >
+                <div>
                   <div
-                    className="lh-feature-icon"
-                    style={{ border: '2px solid var(--color-accent)' }}
+                    className="w-16 h-16 rounded-xl flex items-center justify-center mb-6"
+                    style={{
+                      backgroundColor: 'rgba(66, 71, 105, 0.1)',
+                      border: '1px solid rgba(66, 71, 105, 0.2)',
+                    }}
                   >
                     <svg
-                      className="lh-feature-icon-inner"
+                      className="w-8 h-8"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
-                      style={{ color: 'var(--color-accent)' }}
+                      style={{ color: 'var(--color-primary)' }}
                     >
                       <path
                         strokeLinecap="round"
@@ -167,26 +224,43 @@ const HomePage: React.FC = () => {
                       />
                     </svg>
                   </div>
-                  <h3 className="lh-title-small mb-2">
+                  <h3
+                    className="text-xl font-semibold mb-4"
+                    style={{ color: 'var(--color-text-primary)' }}
+                  >
                     Agent Websites & Discoverability
                   </h3>
-                  <p className="lh-text-description">
+                  <p
+                    className="leading-relaxed"
+                    style={{ color: 'var(--color-text-secondary)' }}
+                  >
                     Stand out in a crowded market. Our built-in agent registry
                     ensures your AI assistants, bots, and agent-based services
                     are indexed and discoverable by users and partner networks.
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
+            </div>
 
-              {/* Web 4.0 Ready */}
-              <Card className="lh-feature-card">
-                <CardContent>
+            {/* Web 4.0 Ready */}
+            <div className="group relative">
+              <div
+                className="relative rounded-2xl p-8 transition-all duration-300 border"
+                style={{
+                  backgroundColor: 'var(--color-bg-card)',
+                  borderColor: 'var(--color-border)',
+                }}
+              >
+                <div>
                   <div
-                    className="lh-feature-icon"
-                    style={{ border: '2px solid var(--color-accent)' }}
+                    className="w-16 h-16 rounded-xl flex items-center justify-center mb-6"
+                    style={{
+                      backgroundColor: 'rgba(249, 196, 168, 0.1)',
+                      border: '1px solid rgba(249, 196, 168, 0.2)',
+                    }}
                   >
                     <svg
-                      className="lh-feature-icon-inner"
+                      className="w-8 h-8"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -200,69 +274,113 @@ const HomePage: React.FC = () => {
                       />
                     </svg>
                   </div>
-                  <h3 className="lh-title-small mb-2">
+                  <h3
+                    className="text-xl font-semibold mb-4"
+                    style={{ color: 'var(--color-text-primary)' }}
+                  >
                     Next-Gen Web 4.0 Ready
                   </h3>
-                  <p className="lh-text-description">
+                  <p
+                    className="leading-relaxed"
+                    style={{ color: 'var(--color-text-secondary)' }}
+                  >
                     Embrace the semantic web. Lighthouse Dashboard leverages
                     neural search and structured data to make your site
                     compatible with Web 4.0 standards and emerging AI
                     ecosystems.
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Core Features Section */}
-        <div
-          className="py-16"
-          style={{ backgroundColor: 'var(--color-bg-main)' }}
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="lh-title-hero text-3xl font-bold">
-                Core Features
-              </h2>
-            </div>
+      {/* Core Features Section */}
+      <section
+        className="relative py-24"
+        style={{ backgroundColor: 'var(--color-bg-main)' }}
+      >
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-20">
+            <h2
+              className="text-3xl font-bold mb-4"
+              style={{ color: 'var(--color-text-primary)' }}
+            >
+              Core Features
+            </h2>
+            <div
+              className="w-24 h-1 mx-auto rounded-full"
+              style={{ backgroundColor: 'var(--color-accent)' }}
+            ></div>
+          </div>
 
-            <div className="space-y-12">
-              {/* Feature 1 */}
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div>
-                  <h3
-                    className="text-2xl font-bold mb-4"
-                    style={{ color: 'var(--color-text-primary)' }}
-                  >
-                    1. Centralized Site Management
-                  </h3>
-                  <ul className="space-y-2 lh-text-description">
-                    <li>
-                      <strong>Multi-Site Dashboard:</strong> Monitor
-                      performance, uptime, and security across all your
-                      WordPress sites.
-                    </li>
-                    <li>
-                      <strong>One-Click Deployment:</strong> Spin up new
-                      WordPress instances pre-configured with industry-leading
-                      AI plugins.
-                    </li>
-                  </ul>
-                </div>
+          <div className="space-y-24">
+            {/* Feature 1 */}
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              <div className="space-y-6">
                 <div
-                  className="lh-feature-icon"
+                  className="inline-block px-4 py-2 rounded-full text-sm font-medium border"
                   style={{
-                    width: '200px',
-                    height: '200px',
-                    margin: '0 auto',
+                    backgroundColor: 'var(--color-accent)',
+                    color: 'white',
+                    borderColor: 'var(--color-accent)',
+                  }}
+                >
+                  01 — Management
+                </div>
+                <h3
+                  className="text-2xl font-bold"
+                  style={{ color: 'var(--color-text-primary)' }}
+                >
+                  Centralized Site Management
+                </h3>
+                <div
+                  className="space-y-4"
+                  style={{ color: 'var(--color-text-secondary)' }}
+                >
+                  <div className="flex items-start space-x-3">
+                    <div
+                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
+                      style={{ backgroundColor: 'var(--color-accent)' }}
+                    ></div>
+                    <p>
+                      <strong style={{ color: 'var(--color-text-primary)' }}>
+                        Multi-Site Dashboard:
+                      </strong>{' '}
+                      Monitor performance, uptime, and security across all your
+                      WordPress sites.
+                    </p>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div
+                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
+                      style={{ backgroundColor: 'var(--color-accent)' }}
+                    ></div>
+                    <p>
+                      <strong style={{ color: 'var(--color-text-primary)' }}>
+                        One-Click Download:
+                      </strong>{' '}
+                      Instantly access the best AI plugins for WordPress. No
+                      code. No expertise.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="relative">
+                <div
+                  className="relative border rounded-3xl p-12 flex items-center justify-center"
+                  style={{
+                    backgroundColor: 'var(--color-bg-card)',
+                    borderColor: 'var(--color-border)',
                   }}
                 >
                   <svg
-                    className="w-full h-full"
+                    className="w-32 h-32"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
+                    style={{ color: 'var(--color-accent)' }}
                   >
                     <path
                       strokeLinecap="round"
@@ -273,42 +391,52 @@ const HomePage: React.FC = () => {
                   </svg>
                 </div>
               </div>
+            </div>
 
-              {/* Feature 2 */}
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div className="md:order-2">
-                  <h3
-                    className="text-2xl font-bold mb-4"
-                    style={{ color: 'var(--color-text-primary)' }}
-                  >
-                    2. AI Plugin Marketplace
-                  </h3>
-                  <ul className="space-y-2 lh-text-description">
-                    <li>
-                      <strong>Curated Selection:</strong> Browse top AI
-                      plugins—content AI, SEO AI, personalization engines, and
-                      more.
-                    </li>
-                    <li>
-                      <strong>Seamless Integration:</strong> Auto-install and
-                      auto-configure plugins optimized for semantic search and
-                      neural indexing.
-                    </li>
-                  </ul>
+            {/* Feature 2 */}
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              <div className="lg:order-2 space-y-6">
+                <div className="inline-block px-4 py-2 bg-blue-400/10 text-blue-400 rounded-full text-sm font-medium border border-blue-400/20">
+                  02 — Marketplace
                 </div>
+                <h3 className="text-2xl font-bold text-white">
+                  AI Plugin Marketplace
+                </h3>
+                <div className="space-y-4 text-gray-400">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
+                    <p>
+                      <strong className="text-white">Curated Selection:</strong>{' '}
+                      Browse our top AI plugins — Discoverability, Human & Agent
+                      Search, and more.
+                    </p>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
+                    <p>
+                      <strong className="text-white">
+                        Seamless Integration:
+                      </strong>{' '}
+                      Auto-install and auto-configure plugins optimized for
+                      semantic search and neural indexing.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="lg:order-1 relative">
                 <div
-                  className="lh-feature-icon md:order-1"
+                  className="relative border rounded-3xl p-12 flex items-center justify-center"
                   style={{
-                    width: '200px',
-                    height: '200px',
-                    margin: '0 auto',
+                    backgroundColor: 'var(--color-bg-card)',
+                    borderColor: 'var(--color-border)',
                   }}
                 >
                   <svg
-                    className="w-full h-full"
+                    className="w-32 h-32"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
+                    style={{ color: 'var(--color-primary)' }}
                   >
                     <path
                       strokeLinecap="round"
@@ -319,47 +447,74 @@ const HomePage: React.FC = () => {
                   </svg>
                 </div>
               </div>
+            </div>
 
-              {/* Feature 3 */}
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div>
-                  <h3
-                    className="text-2xl font-bold mb-4"
-                    style={{ color: 'var(--color-text-primary)' }}
-                  >
-                    3. Agent Discoverability Suite
-                  </h3>
-                  <ul className="space-y-2 lh-text-description">
-                    <li>
-                      <strong>AI Readiness Diagnostics:</strong> Run diagnostics
-                      and understand how ready your site is for the era of AI.
-                    </li>
-                    <li>
-                      <strong>AI Readiness Core:</strong> AI agents are becoming
-                      the new browsers and web surfers. As AI agents become
-                      increasingly autonomous they'll begin to make up the vast
-                      majority of website traffic, browsing and even purchasing
-                      products online. Already today, chatbots like ChatGPT,
-                      Claude, and Perplexity increasingly access web content. AI
-                      Ready is a suite of tools for optimizing your website for
-                      AI discoverability and comprehension, ultimately leading
-                      to increased traffic and conversions.
-                    </li>
-                  </ul>
-                </div>
+            {/* Feature 3 */}
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              <div className="space-y-6">
                 <div
-                  className="lh-feature-icon"
+                  className="inline-block px-4 py-2 rounded-full text-sm font-medium border"
                   style={{
-                    width: '200px',
-                    height: '200px',
-                    margin: '0 auto',
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'white',
+                    borderColor: 'var(--color-primary)',
+                  }}
+                >
+                  03 — AI Readiness
+                </div>
+                <h3
+                  className="text-2xl font-bold"
+                  style={{ color: 'var(--color-text-primary)' }}
+                >
+                  Agent Discoverability Suite
+                </h3>
+                <div
+                  className="space-y-4"
+                  style={{ color: 'var(--color-text-secondary)' }}
+                >
+                  <div className="flex items-start space-x-3">
+                    <div
+                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
+                      style={{ backgroundColor: 'var(--color-primary)' }}
+                    ></div>
+                    <p>
+                      <strong style={{ color: 'var(--color-text-primary)' }}>
+                        AI Readiness Diagnostics:
+                      </strong>{' '}
+                      Run diagnostics and understand how ready your site is for
+                      the era of AI.
+                    </p>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div
+                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
+                      style={{ backgroundColor: 'var(--color-primary)' }}
+                    ></div>
+                    <p>
+                      <strong style={{ color: 'var(--color-text-primary)' }}>
+                        Future-Proof Your Site:
+                      </strong>{' '}
+                      AI agents are becoming the new browsers. Optimize your
+                      website for AI discoverability and comprehension, leading
+                      to increased traffic and conversions.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="relative">
+                <div
+                  className="relative border rounded-3xl p-12 flex items-center justify-center"
+                  style={{
+                    backgroundColor: 'var(--color-bg-card)',
+                    borderColor: 'var(--color-border)',
                   }}
                 >
                   <svg
-                    className="w-full h-full"
+                    className="w-32 h-32"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
+                    style={{ color: 'var(--color-primary)' }}
                   >
                     <path
                       strokeLinecap="round"
@@ -370,43 +525,73 @@ const HomePage: React.FC = () => {
                   </svg>
                 </div>
               </div>
+            </div>
 
-              {/* Feature 4 */}
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div className="md:order-2">
-                  <h3
-                    className="text-2xl font-bold mb-4"
-                    style={{ color: 'var(--color-text-primary)' }}
-                  >
-                    4. Advanced Neural & Semantic Search
-                  </h3>
-                  <ul className="space-y-2 lh-text-description">
-                    <li>
-                      <strong>On-Site Neural Search:</strong> Give your users
-                      the power of vector-based search for faster, more relevant
-                      results.
-                    </li>
-                    <li>
-                      <strong>Semantic Indexing:</strong> Use natural language
-                      understanding to tag and categorize content, boosting SEO
-                      for keywords like "AI WordPress plugins," "agent
-                      websites," and "neural search."
-                    </li>
-                  </ul>
-                </div>
+            {/* Feature 4 */}
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              <div className="lg:order-2 space-y-6">
                 <div
-                  className="lh-feature-icon md:order-1"
+                  className="inline-block px-4 py-2 rounded-full text-sm font-medium border"
                   style={{
-                    width: '200px',
-                    height: '200px',
-                    margin: '0 auto',
+                    backgroundColor: 'var(--color-accent)',
+                    color: 'white',
+                    borderColor: 'var(--color-accent)',
+                  }}
+                >
+                  04 — Neural Search
+                </div>
+                <h3
+                  className="text-2xl font-bold"
+                  style={{ color: 'var(--color-text-primary)' }}
+                >
+                  Advanced Neural & Semantic Search
+                </h3>
+                <div
+                  className="space-y-4"
+                  style={{ color: 'var(--color-text-secondary)' }}
+                >
+                  <div className="flex items-start space-x-3">
+                    <div
+                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
+                      style={{ backgroundColor: 'var(--color-accent)' }}
+                    ></div>
+                    <p>
+                      <strong style={{ color: 'var(--color-text-primary)' }}>
+                        On-Site Neural Search:
+                      </strong>{' '}
+                      Give your users the power of vector-based search for
+                      faster, more relevant results.
+                    </p>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div
+                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
+                      style={{ backgroundColor: 'var(--color-accent)' }}
+                    ></div>
+                    <p>
+                      <strong style={{ color: 'var(--color-text-primary)' }}>
+                        Semantic Indexing:
+                      </strong>{' '}
+                      Use natural language understanding to tag and categorize
+                      content, boosting SEO for AI discovery.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="lg:order-1 relative">
+                <div
+                  className="relative border rounded-3xl p-12 flex items-center justify-center"
+                  style={{
+                    backgroundColor: 'var(--color-bg-card)',
+                    borderColor: 'var(--color-border)',
                   }}
                 >
                   <svg
-                    className="w-full h-full"
+                    className="w-32 h-32"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
+                    style={{ color: 'var(--color-accent)' }}
                   >
                     <path
                       strokeLinecap="round"
@@ -417,40 +602,73 @@ const HomePage: React.FC = () => {
                   </svg>
                 </div>
               </div>
+            </div>
 
-              {/* Feature 5 */}
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div>
-                  <h3
-                    className="text-2xl font-bold mb-4"
-                    style={{ color: 'var(--color-text-primary)' }}
-                  >
-                    5. Billing & Subscription Control
-                  </h3>
-                  <ul className="space-y-2 lh-text-description">
-                    <li>
-                      <strong>Flexible Plans:</strong> Pay-as-you-grow pricing
-                      to suit blogs, agencies, and enterprises.
-                    </li>
-                    <li>
-                      <strong>Automated Invoicing:</strong> Generate and send
-                      invoices automatically; track payments in real time.
-                    </li>
-                  </ul>
-                </div>
+            {/* Feature 5 */}
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              <div className="space-y-6">
                 <div
-                  className="lh-feature-icon"
+                  className="inline-block px-4 py-2 rounded-full text-sm font-medium border"
                   style={{
-                    width: '200px',
-                    height: '200px',
-                    margin: '0 auto',
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'white',
+                    borderColor: 'var(--color-primary)',
+                  }}
+                >
+                  05 — Billing
+                </div>
+                <h3
+                  className="text-2xl font-bold"
+                  style={{ color: 'var(--color-text-primary)' }}
+                >
+                  Billing & Subscription Control
+                </h3>
+                <div
+                  className="space-y-4"
+                  style={{ color: 'var(--color-text-secondary)' }}
+                >
+                  <div className="flex items-start space-x-3">
+                    <div
+                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
+                      style={{ backgroundColor: 'var(--color-primary)' }}
+                    ></div>
+                    <p>
+                      <strong style={{ color: 'var(--color-text-primary)' }}>
+                        Flexible Plans:
+                      </strong>{' '}
+                      Pay-as-you-grow pricing to suit blogs, agencies, and
+                      enterprises.
+                    </p>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div
+                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
+                      style={{ backgroundColor: 'var(--color-primary)' }}
+                    ></div>
+                    <p>
+                      <strong style={{ color: 'var(--color-text-primary)' }}>
+                        Automated Invoicing:
+                      </strong>{' '}
+                      Generate and send invoices automatically; track payments
+                      in real time.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="relative">
+                <div
+                  className="relative border rounded-3xl p-12 flex items-center justify-center"
+                  style={{
+                    backgroundColor: 'var(--color-bg-card)',
+                    borderColor: 'var(--color-border)',
                   }}
                 >
                   <svg
-                    className="w-full h-full"
+                    className="w-32 h-32"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
+                    style={{ color: 'var(--color-primary)' }}
                   >
                     <path
                       strokeLinecap="round"
@@ -464,231 +682,235 @@ const HomePage: React.FC = () => {
             </div>
           </div>
         </div>
+      </section>
 
-        {/* How It Works Section */}
-        <div
-          className="py-16"
-          style={{ backgroundColor: 'var(--color-bg-secondary)' }}
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="lh-title-hero text-3xl font-bold">How It Works</h2>
-            </div>
+      {/* How It Works Section */}
+      <section className="relative py-24 bg-gradient-to-b from-slate-900/50 to-transparent">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-20">
+            <h2 className="text-3xl font-bold text-white mb-4">How It Works</h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-orange-400 to-pink-400 mx-auto rounded-full"></div>
+          </div>
 
-            <div className="grid md:grid-cols-5 gap-8">
-              {[
-                {
-                  step: '1',
-                  title: 'Sign Up & Connect',
-                  description:
-                    'Create your Lighthouse account and link your WordPress sites via our secure API.',
-                },
-                {
-                  step: '2',
-                  title: 'Explore the AI Plugin Library',
-                  description:
-                    'Install AI plugins optimized for Web 4.0 with a single click.',
-                },
-                {
-                  step: '3',
-                  title: 'Make your website AI Ready',
-                  description:
-                    'Run diagnostics and understand how ready your site is for the era of AI, and get immidiate steps to make this happen.',
-                },
-                {
-                  step: '4',
-                  title: 'Optimize & Scale',
-                  description:
-                    'Leverage neural and semantic search tools to improve on-site engagement and SEO rankings, and enable AI agents to find and use your content.',
-                },
-                {
-                  step: '5',
-                  title: 'Manage Billing',
-                  description:
-                    'View usage reports, upgrade plans, and handle invoices—all from one sleek interface.',
-                },
-              ].map((item, index) => (
-                <div key={index} className="text-center">
+          <div className="grid md:grid-cols-5 gap-8">
+            {[
+              {
+                step: '01',
+                title: 'Sign Up & Connect',
+                description:
+                  'Create your Lighthouse account and link your WordPress sites via our secure API.',
+                color: 'from-orange-400 to-red-400',
+              },
+              {
+                step: '02',
+                title: 'Explore AI Plugins',
+                description:
+                  'Install AI plugins optimized for Web 4.0 with a single click.',
+                color: 'from-blue-400 to-cyan-400',
+              },
+              {
+                step: '03',
+                title: 'AI Readiness Check',
+                description:
+                  'Run diagnostics and get immediate steps to make your site AI-ready.',
+                color: 'from-green-400 to-emerald-400',
+              },
+              {
+                step: '04',
+                title: 'Optimize & Scale',
+                description:
+                  'Leverage neural search tools to improve engagement and enable AI discovery.',
+                color: 'from-purple-400 to-violet-400',
+              },
+              {
+                step: '05',
+                title: 'Manage Billing',
+                description:
+                  'View usage reports, upgrade plans, and handle invoices from one interface.',
+                color: 'from-pink-400 to-rose-400',
+              },
+            ].map((item, index) => (
+              <div key={index} className="text-center relative">
+                <div className="relative mb-6">
                   <div
-                    className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center text-white font-bold text-lg"
-                    style={{ backgroundColor: 'var(--color-primary)' }}
+                    className={`w-16 h-16 rounded-2xl mx-auto bg-gradient-to-r ${item.color} flex items-center justify-center`}
                   >
-                    {item.step}
+                    <span className="text-white font-bold text-lg">
+                      {item.step}
+                    </span>
                   </div>
-                  <h3 className="text-lg font-semibold mb-2 lh-title-small">
-                    {item.title}
-                  </h3>
-                  <p className="lh-text-description text-sm">
-                    {item.description}
-                  </p>
+                  {index < 4 && (
+                    <div className="hidden md:block absolute top-8 left-16 w-full h-0.5 bg-gradient-to-r from-white/20 to-transparent"></div>
+                  )}
                 </div>
-              ))}
-            </div>
+                <h3 className="text-lg font-semibold mb-3 text-white">
+                  {item.title}
+                </h3>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  {item.description}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
+      </section>
 
-        {/* SEO & Best Practices Section */}
-        <div
-          className="py-16"
-          style={{ backgroundColor: 'var(--color-bg-main)' }}
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="lh-title-hero text-3xl font-bold">
-                SEO & Discoverability Best Practices
-              </h2>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              {[
-                {
-                  title: 'Keyword Integration',
-                  description:
-                    'Content is optimized for "AI WordPress plugins," "AI websites," "Web 4.0," "semantic search," and "neural search."',
-                },
-                {
-                  title: 'Structured Data',
-                  description:
-                    'Automatic generation of Schema.org markup for AI Agents (SoftwareApplication, Chatbot, FAQPage).',
-                },
-                {
-                  title: 'Performance Optimization',
-                  description:
-                    'Lazy-loading, CDN integration, and caching for lightning-fast page loads—crucial for SEO.',
-                },
-                {
-                  title: 'Mobile-First Design',
-                  description:
-                    "Fully responsive dashboard and public pages for optimal rankings on Google's mobile-first index.",
-                },
-              ].map((item, index) => (
-                <Card key={index} className="lh-feature-card">
-                  <CardContent>
-                    <h3 className="lh-title-small mb-2">{item.title}</h3>
-                    <p className="lh-text-description">{item.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* FAQs Section */}
-        <div
-          className="py-16"
-          style={{ backgroundColor: 'var(--color-bg-secondary)' }}
-        >
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="lh-title-hero text-3xl font-bold">
-                Frequently Asked Questions
-              </h2>
-            </div>
-
-            <div className="space-y-8">
-              {[
-                {
-                  question: 'What is Web 4.0?',
-                  answer:
-                    'Web 4.0 refers to the next evolution of the internet, centered on semantic understanding, AI-powered personalization, and decentralized architectures. Lighthouse Dashboard equips you with the tools to thrive in this new era.',
-                },
-                {
-                  question: 'Can I control which AI crawlers access my site?',
-                  answer:
-                    'Yes—the AI Readiness plugin’s Access Control lets you allow or block any crawler without touching server configs.',
-                },
-                {
-                  question: 'Is neural search better than keyword search?',
-                  answer:
-                    "Yes—neural (vector-based) search understands context and semantics, delivering more accurate results even if the user's query doesn't match exact keywords. Lighthouse integrates both to cover all bases.",
-                },
-                {
-                  question:
-                    'Will search indexes update when I add new content?',
-                  answer:
-                    'Absolutely — our AI Search plugins auto-reindex on publish or update.',
-                },
-              ].map((faq, index) => (
-                <Card key={index} className="lh-feature-card">
-                  <CardContent>
-                    <h3 className="lh-title-small mb-2 font-semibold">
-                      Q: {faq.question}
-                    </h3>
-                    <p className="lh-text-description">{faq.answer}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Final CTA Section */}
-        <div className="lh-cta-section">
-          <div className="lh-cta-container">
-            <h2 className="lh-cta-title">
-              <span className="block">
-                Ready to Illuminate Your Web Presence?
-              </span>
-              <span className="lh-cta-subtitle">
-                Experience the future of website management today.
-              </span>
+      {/* FAQs Section */}
+      <section className="relative py-24">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center mb-20">
+            <h2 className="text-3xl font-bold text-white mb-4">
+              Frequently Asked Questions
             </h2>
-            <div className="mt-8 flex flex-wrap justify-center gap-4 lg:mt-0 lg:flex-shrink-0">
-              <div className="inline-flex rounded-md shadow">
-                <Link href="/register">
-                  <Button size="lg" variant="secondary" className="px-8 py-3">
-                    Get Started Free
-                  </Button>
-                </Link>
+            <div className="w-24 h-1 bg-gradient-to-r from-orange-400 to-pink-400 mx-auto rounded-full"></div>
+          </div>
+
+          <div className="space-y-6">
+            {[
+              {
+                question: 'What is Web 4.0?',
+                answer:
+                  'Web 4.0 refers to the next evolution of the internet, centered on semantic understanding, AI-powered personalization, and decentralized architectures. Lighthouse Dashboard equips you with the tools to thrive in this new era.',
+              },
+              {
+                question: 'Can I control which AI crawlers access my site?',
+                answer:
+                  "Yes—the AI Readiness plugin's Access Control lets you allow or block any crawler without touching server configs.",
+              },
+              {
+                question: 'Is neural search better than keyword search?',
+                answer:
+                  "Yes—neural (vector-based) search understands context and semantics, delivering more accurate results even if the user's query doesn't match exact keywords. Lighthouse integrates both to cover all bases.",
+              },
+              {
+                question: 'Will search indexes update when I add new content?',
+                answer:
+                  'Absolutely — our AI Search plugins auto-reindex on publish or update.',
+              },
+              {
+                question: 'Who will be able to use the AI Search plugins?',
+                answer:
+                  'Who and What. Our search plugins can be used by humans, and importantly, AI agents that search the web. Your site can now be accessed by AI agents, and your content can be discovered by them.',
+              },
+            ].map((faq, index) => (
+              <div key={index} className="group">
+                <div className="bg-slate-800/40 backdrop-blur-xl border border-purple-400/20 rounded-2xl p-8 hover:bg-slate-800/60 transition-all duration-300">
+                  <h3 className="text-lg font-semibold mb-3 text-white">
+                    Q: {faq.question}
+                  </h3>
+                  <p className="text-gray-400 leading-relaxed">{faq.answer}</p>
+                </div>
               </div>
-              <div className="inline-flex rounded-md shadow">
-                <Link href="#pricing" id="pricing">
-                  <Button size="lg" variant="outline" className="px-8 py-3">
-                    View Pricing
-                  </Button>
-                </Link>
-              </div>
-              <div className="inline-flex rounded-md shadow">
-                <Link href="/contact">
-                  <Button size="lg" variant="ghost" className="px-8 py-3">
-                    Request a Demo
-                  </Button>
-                </Link>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
-      </main>
+      </section>
+
+      {/* Final CTA Section */}
+      <section
+        className="relative py-24 overflow-hidden"
+        style={{ backgroundColor: 'var(--color-bg-secondary)' }}
+      >
+        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+          <h2
+            className="text-4xl md:text-5xl font-bold mb-6"
+            style={{ color: 'var(--color-text-primary)' }}
+          >
+            Ready to Illuminate Your
+            <span style={{ color: 'var(--color-accent)' }} className="block">
+              Web Presence?
+            </span>
+          </h2>
+          <p
+            className="text-xl mb-12 max-w-2xl mx-auto"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
+            Experience the future of website management today.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/register">
+              <Button
+                size="lg"
+                className="text-white border-0 transition-all duration-300 px-8 py-4 text-lg"
+                style={{ backgroundColor: 'var(--color-accent)' }}
+              >
+                Get Started Free
+              </Button>
+            </Link>
+            <Link href="#pricing" id="pricing">
+              <Button
+                size="lg"
+                variant="outline"
+                className="px-8 py-4 text-lg transition-all duration-300"
+                style={{
+                  borderColor: 'var(--color-border)',
+                  color: 'var(--color-text-secondary)',
+                }}
+              >
+                View Pricing
+              </Button>
+            </Link>
+            <Link href="/contact">
+              <Button
+                size="lg"
+                variant="ghost"
+                className="px-8 py-4 text-lg transition-all duration-300"
+                style={{ color: 'var(--color-text-secondary)' }}
+              >
+                Request a Demo
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
-      <footer style={{ backgroundColor: 'var(--color-bg-card)' }}>
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
+      <footer
+        className="relative border-t backdrop-blur-xl"
+        style={{
+          borderColor: 'var(--color-border)',
+          backgroundColor: 'var(--color-bg-card)',
+        }}
+      >
+        <div className="max-w-7xl mx-auto py-16 px-6">
+          <div className="grid md:grid-cols-4 gap-12">
             {/* Company Info */}
             <div className="md:col-span-2">
-              <div className="lh-flex-icon-text mb-4">
-                <div className="lh-icon-circle-primary">
-                  <span className="font-bold text-lg">L</span>
+              <div className="flex items-center space-x-3 mb-6">
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{ backgroundColor: 'var(--color-accent)' }}
+                >
+                  <span className="font-bold text-white text-lg">L</span>
                 </div>
-                <span className="text-xl font-semibold lh-title-section">
+                <span
+                  className="text-xl font-semibold"
+                  style={{ color: 'var(--color-text-primary)' }}
+                >
                   Lighthouse Dashboard
                 </span>
               </div>
-              <p className="lh-text-description mb-4">
+              <p
+                className="mb-6 leading-relaxed"
+                style={{ color: 'var(--color-text-secondary)' }}
+              >
                 The ultimate AI-powered portal for managing WordPress sites,
                 plugins, and billing—optimized for Web 4.0 agent
                 discoverability.
               </p>
-              <div className="flex space-x-4">
+              <div className="flex space-x-6">
                 <Link
                   href="/privacy"
-                  className="lh-text-muted hover:text-primary transition-colors"
+                  className="transition-colors"
+                  style={{ color: 'var(--color-text-muted)' }}
                 >
                   Privacy Policy
                 </Link>
                 <Link
                   href="/terms"
-                  className="lh-text-muted hover:text-primary transition-colors"
+                  className="transition-colors"
+                  style={{ color: 'var(--color-text-muted)' }}
                 >
                   Terms of Service
                 </Link>
@@ -697,93 +919,63 @@ const HomePage: React.FC = () => {
 
             {/* Quick Links */}
             <div>
-              <h3 className="font-semibold lh-title-small mb-4">Quick Links</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link
-                    href="/features"
-                    className="lh-text-muted hover:text-primary transition-colors"
-                  >
-                    Features
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/pricing"
-                    className="lh-text-muted hover:text-primary transition-colors"
-                  >
-                    Pricing
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/docs"
-                    className="lh-text-muted hover:text-primary transition-colors"
-                  >
-                    Documentation
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/support"
-                    className="lh-text-muted hover:text-primary transition-colors"
-                  >
-                    Support
-                  </Link>
-                </li>
+              <h3
+                className="font-semibold mb-6"
+                style={{ color: 'var(--color-text-primary)' }}
+              >
+                Quick Links
+              </h3>
+              <ul className="space-y-3">
+                {['Features', 'Pricing', 'Documentation', 'Support'].map(
+                  item => (
+                    <li key={item}>
+                      <Link
+                        href={`/${item.toLowerCase()}`}
+                        className="transition-colors"
+                        style={{ color: 'var(--color-text-muted)' }}
+                      >
+                        {item}
+                      </Link>
+                    </li>
+                  )
+                )}
               </ul>
             </div>
 
             {/* Resources */}
             <div>
-              <h3 className="font-semibold lh-title-small mb-4">Resources</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link
-                    href="/blog"
-                    className="lh-text-muted hover:text-primary transition-colors"
-                  >
-                    Blog
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/case-studies"
-                    className="lh-text-muted hover:text-primary transition-colors"
-                  >
-                    Case Studies
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/api-docs"
-                    className="lh-text-muted hover:text-primary transition-colors"
-                  >
-                    API Documentation
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/community"
-                    className="lh-text-muted hover:text-primary transition-colors"
-                  >
-                    Community
-                  </Link>
-                </li>
+              <h3
+                className="font-semibold mb-6"
+                style={{ color: 'var(--color-text-primary)' }}
+              >
+                Resources
+              </h3>
+              <ul className="space-y-3">
+                {['Blog', 'Case Studies', 'API Documentation', 'Community'].map(
+                  item => (
+                    <li key={item}>
+                      <Link
+                        href={`/${item.toLowerCase().replace(' ', '-')}`}
+                        className="transition-colors"
+                        style={{ color: 'var(--color-text-muted)' }}
+                      >
+                        {item}
+                      </Link>
+                    </li>
+                  )
+                )}
               </ul>
             </div>
           </div>
 
-          <div className="mt-8 pt-8 border-t border-gray-200">
-            <div className="md:flex md:items-center md:justify-between">
-              <div className="flex space-x-6 md:order-2">
-                {/* Social links can be added here */}
-              </div>
-              <div className="mt-8 md:mt-0 md:order-1">
-                <p className="text-center text-base lh-text-muted">
-                  &copy; 2025 Lighthouse Studios. All rights reserved.
-                </p>
-              </div>
+          <div
+            className="mt-12 pt-8 border-t"
+            style={{ borderColor: 'var(--color-border)' }}
+          >
+            <div className="text-center">
+              <p style={{ color: 'var(--color-text-muted)' }}>
+                &copy; 2025 Lighthouse Studios. All rights reserved.
+              </p>
             </div>
           </div>
         </div>
