@@ -229,7 +229,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
         {/* Action section - always at bottom */}
         <div className="mt-auto">
-          {sites.length > 0 ? (
+          {/* {sites.length > 0 ? (
             <div className="border-t pt-4">
               <div className="lh-form-section">
                 <label className="block lh-table-cell-content mb-2">
@@ -298,7 +298,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 </div>
               </div>
             </div>
-          )}
+          )} */}
+          <div className="mt-3">
+            <Link href={`/dashboard/products/${product.slug}`}>
+              <Button variant="outline" className="w-full">
+                View Details
+              </Button>
+            </Link>
+          </div>
         </div>
       </CardContent>
     </Card>

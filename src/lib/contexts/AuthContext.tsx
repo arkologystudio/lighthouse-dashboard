@@ -7,6 +7,7 @@ import React, {
   type ReactNode,
 } from 'react';
 import { authApi, matchResult, setGlobalLogoutCallback } from '../api';
+import Cookies from 'js-cookie';
 import { STORAGE_KEYS, MESSAGES } from '../constants';
 import type { AuthState, User } from '../../types';
 import toast from 'react-hot-toast';
@@ -54,7 +55,7 @@ const initialState: AuthState = {
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
-  logout: () => Promise<void>;
+  logout: () => void;
   forceLogout: () => void;
 }
 
@@ -201,36 +202,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Logout function
-  const logout = async (): Promise<void> => {
+  const logout = (): void => {
     dispatch({ type: 'SET_LOADING', payload: true });
 
-    const result = await authApi.logout();
+    // Clear auth state
+    dispatch({ type: 'LOGOUT' });
 
-    matchResult(result, {
-      success: () => {
-        dispatch({ type: 'LOGOUT' });
+    // Clear localStorage and cookies (only on client side)
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(STORAGE_KEYS.USER);
+      localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+      Cookies.remove(STORAGE_KEYS.AUTH_TOKEN);
+    }
 
-        // Clear localStorage (only on client side)
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem(STORAGE_KEYS.USER);
-          localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
-        }
+    toast.success(MESSAGES.SUCCESS.LOGOUT);
 
-        toast.success(MESSAGES.SUCCESS.LOGOUT);
-      },
-      error: error => {
-        // Still logout locally even if API call fails
-        dispatch({ type: 'LOGOUT' });
-
-        // Clear localStorage (only on client side)
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem(STORAGE_KEYS.USER);
-          localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
-        }
-
-        console.warn('Logout API call failed, but logged out locally:', error);
-      },
-    });
+    // Redirect to login page
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
   };
 
   const value: AuthContextType = {
