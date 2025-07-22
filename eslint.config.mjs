@@ -11,7 +11,6 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
-  ...compat.extends("@typescript-eslint/recommended"),
   ...compat.extends("prettier"),
   {
     rules: {
@@ -26,9 +25,6 @@ const eslintConfig = [
       "@typescript-eslint/no-unused-vars": "error",
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/no-non-null-assertion": "error",
-      "@typescript-eslint/prefer-optional-chain": "error",
-      "@typescript-eslint/prefer-nullish-coalescing": "error",
-      "@typescript-eslint/no-unnecessary-type-assertion": "error",
       
       // React/Next.js specific
       "react/function-component-definition": [

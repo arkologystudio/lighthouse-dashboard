@@ -33,7 +33,7 @@ const RegisterPage: React.FC = () => {
       // Redirect to dashboard after successful registration
       router.push('/dashboard');
     } catch (error) {
-      // Error is handled by the AuthContext
+      console.error(error);
     }
   };
 

@@ -7,7 +7,6 @@ import {
   UpdateSiteProductRequest,
   SiteProductsResponse,
   Result,
-  ApiError,
 } from '../../types';
 import { useAuth } from './useAuth';
 import Cookies from 'js-cookie';
@@ -153,8 +152,8 @@ export const useProducts = (): UseProductsReturn => {
             : 'Failed to fetch products'
         );
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : 'Unknown error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -211,10 +210,10 @@ export const useProducts = (): UseProductsReturn => {
         } else {
           return { success: false, error: result.error.message };
         }
-      } catch (err) {
+      } catch (_err) {
         return {
           success: false,
-          error: err instanceof Error ? err.message : 'Unknown error occurred',
+          error: _err instanceof Error ? _err.message : 'Unknown error occurred',
         };
       }
     },
@@ -244,10 +243,10 @@ export const useProducts = (): UseProductsReturn => {
         } else {
           return { success: false, error: result.error.message };
         }
-      } catch (err) {
+      } catch (_err) {
         return {
           success: false,
-          error: err instanceof Error ? err.message : 'Unknown error occurred',
+          error: _err instanceof Error ? _err.message : 'Unknown error occurred',
         };
       }
     },
@@ -275,10 +274,10 @@ export const useProducts = (): UseProductsReturn => {
         } else {
           return { success: false, error: result.error.message };
         }
-      } catch (err) {
+      } catch (_err) {
         return {
           success: false,
-          error: err instanceof Error ? err.message : 'Unknown error occurred',
+          error: _err instanceof Error ? _err.message : 'Unknown error occurred',
         };
       }
     },
@@ -299,8 +298,8 @@ export const useProducts = (): UseProductsReturn => {
           return result.data;
         }
         return null;
-      } catch (err) {
-        console.error('Failed to check product status:', err);
+      } catch (_err) {
+        console.error('Failed to check product status:', _err);
         return null;
       }
     },

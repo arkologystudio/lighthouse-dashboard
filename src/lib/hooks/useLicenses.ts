@@ -6,7 +6,6 @@ import {
   ValidateLicenseRequest,
   ValidateLicenseResponse,
   Result,
-  ApiError,
 } from '../../types';
 import { useAuth } from './useAuth';
 import Cookies from 'js-cookie';
@@ -132,8 +131,8 @@ export const useLicenses = (): UseLicensesReturn => {
             : 'Failed to fetch licenses'
         );
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : 'Unknown error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -150,9 +149,9 @@ export const useLicenses = (): UseLicensesReturn => {
       if (result.success && result.data) {
         setStats(result.data.stats);
       }
-    } catch (err) {
+    } catch (_err) {
       // Don't show errors for stats endpoint
-      console.warn('Failed to fetch license stats:', err);
+      console.warn('Failed to fetch license stats:', _err);
     }
   }, [forceLogout]);
 
@@ -174,8 +173,8 @@ export const useLicenses = (): UseLicensesReturn => {
           return result.data;
         }
         return null;
-      } catch (err) {
-        console.error('Failed to validate license:', err);
+      } catch (_err) {
+        console.error('Failed to validate license:', _err);
         return null;
       }
     },
@@ -195,8 +194,8 @@ export const useLicenses = (): UseLicensesReturn => {
           return result.data.license;
         }
         return null;
-      } catch (err) {
-        console.error('Failed to get license:', err);
+      } catch (_err) {
+        console.error('Failed to get license:', _err);
         return null;
       }
     },
@@ -204,12 +203,11 @@ export const useLicenses = (): UseLicensesReturn => {
   );
 
   const getLicenseByProduct = useCallback(
-    (productSlug: string): License | undefined => {
-      return licenses.find(
+    (productSlug: string): License | undefined =>
+      licenses.find(
         license =>
           license.product?.slug === productSlug && license.status === 'active'
-      );
-    },
+      ),
     [licenses]
   );
 

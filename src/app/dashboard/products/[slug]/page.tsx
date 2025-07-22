@@ -27,10 +27,10 @@ const ProductDetailPage: React.FC = () => {
     registerProduct,
     unregisterProduct,
   } = useProducts();
-  const { licenses, getLicenseByProduct, refreshLicenses } = useLicenses();
+  const { getLicenseByProduct, refreshLicenses } = useLicenses();
   const { simulatePurchase } = usePurchases();
   const { initiateDownload, downloadFile } = useDownloads();
-  const { tiers, getTierByName, getProductPricing } = usePricing();
+  const { getTierByName } = usePricing();
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedSite, setSelectedSite] = useState<string>('');
@@ -210,6 +210,7 @@ const ProductDetailPage: React.FC = () => {
         toast.error(result.error || 'Purchase failed');
       }
     } catch (error) {
+      console.error(error);
       toast.dismiss();
       toast.error('Purchase failed');
     } finally {
@@ -255,6 +256,7 @@ const ProductDetailPage: React.FC = () => {
         toast.error(result.error || 'Failed to initiate download');
       }
     } catch (error) {
+      console.error(error);
       toast.dismiss();
       toast.error('Download failed');
     } finally {
@@ -748,7 +750,7 @@ const ProductDetailPage: React.FC = () => {
                                   : license.license_type === 'premium'
                                     ? 'enterprise'
                                     : 'enterprise';
-                            setSelectedLicenseType(upgradeTier as any);
+                            setSelectedLicenseType(upgradeTier);
                             setShowUpgradeForm(true);
                           }}
                           variant="outline"

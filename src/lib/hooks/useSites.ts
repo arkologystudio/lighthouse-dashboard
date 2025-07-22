@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { sitesApi, matchResult } from '../api';
 import { MESSAGES } from '../constants';
-import type { Site, CreateSiteRequest, Result } from '../../types';
+import type { Site, CreateSiteRequest } from '../../types';
 import toast from 'react-hot-toast';
 
 interface UseSitesReturn {

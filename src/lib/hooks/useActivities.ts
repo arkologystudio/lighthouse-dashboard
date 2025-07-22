@@ -153,8 +153,8 @@ export const useActivities = (): UseActivitiesReturn => {
               : 'Failed to fetch activities'
           );
         }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error occurred');
+      } catch (_err) {
+        setError(_err instanceof Error ? _err.message : 'Unknown error occurred');
       } finally {
         setIsLoading(false);
       }
@@ -187,7 +187,7 @@ export const useActivities = (): UseActivitiesReturn => {
             activities_by_type: {},
           });
         }
-      } catch (err) {
+      } catch {
         // For development: Don't show errors for missing stats endpoint
         setStats({
           total_activities: 0,

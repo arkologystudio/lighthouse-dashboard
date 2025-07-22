@@ -6,7 +6,7 @@ import type { AuthState } from '../../types';
 export const useAuth = (): AuthState & {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
-  logout: () => Promise<void>;
+  logout: () => void;
   forceLogout: () => void;
 } => {
   const context = useContext(AuthContext);

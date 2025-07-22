@@ -76,7 +76,7 @@ export interface EcosystemProduct {
   base_price?: number;
   usage_based: boolean;
   features?: string[];
-  limits?: Record<string, any>;
+  limits?: Record<string, unknown>;
   extended_documentation?: string;
   created_at: string;
   updated_at: string;
@@ -89,8 +89,8 @@ export interface SiteProduct {
   is_enabled: boolean;
   enabled_at: string;
   disabled_at?: string;
-  config?: Record<string, any>;
-  usage_limits?: Record<string, any>;
+  config?: Record<string, unknown>;
+  usage_limits?: Record<string, unknown>;
   last_used_at?: string;
   usage_count: number;
   created_at: string;
@@ -100,13 +100,13 @@ export interface SiteProduct {
 
 export interface RegisterSiteProductRequest {
   product_slug: string;
-  config?: Record<string, any>;
+  config?: Record<string, unknown>;
 }
 
 export interface UpdateSiteProductRequest {
   is_enabled?: boolean;
-  config?: Record<string, any>;
-  usage_limits?: Record<string, any>;
+  config?: Record<string, unknown>;
+  usage_limits?: Record<string, unknown>;
 }
 
 export interface SiteProductsResponse {
@@ -124,7 +124,7 @@ export interface ActivityLog {
   site_id?: string;
   target_id?: string;
   target_type?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   ip_address?: string;
   user_agent?: string;
   created_at: string;
@@ -303,7 +303,7 @@ export interface License {
   // Metadata
   purchase_reference?: string;
   notes?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 
@@ -328,7 +328,7 @@ export interface Download {
   completed_at?: string;
   bytes_downloaded?: number;
   error_message?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   created_at: string;
   user?: User;
   product?: EcosystemProduct;

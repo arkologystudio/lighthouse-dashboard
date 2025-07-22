@@ -32,7 +32,7 @@ const LoginPage: React.FC = () => {
       // Redirect to dashboard after successful login
       router.push('/dashboard');
     } catch (error) {
-      // Error is handled by the AuthContext
+      console.error('Login error:', error);
     }
   };
 
@@ -112,7 +112,7 @@ const LoginPage: React.FC = () => {
 
               <div className="text-center mt-4">
                 <p className="lh-text-muted">
-                  Don't have an account?{' '}
+                  Don&apos;t have an account?{' '}
                   <Link href="/register" className="lh-text-link font-medium">
                     Sign up here
                   </Link>

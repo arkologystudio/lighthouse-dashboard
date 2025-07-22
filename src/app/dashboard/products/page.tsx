@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { Card, CardHeader, CardContent } from '../../../components/ui/Card';
@@ -20,13 +20,7 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
-  sites,
-  siteProducts,
-  onActivate,
-  onDeactivate,
-  isProcessing,
 }) => {
-  const [selectedSite, setSelectedSite] = useState<string>('');
 
   const getProductIcon = (productSlug: string) => {
     switch (productSlug) {
@@ -117,32 +111,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     return `$${price}/month`;
   };
 
-  // Check if this product is already registered for any site
-  const isProductRegistered = (siteId: string) => {
-    return siteProducts.some(
-      sp => sp.product?.slug === product.slug && sp.site_id === siteId
-    );
-  };
 
-  const getSiteProductStatus = (siteId: string) => {
-    const siteProduct = siteProducts.find(
-      sp => sp.product?.slug === product.slug && sp.site_id === siteId
-    );
-    return siteProduct
-      ? { registered: true, enabled: siteProduct.is_enabled }
-      : { registered: false, enabled: false };
-  };
-
-  const handleAction = () => {
-    if (!selectedSite) return;
-
-    const status = getSiteProductStatus(selectedSite);
-    if (status.registered) {
-      onDeactivate(product.slug, selectedSite);
-    } else {
-      onActivate(product.slug, selectedSite);
-    }
-  };
 
   return (
     <Card className="lh-card-hover group flex flex-col h-full">
@@ -229,76 +198,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
         {/* Action section - always at bottom */}
         <div className="mt-auto">
-          {/* {sites.length > 0 ? (
-            <div className="border-t pt-4">
-              <div className="lh-form-section">
-                <label className="block lh-table-cell-content mb-2">
-                  Activate for Site:
-                </label>
-                <select
-                  value={selectedSite}
-                  onChange={e => setSelectedSite(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg lh-focus-ring"
-                >
-                  <option value="">Select a site...</option>
-                  {sites.map(site => {
-                    const status = getSiteProductStatus(site.id);
-                    return (
-                      <option key={site.id} value={site.id}>
-                        {site.name} {status.registered ? '(Registered)' : ''}
-                      </option>
-                    );
-                  })}
-                </select>
-
-                {selectedSite && (
-                  <div className="mt-3">
-                    <Button
-                      onClick={handleAction}
-                      disabled={isProcessing}
-                      className={`w-full ${
-                        getSiteProductStatus(selectedSite).registered
-                          ? 'bg-red-600 hover:bg-red-700 text-white'
-                          : 'bg-lighthouse-primary hover:bg-lighthouse-primary/90 text-white'
-                      }`}
-                    >
-                      {isProcessing
-                        ? 'Processing...'
-                        : getSiteProductStatus(selectedSite).registered
-                          ? 'Deactivate Product'
-                          : 'Activate Product'}
-                    </Button>
-                  </div>
-                )}
-
-                <div className="mt-3">
-                  <Link href={`/dashboard/products/${product.slug}`}>
-                    <Button variant="outline" className="w-full">
-                      View Details
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="border-t pt-4">
-              <div className="lh-empty-state text-left py-4">
-                <p className="lh-text-muted mb-3 text-sm">
-                  You need to add a site before you can activate products.
-                </p>
-                <div className="space-y-2">
-                  <Button variant="outline" size="sm" className="w-full">
-                    Add Your First Site
-                  </Button>
-                  <Link href={`/dashboard/products/${product.slug}`}>
-                    <Button variant="ghost" size="sm" className="w-full">
-                      View Details
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          )} */}
           <div className="mt-3">
             <Link href={`/dashboard/products/${product.slug}`}>
               <Button variant="outline" className="w-full">
@@ -325,17 +224,17 @@ const ProductsPage: React.FC = () => {
   } = useProducts();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleRefreshProducts = async () => {
+  const handleRefreshProducts = useCallback(async () => {
     toast.loading('Refreshing products...');
     try {
       await refreshProducts();
       toast.dismiss();
       toast.success('Products refreshed successfully!');
-    } catch (error) {
+    } catch {
       toast.dismiss();
       toast.error('Failed to refresh products');
     }
-  };
+  }, [refreshProducts]);
 
   // Add keyboard shortcut for refresh (Ctrl/Cmd + R)
   useEffect(() => {
@@ -350,7 +249,7 @@ const ProductsPage: React.FC = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, []); // Note: handleRefreshProducts should be stable
+  }, [handleRefreshProducts]); // Add handleRefreshProducts dependency
 
   const handleActivateProduct = async (productSlug: string, siteId: string) => {
     setIsProcessing(true);

@@ -5,7 +5,6 @@ import {
   PricingCalculationRequest,
   PricingCalculationResponse,
   Result,
-  ApiError,
 } from '../../types';
 import { useAuth } from './useAuth';
 import Cookies from 'js-cookie';
@@ -158,7 +157,7 @@ interface UsePricingReturn {
   }>;
   getPricingComparison: () => Promise<{
     success: boolean;
-    data?: any;
+    data?: unknown;
     error?: string;
   }>;
 }
@@ -205,17 +204,16 @@ export const usePricing = (): UsePricingReturn => {
           );
         }
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : 'Unknown error occurred');
     } finally {
       setIsLoading(false);
     }
   }, [forceLogout]);
 
   const getTierByName = useCallback(
-    (tierName: string): PricingTier | undefined => {
-      return tiers.find(tier => tier.tier_name === tierName);
-    },
+    (tierName: string): PricingTier | undefined =>
+      tiers.find(tier => tier.tier_name === tierName),
     [tiers]
   );
 
@@ -248,10 +246,10 @@ export const usePricing = (): UsePricingReturn => {
                 : 'Pricing calculation failed',
           };
         }
-      } catch (err) {
+      } catch (_err) {
         return {
           success: false,
-          error: err instanceof Error ? err.message : 'Unknown error occurred',
+          error: _err instanceof Error ? _err.message : 'Unknown error occurred',
         };
       }
     },
@@ -294,10 +292,10 @@ export const usePricing = (): UsePricingReturn => {
             };
           }
         }
-      } catch (err) {
+      } catch (_err) {
         return {
           success: false,
-          error: err instanceof Error ? err.message : 'Unknown error occurred',
+          error: _err instanceof Error ? _err.message : 'Unknown error occurred',
         };
       }
     },
@@ -306,18 +304,18 @@ export const usePricing = (): UsePricingReturn => {
 
   const getPricingComparison = useCallback(async (): Promise<{
     success: boolean;
-    data?: any;
+    data?: unknown;
     error?: string;
   }> => {
     try {
       // Try public endpoint first (no authentication required)
-      const result = await publicPricingApiRequest<any>('/pricing/comparison');
+      const result = await publicPricingApiRequest<unknown>('/pricing/comparison');
 
       if (result.success && result.data) {
         return { success: true, data: result.data };
       } else {
         // If public endpoint fails, try with authentication
-        const authResult = await pricingApiRequest<any>(
+        const authResult = await pricingApiRequest<unknown>(
           '/pricing/comparison',
           {},
           forceLogout

@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { Button } from '../components/ui/Button';
-import { Card, CardContent } from '../components/ui/Card';
 
 export const metadata = {
   title:
@@ -26,8 +25,7 @@ export const metadata = {
   },
 };
 
-const HomePage: React.FC = () => {
-  return (
+const HomePage: React.FC = () => (
     <div
       className="min-h-screen"
       style={{ backgroundColor: 'var(--color-bg-main)' }}
@@ -903,7 +901,6 @@ const HomePage: React.FC = () => {
         </div>
       </footer>
     </div>
-  );
-};
+);
 
 export default HomePage;

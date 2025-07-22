@@ -274,11 +274,10 @@ export const sitesApi = {
     return result;
   },
 
-  delete: async (id: string): Promise<Result<void>> => {
-    return authenticatedRequest<void>(ENDPOINTS.SITES.DELETE(id), {
+  delete: async (id: string): Promise<Result<void>> =>
+    authenticatedRequest<void>(ENDPOINTS.SITES.DELETE(id), {
       method: 'DELETE',
-    });
-  },
+    }),
 };
 
 // Utility functions for working with Result type

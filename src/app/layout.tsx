@@ -27,12 +27,11 @@ export const metadata: Metadata = {
   ],
 };
 
-export default function RootLayout({
+const RootLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
-  return (
+}>) => (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-lighthouse-surface`}
@@ -67,4 +66,5 @@ export default function RootLayout({
       </body>
     </html>
   );
-}
+
+export default RootLayout;

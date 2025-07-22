@@ -146,33 +146,29 @@ interface ActivityItemProps {
   activity: ActivityLog;
 }
 
-const ActivityItem: React.FC<ActivityItemProps> = ({ activity }) => {
-  return (
-    <div className="lh-flex-start p-4 hover:bg-gray-50 lh-transition-colors rounded-lg">
-      <div
-        className={`flex-shrink-0 lh-icon-xl lh-icon-circle ${getActivityColor(activity.activity_type)}`}
-      >
-        {getActivityIcon(activity.activity_type)}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="lh-table-cell-content">{activity.title}</p>
-        {activity.description && (
-          <p className="lh-text-description mt-1">{activity.description}</p>
+const ActivityItem: React.FC<ActivityItemProps> = ({ activity }) => (
+  <div className="lh-flex-start p-4 hover:bg-gray-50 lh-transition-colors rounded-lg">
+    <div
+      className={`flex-shrink-0 lh-icon-xl lh-icon-circle ${getActivityColor(activity.activity_type)}`}
+    >
+      {getActivityIcon(activity.activity_type)}
+    </div>
+    <div className="flex-1 min-w-0">
+      <p className="lh-table-cell-content">{activity.title}</p>
+      {activity.description && (
+        <p className="lh-text-description mt-1">{activity.description}</p>
+      )}
+      <div className="lh-flex-icon-text mt-2">
+        <span className="lh-text-small">
+          {formatTimeAgo(activity.created_at)}
+        </span>
+        {activity.site && (
+          <span className="text-xs text-gray-400">• {activity.site.name}</span>
         )}
-        <div className="lh-flex-icon-text mt-2">
-          <span className="lh-text-small">
-            {formatTimeAgo(activity.created_at)}
-          </span>
-          {activity.site && (
-            <span className="text-xs text-gray-400">
-              • {activity.site.name}
-            </span>
-          )}
-        </div>
       </div>
     </div>
-  );
-};
+  </div>
+);
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
@@ -304,7 +300,7 @@ const DashboardPage: React.FC = () => {
       <div>
         <h2 className="lh-title-section mb-6">Overview</h2>
         <div className="lh-grid-stats">
-          {stats_data.map((stat, index) => (
+          {stats_data.map(stat => (
             <Card key={stat.name} className="lh-card-hover lh-card">
               <CardHeader className="pb-2">
                 <div className="lh-flex-between">

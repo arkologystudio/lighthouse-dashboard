@@ -1,11 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { API_BASE_URL } from '../constants';
 import {
   Download,
   InitiateDownloadRequest,
   InitiateDownloadResponse,
   Result,
-  ApiError,
 } from '../../types';
 import { useAuth } from './useAuth';
 import Cookies from 'js-cookie';

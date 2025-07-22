@@ -6,7 +6,6 @@ import {
   SimulatePurchaseResponse,
   License,
   Result,
-  ApiError,
 } from '../../types';
 import { useAuth } from './useAuth';
 import Cookies from 'js-cookie';
@@ -149,8 +148,8 @@ export const usePurchases = (): UsePurchasesReturn => {
             : 'Failed to fetch available products'
         );
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : 'Unknown error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -165,8 +164,8 @@ export const usePurchases = (): UsePurchasesReturn => {
       if (result.success && result.data) {
         setPurchaseHistory(result.data.purchases);
       }
-    } catch (err) {
-      console.warn('Failed to fetch purchase history:', err);
+    } catch (_err) {
+      console.warn('Failed to fetch purchase history:', _err);
     }
   }, [forceLogout]);
 
@@ -205,10 +204,10 @@ export const usePurchases = (): UsePurchasesReturn => {
                 : 'Purchase failed',
           };
         }
-      } catch (err) {
+      } catch (_err) {
         return {
           success: false,
-          error: err instanceof Error ? err.message : 'Unknown error occurred',
+          error: _err instanceof Error ? _err.message : 'Unknown error occurred',
         };
       }
     },
