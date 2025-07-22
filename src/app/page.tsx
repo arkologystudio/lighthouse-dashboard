@@ -659,14 +659,23 @@ const HomePage: React.FC = () => {
               <div key={index} className="text-center relative">
                 <div className="relative mb-6">
                   <div
-                    className={`w-16 h-16 rounded-2xl mx-auto bg-gradient-to-r ${item.color} flex items-center justify-center`}
+                    className={`w-16 h-16 rounded-2xl mx-auto bg-gradient-to-r ${item.color} flex items-center justify-center relative z-10 shadow-lg`}
                   >
                     <span className="text-white font-bold text-lg">
                       {item.step}
                     </span>
                   </div>
                   {index < 4 && (
-                    <div className="hidden md:block absolute top-8 left-16 w-full h-0.5 bg-gradient-to-r from-white/20 to-transparent"></div>
+                    <div className="hidden md:block absolute top-8 left-1/2 w-full h-px">
+                      {/* Main connecting line */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-orange-400/15 via-pink-400/20 to-purple-400/15"></div>
+                      {/* Decorative dots */}
+                      <div className="absolute top-1/2 left-1/4 w-1 h-1 bg-orange-400/30 rounded-full transform -translate-y-1/2"></div>
+                      <div className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-pink-400/40 rounded-full transform -translate-y-1/2"></div>
+                      <div className="absolute top-1/2 left-3/4 w-1 h-1 bg-purple-400/30 rounded-full transform -translate-y-1/2"></div>
+                      {/* Connection point to next icon */}
+                      <div className="absolute top-1/2 right-4 w-2 h-2 bg-gradient-to-r from-pink-400/50 to-purple-400/50 rounded-full transform -translate-y-1/2 animate-pulse"></div>
+                    </div>
                   )}
                 </div>
                 <h3 className="text-lg font-semibold mb-3 text-white">
@@ -754,7 +763,7 @@ const HomePage: React.FC = () => {
             Experience the future of website management today.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link href="/register">
               <Button
                 size="lg"
@@ -762,19 +771,6 @@ const HomePage: React.FC = () => {
                 style={{ backgroundColor: 'var(--color-accent)' }}
               >
                 Get Started Free
-              </Button>
-            </Link>
-            <Link href="#pricing" id="pricing">
-              <Button
-                size="lg"
-                variant="outline"
-                className="px-8 py-4 text-lg transition-all duration-300"
-                style={{
-                  borderColor: 'var(--color-border)',
-                  color: 'var(--color-text-secondary)',
-                }}
-              >
-                View Pricing
               </Button>
             </Link>
             <Link href="/contact">
