@@ -135,28 +135,19 @@ const HomePage: React.FC = () => {
             >
               Why Choose Lighthouse?
             </h2>
-            <div
-              className="w-24 h-1 mx-auto rounded-full"
-              style={{ backgroundColor: 'var(--color-accent)' }}
-            ></div>
+            <div className="w-24 h-1 bg-gradient-to-r from-orange-400 to-pink-400 mx-auto rounded-full"></div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* AI WordPress Plugins */}
             <div className="group relative">
-              <div
-                className="relative rounded-2xl p-8 transition-all duration-300 border"
-                style={{
-                  backgroundColor: 'var(--color-bg-card)',
-                  borderColor: 'var(--color-border)',
-                }}
-              >
+              <div className="relative bg-slate-800/40 backdrop-blur-xl border border-purple-400/20 rounded-2xl p-8 hover:bg-slate-800/60 transition-all duration-300">
                 <div>
                   <div
                     className="w-16 h-16 rounded-xl flex items-center justify-center mb-6"
                     style={{
-                      backgroundColor: 'rgba(246, 173, 138, 0.1)',
-                      border: '1px solid rgba(246, 173, 138, 0.2)',
+                      backgroundColor: 'rgba(246, 173, 138, 0.15)',
+                      border: '1px solid rgba(246, 173, 138, 0.3)',
                     }}
                   >
                     <svg
@@ -164,7 +155,7 @@ const HomePage: React.FC = () => {
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
-                      style={{ color: 'var(--color-accent)' }}
+                      style={{ color: '#f6ad8a', strokeWidth: 2.5 }}
                     >
                       <path
                         strokeLinecap="round"
@@ -194,19 +185,13 @@ const HomePage: React.FC = () => {
 
             {/* Agent Discoverability */}
             <div className="group relative">
-              <div
-                className="relative rounded-2xl p-8 transition-all duration-300 border"
-                style={{
-                  backgroundColor: 'var(--color-bg-card)',
-                  borderColor: 'var(--color-border)',
-                }}
-              >
+              <div className="relative bg-slate-800/40 backdrop-blur-xl border border-purple-400/20 rounded-2xl p-8 hover:bg-slate-800/60 transition-all duration-300">
                 <div>
                   <div
                     className="w-16 h-16 rounded-xl flex items-center justify-center mb-6"
                     style={{
-                      backgroundColor: 'rgba(66, 71, 105, 0.1)',
-                      border: '1px solid rgba(66, 71, 105, 0.2)',
+                      backgroundColor: 'rgba(246, 173, 138, 0.15)',
+                      border: '1px solid rgba(246, 173, 138, 0.3)',
                     }}
                   >
                     <svg
@@ -214,7 +199,7 @@ const HomePage: React.FC = () => {
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
-                      style={{ color: 'var(--color-primary)' }}
+                      style={{ color: '#f6ad8a', strokeWidth: 2.5 }}
                     >
                       <path
                         strokeLinecap="round"
@@ -244,19 +229,13 @@ const HomePage: React.FC = () => {
 
             {/* Web 4.0 Ready */}
             <div className="group relative">
-              <div
-                className="relative rounded-2xl p-8 transition-all duration-300 border"
-                style={{
-                  backgroundColor: 'var(--color-bg-card)',
-                  borderColor: 'var(--color-border)',
-                }}
-              >
+              <div className="relative bg-slate-800/40 backdrop-blur-xl border border-purple-400/20 rounded-2xl p-8 hover:bg-slate-800/60 transition-all duration-300">
                 <div>
                   <div
                     className="w-16 h-16 rounded-xl flex items-center justify-center mb-6"
                     style={{
-                      backgroundColor: 'rgba(249, 196, 168, 0.1)',
-                      border: '1px solid rgba(249, 196, 168, 0.2)',
+                      backgroundColor: 'rgba(249, 196, 168, 0.15)',
+                      border: '1px solid rgba(249, 196, 168, 0.3)',
                     }}
                   >
                     <svg
@@ -264,7 +243,7 @@ const HomePage: React.FC = () => {
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
-                      style={{ color: 'var(--color-accent)' }}
+                      style={{ color: '#f9c4a8', strokeWidth: 2.5 }}
                     >
                       <path
                         strokeLinecap="round"
@@ -309,24 +288,14 @@ const HomePage: React.FC = () => {
             >
               Core Features
             </h2>
-            <div
-              className="w-24 h-1 mx-auto rounded-full"
-              style={{ backgroundColor: 'var(--color-accent)' }}
-            ></div>
+            <div className="w-24 h-1 bg-gradient-to-r from-orange-400 to-pink-400 mx-auto rounded-full"></div>
           </div>
 
           <div className="space-y-24">
             {/* Feature 1 */}
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="space-y-6">
-                <div
-                  className="inline-block px-4 py-2 rounded-full text-sm font-medium border"
-                  style={{
-                    backgroundColor: 'var(--color-accent)',
-                    color: 'white',
-                    borderColor: 'var(--color-accent)',
-                  }}
-                >
+                <div className="inline-block px-4 py-2 bg-orange-400/10 text-orange-400 rounded-full text-sm font-medium border border-orange-400/20">
                   01 — Management
                 </div>
                 <h3
@@ -368,19 +337,13 @@ const HomePage: React.FC = () => {
                 </div>
               </div>
               <div className="relative">
-                <div
-                  className="relative border rounded-3xl p-12 flex items-center justify-center"
-                  style={{
-                    backgroundColor: 'var(--color-bg-card)',
-                    borderColor: 'var(--color-border)',
-                  }}
-                >
+                <div className="relative bg-slate-800/40 backdrop-blur-xl border border-orange-400/20 rounded-3xl p-12 flex items-center justify-center hover:bg-slate-800/60 transition-all duration-300">
                   <svg
                     className="w-32 h-32"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
-                    style={{ color: 'var(--color-accent)' }}
+                    style={{ color: '#f6ad8a', strokeWidth: 2 }}
                   >
                     <path
                       strokeLinecap="round"
@@ -399,14 +362,22 @@ const HomePage: React.FC = () => {
                 <div className="inline-block px-4 py-2 bg-blue-400/10 text-blue-400 rounded-full text-sm font-medium border border-blue-400/20">
                   02 — Marketplace
                 </div>
-                <h3 className="text-2xl font-bold text-white">
+                <h3
+                  className="text-2xl font-bold"
+                  style={{ color: 'var(--color-text-primary)' }}
+                >
                   AI Plugin Marketplace
                 </h3>
-                <div className="space-y-4 text-gray-400">
+                <div
+                  className="space-y-4"
+                  style={{ color: 'var(--color-text-secondary)' }}
+                >
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
                     <p>
-                      <strong className="text-white">Curated Selection:</strong>{' '}
+                      <strong style={{ color: 'var(--color-text-primary)' }}>
+                        Curated Selection:
+                      </strong>{' '}
                       Browse our top AI plugins — Discoverability, Human & Agent
                       Search, and more.
                     </p>
@@ -414,7 +385,7 @@ const HomePage: React.FC = () => {
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
                     <p>
-                      <strong className="text-white">
+                      <strong style={{ color: 'var(--color-text-primary)' }}>
                         Seamless Integration:
                       </strong>{' '}
                       Auto-install and auto-configure plugins optimized for
@@ -424,19 +395,13 @@ const HomePage: React.FC = () => {
                 </div>
               </div>
               <div className="lg:order-1 relative">
-                <div
-                  className="relative border rounded-3xl p-12 flex items-center justify-center"
-                  style={{
-                    backgroundColor: 'var(--color-bg-card)',
-                    borderColor: 'var(--color-border)',
-                  }}
-                >
+                <div className="relative bg-slate-800/40 backdrop-blur-xl border border-blue-400/20 rounded-3xl p-12 flex items-center justify-center hover:bg-slate-800/60 transition-all duration-300">
                   <svg
                     className="w-32 h-32"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
-                    style={{ color: 'var(--color-primary)' }}
+                    style={{ color: '#60a5fa', strokeWidth: 2 }}
                   >
                     <path
                       strokeLinecap="round"
@@ -452,14 +417,7 @@ const HomePage: React.FC = () => {
             {/* Feature 3 */}
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="space-y-6">
-                <div
-                  className="inline-block px-4 py-2 rounded-full text-sm font-medium border"
-                  style={{
-                    backgroundColor: 'var(--color-primary)',
-                    color: 'white',
-                    borderColor: 'var(--color-primary)',
-                  }}
-                >
+                <div className="inline-block px-4 py-2 bg-green-400/10 text-green-400 rounded-full text-sm font-medium border border-green-400/20">
                   03 — AI Readiness
                 </div>
                 <h3
@@ -502,19 +460,13 @@ const HomePage: React.FC = () => {
                 </div>
               </div>
               <div className="relative">
-                <div
-                  className="relative border rounded-3xl p-12 flex items-center justify-center"
-                  style={{
-                    backgroundColor: 'var(--color-bg-card)',
-                    borderColor: 'var(--color-border)',
-                  }}
-                >
+                <div className="relative bg-slate-800/40 backdrop-blur-xl border border-green-400/20 rounded-3xl p-12 flex items-center justify-center hover:bg-slate-800/60 transition-all duration-300">
                   <svg
                     className="w-32 h-32"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
-                    style={{ color: 'var(--color-primary)' }}
+                    style={{ color: '#4ade80', strokeWidth: 2 }}
                   >
                     <path
                       strokeLinecap="round"
@@ -530,14 +482,7 @@ const HomePage: React.FC = () => {
             {/* Feature 4 */}
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="lg:order-2 space-y-6">
-                <div
-                  className="inline-block px-4 py-2 rounded-full text-sm font-medium border"
-                  style={{
-                    backgroundColor: 'var(--color-accent)',
-                    color: 'white',
-                    borderColor: 'var(--color-accent)',
-                  }}
-                >
+                <div className="inline-block px-4 py-2 bg-purple-400/10 text-purple-400 rounded-full text-sm font-medium border border-purple-400/20">
                   04 — Neural Search
                 </div>
                 <h3
@@ -579,19 +524,13 @@ const HomePage: React.FC = () => {
                 </div>
               </div>
               <div className="lg:order-1 relative">
-                <div
-                  className="relative border rounded-3xl p-12 flex items-center justify-center"
-                  style={{
-                    backgroundColor: 'var(--color-bg-card)',
-                    borderColor: 'var(--color-border)',
-                  }}
-                >
+                <div className="relative bg-slate-800/40 backdrop-blur-xl border border-purple-400/20 rounded-3xl p-12 flex items-center justify-center hover:bg-slate-800/60 transition-all duration-300">
                   <svg
                     className="w-32 h-32"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
-                    style={{ color: 'var(--color-accent)' }}
+                    style={{ color: '#a855f7', strokeWidth: 2 }}
                   >
                     <path
                       strokeLinecap="round"
@@ -607,14 +546,7 @@ const HomePage: React.FC = () => {
             {/* Feature 5 */}
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="space-y-6">
-                <div
-                  className="inline-block px-4 py-2 rounded-full text-sm font-medium border"
-                  style={{
-                    backgroundColor: 'var(--color-primary)',
-                    color: 'white',
-                    borderColor: 'var(--color-primary)',
-                  }}
-                >
+                <div className="inline-block px-4 py-2 bg-orange-400/10 text-orange-400 rounded-full text-sm font-medium border border-orange-400/20">
                   05 — Billing
                 </div>
                 <h3
@@ -656,19 +588,13 @@ const HomePage: React.FC = () => {
                 </div>
               </div>
               <div className="relative">
-                <div
-                  className="relative border rounded-3xl p-12 flex items-center justify-center"
-                  style={{
-                    backgroundColor: 'var(--color-bg-card)',
-                    borderColor: 'var(--color-border)',
-                  }}
-                >
+                <div className="relative bg-slate-800/40 backdrop-blur-xl border border-orange-400/20 rounded-3xl p-12 flex items-center justify-center hover:bg-slate-800/60 transition-all duration-300">
                   <svg
                     className="w-32 h-32"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
-                    style={{ color: 'var(--color-primary)' }}
+                    style={{ color: '#f6ad8a', strokeWidth: 2 }}
                   >
                     <path
                       strokeLinecap="round"
