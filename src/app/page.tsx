@@ -1207,7 +1207,7 @@ const HomePage: React.FC = () => (
                     <div
                       className="w-16 h-16 mx-auto rounded border-2 flex items-center justify-center relative z-10"
                       style={{
-                        backgroundColor: 'var(--color-lighthouse-structure)',
+                        backgroundColor: 'var(--color-ocean-surface)',
                         borderColor: 'var(--color-navigation-blue)',
                       }}
                     >
