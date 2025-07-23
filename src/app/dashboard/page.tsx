@@ -211,7 +211,7 @@ const DashboardPage: React.FC = () => {
         'Connect your WordPress site to get started with Lighthouse plugins.',
       href: '/dashboard/sites',
       buttonText: 'Add Site',
-      color: 'bg-blue-500',
+      color: 'dashboard-primary',
       icon: (
         <svg
           className="lh-icon-lg"
@@ -234,7 +234,7 @@ const DashboardPage: React.FC = () => {
         "Learn how AI-powered search can transform your site's user experience.",
       href: '/dashboard/products',
       buttonText: 'Browse Products',
-      color: 'bg-purple-500',
+      color: 'dashboard-secondary',
       icon: (
         <svg
           className="lh-icon-lg"
@@ -257,7 +257,7 @@ const DashboardPage: React.FC = () => {
         'Optimize your site for AI crawlers and improve search visibility.',
       href: '/dashboard/products',
       buttonText: 'Check Products',
-      color: 'bg-green-500',
+      color: 'dashboard-success',
       icon: (
         <svg
           className="lh-icon-lg"
@@ -282,7 +282,8 @@ const DashboardPage: React.FC = () => {
       <div className="lh-card lh-card-content">
         <div className="lh-flex-icon-text">
           <div className="flex-shrink-0">
-            <div className="w-12 h-12 bg-gradient-to-br from-lighthouse-primary to-blue-600 rounded-xl lh-flex-center shadow-sm">
+            <div className="w-12 h-12 rounded-xl lh-flex-center" 
+                 style={{ backgroundColor: 'var(--color-dashboard-accent)' }}>
               <span className="text-white text-xl">👋</span>
             </div>
           </div>
@@ -349,12 +350,13 @@ const DashboardPage: React.FC = () => {
               <CardHeader className="pb-4">
                 <div className="lh-flex-icon-text">
                   <div
-                    className={`flex-shrink-0 w-12 h-12 ${action.color} rounded-xl lh-flex-center text-white shadow-sm group-hover:shadow-md lh-transition-shadow`}
+                    className="flex-shrink-0 w-12 h-12 rounded-xl lh-flex-center text-white shadow-sm group-hover:shadow-md lh-transition-shadow"
+                    style={{ backgroundColor: 'var(--color-dashboard-accent)' }}
                   >
                     {action.icon}
                   </div>
                   <div>
-                    <h3 className="lh-title-card group-hover:text-lighthouse-primary lh-transition-colors">
+                    <h3 className="lh-title-card lh-transition-colors">
                       {action.title}
                     </h3>
                   </div>
@@ -367,7 +369,7 @@ const DashboardPage: React.FC = () => {
                 <Link href={action.href}>
                   <Button
                     variant="outline"
-                    className="w-full lh-text-link border-lighthouse-primary hover:bg-lighthouse-primary hover:text-white lh-transition font-medium"
+                    className="w-full font-medium"
                   >
                     {action.buttonText}
                   </Button>

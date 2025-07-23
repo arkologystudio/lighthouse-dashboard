@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Button } from '../components/ui/Button';
+import { TypewriterText } from '../components/TypewriterText';
 
 export const metadata = {
   title:
@@ -26,881 +27,1638 @@ export const metadata = {
 };
 
 const HomePage: React.FC = () => (
-    <div
-      className="min-h-screen"
-      style={{ backgroundColor: 'var(--color-bg-main)' }}
+  <div
+    className="min-h-screen overflow-x-hidden"
+    style={{ backgroundColor: 'var(--color-bg-main)' }}
+  >
+    {/* Navigation */}
+    <nav
+      className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b"
+      style={{
+        backgroundColor: 'rgba(15, 23, 42, 0.8)',
+        borderColor: 'var(--color-maritime-border)',
+      }}
     >
-      {/* Navigation */}
-      <nav
-        className="relative z-50 backdrop-blur-xl border-b"
-        style={{
-          backgroundColor: 'var(--color-bg-card)',
-          borderColor: 'var(--color-border)',
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center space-x-3">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ backgroundColor: 'var(--color-accent)' }}
-              >
-                <span className="font-bold text-white text-lg">L</span>
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center space-x-3 group cursor-pointer">
+            <div className="relative">
+              {/* Lighthouse icon - geometric, architectural */}
+              <div className="w-8 h-8 flex items-center justify-center">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 2L8 8H16L12 2Z"
+                    fill="var(--color-beacon-light)"
+                  />
+                  <rect
+                    x="10"
+                    y="8"
+                    width="4"
+                    height="12"
+                    fill="var(--color-lighthouse-beam)"
+                    fillOpacity="0.9"
+                  />
+                  <rect
+                    x="8"
+                    y="20"
+                    width="8"
+                    height="2"
+                    fill="var(--color-lighthouse-structure)"
+                  />
+                  <circle
+                    cx="12"
+                    cy="5"
+                    r="1"
+                    fill="var(--color-navigation-blue)"
+                  />
+                </svg>
               </div>
+            </div>
+            <span
+              className="text-lg font-medium tracking-wide"
+              style={{ color: 'var(--color-lighthouse-beam)' }}
+            >
+              Lighthouse
+            </span>
+          </div>
+
+          <Link href="/login">
+            <Button
+              className="border font-medium px-5 py-2 rounded-md transition-all duration-200 hover:shadow-md"
+              style={{
+                backgroundColor: 'var(--color-navigation-blue)',
+                borderColor: 'var(--color-navigation-blue)',
+                color: 'white',
+              }}
+            >
+              Dashboard
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </nav>
+
+    {/* Hero Section */}
+    <section
+      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16"
+      style={{ backgroundColor: 'var(--color-ocean-deep)' }}
+    >
+      {/* Lighthouse beam effect - subtle, purposeful */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Primary lighthouse beam - focused cone of light */}
+        <div className="absolute top-20 left-1/2 transform -translate-x-1/2 w-96 h-96">
+          <div className="w-full h-full bg-gradient-radial from-white/3 via-blue-400/2 to-transparent rounded-full"></div>
+        </div>
+        {/* Secondary depth layers */}
+        <div className="absolute top-32 left-1/2 transform -translate-x-1/2 w-[600px] h-[600px] bg-gradient-radial from-blue-400/1 to-transparent rounded-full"></div>
+        {/* Subtle horizon line effect */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/20 to-transparent"></div>
+      </div>
+
+      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+        <div className="space-y-16">
+          {/* Technical badge */}
+          <div
+            className="inline-flex items-center px-3 py-1 rounded border text-xs font-mono tracking-wider uppercase"
+            style={{
+              borderColor: 'var(--color-maritime-border)',
+              backgroundColor: 'rgba(51, 65, 85, 0.3)',
+              color: 'var(--color-beacon-light)',
+            }}
+          >
+            <span className="w-2 h-2 bg-current rounded-full mr-2 animate-pulse"></span>
+            <TypewriterText text="Navigation System Active" speed={40} />
+          </div>
+
+          {/* Main title - clean, architectural */}
+          <div className="space-y-8">
+            <h1 className="text-5xl md:text-7xl font-light leading-[1.1] tracking-tight">
               <span
-                className="text-xl font-semibold"
-                style={{ color: 'var(--color-text-primary)' }}
+                className="block font-thin"
+                style={{ color: 'var(--color-lighthouse-beam)' }}
               >
                 Lighthouse
               </span>
-            </div>
-
-            <Link href="/login">
-              <Button
-                className="border-0 transition-all duration-300"
-                style={{
-                  backgroundColor: 'var(--color-accent)',
-                  color: 'white',
-                }}
+              <span
+                className="block font-normal"
+                style={{ color: 'var(--color-lighthouse-beam)' }}
               >
-                Dashboard
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
-          <div className="space-y-8">
-            <h1
-              className="text-5xl md:text-7xl font-bold leading-tight"
-              style={{ color: 'var(--color-text-primary)' }}
-            >
-              <span style={{ color: 'var(--color-accent)' }}>
-                Lighthouse Studios
+                Studios
               </span>
             </h1>
 
+            {/* Clean separator line */}
+            <div
+              className="w-16 h-px mx-auto"
+              style={{ backgroundColor: 'var(--color-beacon-light)' }}
+            ></div>
+          </div>
+
+          {/* Purposeful subtitle */}
+          <div className="max-w-3xl mx-auto space-y-6">
             <p
-              className="text-xl max-w-3xl mx-auto leading-relaxed"
-              style={{ color: 'var(--color-text-secondary)' }}
+              className="text-xl md:text-2xl leading-relaxed font-light"
+              style={{ color: 'var(--color-maritime-fog)' }}
             >
-              The ultimate AI-powered portal for upgrading your WordPress sites.
-              Plugins & insights to optimize agent discoverability in the age of
-              Web 4.0.
+              Navigation tools for the AI-powered web.{' '}
+              <span style={{ color: 'var(--color-lighthouse-beam)' }}>
+                Enable discovery, optimize visibility, guide intelligent agents
+              </span>{' '}
+              to your WordPress sites with precision.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-              <Link href="/register">
-                <Button
-                  size="lg"
-                  className="text-white border-0 transition-all duration-300 px-8 py-4 text-lg"
-                  style={{ backgroundColor: 'var(--color-accent)' }}
-                >
-                  Get Started Free
-                </Button>
-              </Link>
-              <Link href="#pricing">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="px-8 py-4 text-lg transition-all duration-300"
-                  style={{
-                    borderColor: 'var(--color-border)',
-                    color: 'var(--color-text-secondary)',
-                  }}
-                >
-                  View Pricing
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Lighthouse Section */}
-      <section
-        className="relative py-24"
-        style={{ backgroundColor: 'var(--color-bg-secondary)' }}
-      >
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2
-              className="text-3xl font-bold mb-4"
-              style={{ color: 'var(--color-text-primary)' }}
+            <p
+              className="text-sm font-mono tracking-wide opacity-75"
+              style={{ color: 'var(--color-beacon-light)' }}
             >
-              Why Choose Lighthouse?
-            </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-orange-400 to-pink-400 mx-auto rounded-full"></div>
+              WEB 4.0 • AGENT DISCOVERABILITY • NEURAL SEARCH
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* AI WordPress Plugins */}
-            <div className="group relative">
-              <div className="relative bg-slate-800/40 backdrop-blur-xl border border-purple-400/20 rounded-2xl p-8 hover:bg-slate-800/60 transition-all duration-300">
-                <div>
-                  <div
-                    className="w-16 h-16 rounded-xl flex items-center justify-center mb-6"
-                    style={{
-                      backgroundColor: 'rgba(246, 173, 138, 0.15)',
-                      border: '1px solid rgba(246, 173, 138, 0.3)',
-                    }}
-                  >
-                    <svg
-                      className="w-8 h-8"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      style={{ color: '#f6ad8a', strokeWidth: 2.5 }}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 10V3L4 14h7v7l9-11h-7z"
-                      />
-                    </svg>
-                  </div>
-                  <h3
-                    className="text-xl font-semibold mb-4"
-                    style={{ color: 'var(--color-text-primary)' }}
-                  >
-                    AI WordPress Plugins Made Simple
-                  </h3>
-                  <p
-                    className="leading-relaxed"
-                    style={{ color: 'var(--color-text-secondary)' }}
-                  >
-                    Install, configure, and update our latest AI-driven
-                    WordPress plugins in seconds. Make your websites AI ready
-                    without writing a single line of code.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Agent Discoverability */}
-            <div className="group relative">
-              <div className="relative bg-slate-800/40 backdrop-blur-xl border border-purple-400/20 rounded-2xl p-8 hover:bg-slate-800/60 transition-all duration-300">
-                <div>
-                  <div
-                    className="w-16 h-16 rounded-xl flex items-center justify-center mb-6"
-                    style={{
-                      backgroundColor: 'rgba(246, 173, 138, 0.15)',
-                      border: '1px solid rgba(246, 173, 138, 0.3)',
-                    }}
-                  >
-                    <svg
-                      className="w-8 h-8"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      style={{ color: '#f6ad8a', strokeWidth: 2.5 }}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                      />
-                    </svg>
-                  </div>
-                  <h3
-                    className="text-xl font-semibold mb-4"
-                    style={{ color: 'var(--color-text-primary)' }}
-                  >
-                    Agent Websites & Discoverability
-                  </h3>
-                  <p
-                    className="leading-relaxed"
-                    style={{ color: 'var(--color-text-secondary)' }}
-                  >
-                    Stand out in a crowded market. Our built-in agent registry
-                    ensures your AI assistants, bots, and agent-based services
-                    are indexed and discoverable by users and partner networks.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Web 4.0 Ready */}
-            <div className="group relative">
-              <div className="relative bg-slate-800/40 backdrop-blur-xl border border-purple-400/20 rounded-2xl p-8 hover:bg-slate-800/60 transition-all duration-300">
-                <div>
-                  <div
-                    className="w-16 h-16 rounded-xl flex items-center justify-center mb-6"
-                    style={{
-                      backgroundColor: 'rgba(249, 196, 168, 0.15)',
-                      border: '1px solid rgba(249, 196, 168, 0.3)',
-                    }}
-                  >
-                    <svg
-                      className="w-8 h-8"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      style={{ color: '#f9c4a8', strokeWidth: 2.5 }}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                      />
-                    </svg>
-                  </div>
-                  <h3
-                    className="text-xl font-semibold mb-4"
-                    style={{ color: 'var(--color-text-primary)' }}
-                  >
-                    Next-Gen Web 4.0 Ready
-                  </h3>
-                  <p
-                    className="leading-relaxed"
-                    style={{ color: 'var(--color-text-secondary)' }}
-                  >
-                    Embrace the semantic web. Lighthouse Dashboard leverages
-                    neural search and structured data to make your site
-                    compatible with Web 4.0 standards and emerging AI
-                    ecosystems.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Core Features Section */}
-      <section
-        className="relative py-24"
-        style={{ backgroundColor: 'var(--color-bg-main)' }}
-      >
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <h2
-              className="text-3xl font-bold mb-4"
-              style={{ color: 'var(--color-text-primary)' }}
-            >
-              Core Features
-            </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-orange-400 to-pink-400 mx-auto rounded-full"></div>
-          </div>
-
-          <div className="space-y-24">
-            {/* Feature 1 */}
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div className="space-y-6">
-                <div className="inline-block px-4 py-2 bg-orange-400/10 text-orange-400 rounded-full text-sm font-medium border border-orange-400/20">
-                  01 — Management
-                </div>
-                <h3
-                  className="text-2xl font-bold"
-                  style={{ color: 'var(--color-text-primary)' }}
-                >
-                  Centralized Site Management
-                </h3>
-                <div
-                  className="space-y-4"
-                  style={{ color: 'var(--color-text-secondary)' }}
-                >
-                  <div className="flex items-start space-x-3">
-                    <div
-                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
-                      style={{ backgroundColor: 'var(--color-accent)' }}
-                    ></div>
-                    <p>
-                      <strong style={{ color: 'var(--color-text-primary)' }}>
-                        Multi-Site Dashboard:
-                      </strong>{' '}
-                      Monitor performance, uptime, and security across all your
-                      WordPress sites.
-                    </p>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div
-                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
-                      style={{ backgroundColor: 'var(--color-accent)' }}
-                    ></div>
-                    <p>
-                      <strong style={{ color: 'var(--color-text-primary)' }}>
-                        One-Click Download:
-                      </strong>{' '}
-                      Instantly access the best AI plugins for WordPress. No
-                      code. No expertise.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="relative">
-                <div className="relative bg-slate-800/40 backdrop-blur-xl border border-orange-400/20 rounded-3xl p-12 flex items-center justify-center hover:bg-slate-800/60 transition-all duration-300">
-                  <svg
-                    className="w-32 h-32"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    style={{ color: '#f6ad8a', strokeWidth: 2 }}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1}
-                      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div className="lg:order-2 space-y-6">
-                <div className="inline-block px-4 py-2 bg-blue-400/10 text-blue-400 rounded-full text-sm font-medium border border-blue-400/20">
-                  02 — Marketplace
-                </div>
-                <h3
-                  className="text-2xl font-bold"
-                  style={{ color: 'var(--color-text-primary)' }}
-                >
-                  AI Plugin Marketplace
-                </h3>
-                <div
-                  className="space-y-4"
-                  style={{ color: 'var(--color-text-secondary)' }}
-                >
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <p>
-                      <strong style={{ color: 'var(--color-text-primary)' }}>
-                        Curated Selection:
-                      </strong>{' '}
-                      Browse our top AI plugins — Discoverability, Human & Agent
-                      Search, and more.
-                    </p>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <p>
-                      <strong style={{ color: 'var(--color-text-primary)' }}>
-                        Seamless Integration:
-                      </strong>{' '}
-                      Auto-install and auto-configure plugins optimized for
-                      semantic search and neural indexing.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="lg:order-1 relative">
-                <div className="relative bg-slate-800/40 backdrop-blur-xl border border-blue-400/20 rounded-3xl p-12 flex items-center justify-center hover:bg-slate-800/60 transition-all duration-300">
-                  <svg
-                    className="w-32 h-32"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    style={{ color: '#60a5fa', strokeWidth: 2 }}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1}
-                      d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div className="space-y-6">
-                <div className="inline-block px-4 py-2 bg-green-400/10 text-green-400 rounded-full text-sm font-medium border border-green-400/20">
-                  03 — AI Readiness
-                </div>
-                <h3
-                  className="text-2xl font-bold"
-                  style={{ color: 'var(--color-text-primary)' }}
-                >
-                  Agent Discoverability Suite
-                </h3>
-                <div
-                  className="space-y-4"
-                  style={{ color: 'var(--color-text-secondary)' }}
-                >
-                  <div className="flex items-start space-x-3">
-                    <div
-                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
-                      style={{ backgroundColor: 'var(--color-primary)' }}
-                    ></div>
-                    <p>
-                      <strong style={{ color: 'var(--color-text-primary)' }}>
-                        AI Readiness Diagnostics:
-                      </strong>{' '}
-                      Run diagnostics and understand how ready your site is for
-                      the era of AI.
-                    </p>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div
-                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
-                      style={{ backgroundColor: 'var(--color-primary)' }}
-                    ></div>
-                    <p>
-                      <strong style={{ color: 'var(--color-text-primary)' }}>
-                        Future-Proof Your Site:
-                      </strong>{' '}
-                      AI agents are becoming the new browsers. Optimize your
-                      website for AI discoverability and comprehension, leading
-                      to increased traffic and conversions.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="relative">
-                <div className="relative bg-slate-800/40 backdrop-blur-xl border border-green-400/20 rounded-3xl p-12 flex items-center justify-center hover:bg-slate-800/60 transition-all duration-300">
-                  <svg
-                    className="w-32 h-32"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    style={{ color: '#4ade80', strokeWidth: 2 }}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1}
-                      d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* Feature 4 */}
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div className="lg:order-2 space-y-6">
-                <div className="inline-block px-4 py-2 bg-purple-400/10 text-purple-400 rounded-full text-sm font-medium border border-purple-400/20">
-                  04 — Neural Search
-                </div>
-                <h3
-                  className="text-2xl font-bold"
-                  style={{ color: 'var(--color-text-primary)' }}
-                >
-                  Advanced Neural & Semantic Search
-                </h3>
-                <div
-                  className="space-y-4"
-                  style={{ color: 'var(--color-text-secondary)' }}
-                >
-                  <div className="flex items-start space-x-3">
-                    <div
-                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
-                      style={{ backgroundColor: 'var(--color-accent)' }}
-                    ></div>
-                    <p>
-                      <strong style={{ color: 'var(--color-text-primary)' }}>
-                        On-Site Neural Search:
-                      </strong>{' '}
-                      Give your users the power of vector-based search for
-                      faster, more relevant results.
-                    </p>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div
-                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
-                      style={{ backgroundColor: 'var(--color-accent)' }}
-                    ></div>
-                    <p>
-                      <strong style={{ color: 'var(--color-text-primary)' }}>
-                        AI Discoverability:
-                      </strong>{' '}
-                      Configure an easy interface to enable AIs to search your
-                      content in machine readable format.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="lg:order-1 relative">
-                <div className="relative bg-slate-800/40 backdrop-blur-xl border border-purple-400/20 rounded-3xl p-12 flex items-center justify-center hover:bg-slate-800/60 transition-all duration-300">
-                  <svg
-                    className="w-32 h-32"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    style={{ color: '#a855f7', strokeWidth: 2 }}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1}
-                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* Feature 5 */}
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div className="space-y-6">
-                <div className="inline-block px-4 py-2 bg-orange-400/10 text-orange-400 rounded-full text-sm font-medium border border-orange-400/20">
-                  05 — Billing
-                </div>
-                <h3
-                  className="text-2xl font-bold"
-                  style={{ color: 'var(--color-text-primary)' }}
-                >
-                  Billing & Subscription Control
-                </h3>
-                <div
-                  className="space-y-4"
-                  style={{ color: 'var(--color-text-secondary)' }}
-                >
-                  <div className="flex items-start space-x-3">
-                    <div
-                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
-                      style={{ backgroundColor: 'var(--color-primary)' }}
-                    ></div>
-                    <p>
-                      <strong style={{ color: 'var(--color-text-primary)' }}>
-                        Flexible Plans:
-                      </strong>{' '}
-                      Pay-as-you-grow pricing to suit blogs, agencies, and
-                      enterprises.
-                    </p>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div
-                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
-                      style={{ backgroundColor: 'var(--color-primary)' }}
-                    ></div>
-                    <p>
-                      <strong style={{ color: 'var(--color-text-primary)' }}>
-                        Automated Invoicing:
-                      </strong>{' '}
-                      Generate and send invoices automatically; track payments
-                      in real time.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="relative">
-                <div className="relative bg-slate-800/40 backdrop-blur-xl border border-orange-400/20 rounded-3xl p-12 flex items-center justify-center hover:bg-slate-800/60 transition-all duration-300">
-                  <svg
-                    className="w-32 h-32"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    style={{ color: '#f6ad8a', strokeWidth: 2 }}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1}
-                      d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="relative py-24 bg-gradient-to-b from-slate-900/50 to-transparent">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <h2 className="text-3xl font-bold text-white mb-4">How It Works</h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-orange-400 to-pink-400 mx-auto rounded-full"></div>
-          </div>
-
-          <div className="grid md:grid-cols-5 gap-8">
-            {[
-              {
-                step: '01',
-                title: 'Sign Up & Connect',
-                description:
-                  'Create your Lighthouse account and link your WordPress sites via our secure API.',
-                color: 'from-orange-400 to-red-400',
-              },
-              {
-                step: '02',
-                title: 'Explore AI Plugins',
-                description:
-                  'Install AI plugins optimized for Web 4.0 with a single click.',
-                color: 'from-blue-400 to-cyan-400',
-              },
-              {
-                step: '03',
-                title: 'AI Readiness Check',
-                description:
-                  'Run diagnostics and get immediate steps to make your site AI-ready.',
-                color: 'from-green-400 to-emerald-400',
-              },
-              {
-                step: '04',
-                title: 'Optimize & Scale',
-                description:
-                  'Leverage neural search tools to improve engagement and enable AI discovery.',
-                color: 'from-purple-400 to-violet-400',
-              },
-              {
-                step: '05',
-                title: 'Manage Billing',
-                description:
-                  'View usage reports, upgrade plans, and handle invoices from one interface.',
-                color: 'from-pink-400 to-rose-400',
-              },
-            ].map((item, index) => (
-              <div key={index} className="text-center relative">
-                <div className="relative mb-6">
-                  <div
-                    className={`w-16 h-16 rounded-2xl mx-auto bg-gradient-to-r ${item.color} flex items-center justify-center relative z-10 shadow-lg`}
-                  >
-                    <span className="text-white font-bold text-lg">
-                      {item.step}
-                    </span>
-                  </div>
-                  {index < 4 && (
-                    <div className="hidden md:block absolute top-8 left-1/2 w-full h-px">
-                      {/* Main connecting line */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-orange-400/15 via-pink-400/20 to-purple-400/15"></div>
-                      {/* Decorative dots */}
-                      <div className="absolute top-1/2 left-1/4 w-1 h-1 bg-orange-400/30 rounded-full transform -translate-y-1/2"></div>
-                      <div className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-pink-400/40 rounded-full transform -translate-y-1/2"></div>
-                      <div className="absolute top-1/2 left-3/4 w-1 h-1 bg-purple-400/30 rounded-full transform -translate-y-1/2"></div>
-                      {/* Connection point to next icon */}
-                      <div className="absolute top-1/2 right-4 w-2 h-2 bg-gradient-to-r from-pink-400/50 to-purple-400/50 rounded-full transform -translate-y-1/2 animate-pulse"></div>
-                    </div>
-                  )}
-                </div>
-                <h3 className="text-lg font-semibold mb-3 text-white">
-                  {item.title}
-                </h3>
-                <p className="text-gray-400 text-sm leading-relaxed">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQs Section */}
-      <section className="relative py-24">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <h2 className="text-3xl font-bold text-white mb-4">
-              Frequently Asked Questions
-            </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-orange-400 to-pink-400 mx-auto rounded-full"></div>
-          </div>
-
-          <div className="space-y-6">
-            {[
-              {
-                question: 'What is Web 4.0?',
-                answer:
-                  'Web 4.0 refers to the next evolution of the internet, centered on semantic understanding, AI-powered personalization, and decentralized architectures. Lighthouse Dashboard equips you with the tools to thrive in this new era.',
-              },
-              {
-                question: 'Can I control which AI crawlers access my site?',
-                answer:
-                  "Yes—the AI Readiness plugin's Access Control lets you allow or block any crawler without touching server configs.",
-              },
-              {
-                question: 'Is neural search better than keyword search?',
-                answer:
-                  "Yes—neural (vector-based) search understands context and semantics, delivering more accurate results even if the user's query doesn't match exact keywords. Lighthouse integrates both to cover all bases.",
-              },
-              {
-                question: 'Will search indexes update when I add new content?',
-                answer:
-                  'Absolutely — our AI Search plugins auto-reindex on publish or update.',
-              },
-              {
-                question: 'Who will be able to use the AI Search plugins?',
-                answer:
-                  'Who and What. Our search plugins can be used by humans, and importantly, AI agents that search the web. Your site can now be accessed by AI agents, and your content can be discovered by them.',
-              },
-            ].map((faq, index) => (
-              <div key={index} className="group">
-                <div className="bg-slate-800/40 backdrop-blur-xl border border-purple-400/20 rounded-2xl p-8 hover:bg-slate-800/60 transition-all duration-300">
-                  <h3 className="text-lg font-semibold mb-3 text-white">
-                    Q: {faq.question}
-                  </h3>
-                  <p className="text-gray-400 leading-relaxed">{faq.answer}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA Section */}
-      <section
-        className="relative py-24 overflow-hidden"
-        style={{ backgroundColor: 'var(--color-bg-secondary)' }}
-      >
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <h2
-            className="text-4xl md:text-5xl font-bold mb-6"
-            style={{ color: 'var(--color-text-primary)' }}
-          >
-            Ready to Illuminate Your
-            <span style={{ color: 'var(--color-accent)' }} className="block">
-              Web Presence?
-            </span>
-          </h2>
-          <p
-            className="text-xl mb-12 max-w-2xl mx-auto"
-            style={{ color: 'var(--color-text-secondary)' }}
-          >
-            Experience the future of website management today.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+          {/* Clean, purposeful CTAs */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
             <Link href="/register">
               <Button
                 size="lg"
-                className="text-white border-0 transition-all duration-300 px-8 py-4 text-lg"
-                style={{ backgroundColor: 'var(--color-accent)' }}
+                className="font-medium px-8 py-3 text-lg rounded transition-all duration-200 hover:shadow-lg"
+                style={{
+                  backgroundColor: 'var(--color-navigation-blue)',
+                  color: 'white',
+                  border: 'none',
+                }}
               >
-                Get Started Free
+                Begin Navigation
+              </Button>
+            </Link>
+            <Link href="#features">
+              <Button
+                variant="outline"
+                size="lg"
+                className="px-8 py-3 text-lg font-medium rounded transition-all duration-200"
+                style={{
+                  borderColor: 'var(--color-maritime-border)',
+                  color: 'var(--color-lighthouse-beam)',
+                  backgroundColor: 'transparent',
+                }}
+              >
+                Explore Systems
+              </Button>
+            </Link>
+          </div>
+
+          {/* Technical indicators */}
+          <div className="pt-20 opacity-60">
+            <div
+              className="flex justify-center items-center space-x-8 text-xs font-mono uppercase tracking-wider"
+              style={{ color: 'var(--color-maritime-fog)' }}
+            >
+              <div className="flex items-center space-x-2">
+                <div
+                  className="w-1 h-1 rounded-full"
+                  style={{ backgroundColor: 'var(--color-navigation-green)' }}
+                ></div>
+                <span>10K+ Sites</span>
+              </div>
+              <div
+                className="w-px h-4"
+                style={{ backgroundColor: 'var(--color-maritime-border)' }}
+              ></div>
+              <div className="flex items-center space-x-2">
+                <div
+                  className="w-1 h-1 rounded-full"
+                  style={{ backgroundColor: 'var(--color-navigation-green)' }}
+                ></div>
+                <span>AI Ready</span>
+              </div>
+              <div
+                className="w-px h-4"
+                style={{ backgroundColor: 'var(--color-maritime-border)' }}
+              ></div>
+              <div className="flex items-center space-x-2">
+                <div
+                  className="w-1 h-1 rounded-full"
+                  style={{ backgroundColor: 'var(--color-navigation-green)' }}
+                ></div>
+                <span>99.9% Uptime</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* Core Systems Section */}
+    <section
+      id="features"
+      className="relative py-24"
+      style={{ backgroundColor: 'var(--color-ocean-surface)' }}
+    >
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Section header */}
+        <div className="text-center mb-16">
+          <div
+            className="inline-flex items-center px-3 py-1 rounded border text-xs font-mono tracking-wider uppercase mb-8"
+            style={{
+              borderColor: 'var(--color-maritime-border)',
+              backgroundColor: 'rgba(51, 65, 85, 0.3)',
+              color: 'var(--color-beacon-light)',
+            }}
+          >
+            <span className="w-1 h-1 bg-current rounded-full mr-2"></span>
+            Core Navigation Systems
+          </div>
+          <h2
+            className="text-4xl md:text-5xl font-light leading-tight mb-6"
+            style={{ color: 'var(--color-lighthouse-beam)' }}
+          >
+            Precision Tools for{' '}
+            <span style={{ color: 'var(--color-beacon-light)' }}>
+              Web Discovery
+            </span>
+          </h2>
+          <p
+            className="text-lg max-w-3xl mx-auto leading-relaxed"
+            style={{ color: 'var(--color-maritime-fog)' }}
+          >
+            Three integrated systems that make your WordPress sites visible and
+            navigable to intelligent agents across the evolving web
+            infrastructure.
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Plugin Management System */}
+          <div className="group relative">
+            <div
+              className="border rounded-lg p-8 transition-all duration-200 hover:shadow-lg"
+              style={{
+                backgroundColor: 'var(--color-lighthouse-structure)',
+                borderColor: 'var(--color-maritime-border)',
+              }}
+            >
+              {/* System indicator */}
+              <div className="flex items-center justify-between mb-6">
+                <div
+                  className="text-xs font-mono tracking-wider uppercase"
+                  style={{ color: 'var(--color-beacon-light)' }}
+                >
+                  01 • Plugin Management
+                </div>
+                <div
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: 'var(--color-navigation-green)' }}
+                ></div>
+              </div>
+
+              {/* Icon - geometric, purposeful */}
+              <div
+                className="w-12 h-12 mb-6 flex items-center justify-center rounded"
+                style={{ backgroundColor: 'rgba(37, 99, 235, 0.1)' }}
+              >
+                <svg
+                  className="w-6 h-6"
+                  style={{ color: 'var(--color-navigation-blue)' }}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"
+                  />
+                </svg>
+              </div>
+
+              <h3
+                className="text-xl font-medium mb-4 leading-tight"
+                style={{ color: 'var(--color-lighthouse-beam)' }}
+              >
+                AI Plugin Infrastructure
+              </h3>
+
+              <p
+                className="leading-relaxed mb-6 text-sm"
+                style={{ color: 'var(--color-maritime-fog)' }}
+              >
+                Automated deployment and configuration of AI-ready WordPress
+                plugins. Transform existing sites into agent-discoverable
+                platforms without technical overhead.
+              </p>
+
+              {/* Technical specs */}
+              <div
+                className="space-y-2 text-xs font-mono"
+                style={{ color: 'var(--color-maritime-fog)' }}
+              >
+                <div className="flex justify-between">
+                  <span>Deployment</span>
+                  <span style={{ color: 'var(--color-navigation-green)' }}>
+                    Automated
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Configuration</span>
+                  <span style={{ color: 'var(--color-navigation-green)' }}>
+                    Zero-touch
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Updates</span>
+                  <span style={{ color: 'var(--color-navigation-green)' }}>
+                    Continuous
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Discovery Registry */}
+          <div className="group relative lg:mt-8">
+            <div
+              className="border rounded-lg p-8 transition-all duration-200 hover:shadow-lg"
+              style={{
+                backgroundColor: 'var(--color-lighthouse-structure)',
+                borderColor: 'var(--color-maritime-border)',
+              }}
+            >
+              {/* System indicator */}
+              <div className="flex items-center justify-between mb-6">
+                <div
+                  className="text-xs font-mono tracking-wider uppercase"
+                  style={{ color: 'var(--color-beacon-light)' }}
+                >
+                  02 • Discovery Registry
+                </div>
+                <div
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: 'var(--color-navigation-green)' }}
+                ></div>
+              </div>
+
+              {/* Icon */}
+              <div
+                className="w-12 h-12 mb-6 flex items-center justify-center rounded"
+                style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)' }}
+              >
+                <svg
+                  className="w-6 h-6"
+                  style={{ color: 'var(--color-navigation-green)' }}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                  />
+                </svg>
+              </div>
+
+              <h3
+                className="text-xl font-medium mb-4 leading-tight"
+                style={{ color: 'var(--color-lighthouse-beam)' }}
+              >
+                Agent Discovery Network
+              </h3>
+
+              <p
+                className="leading-relaxed mb-6 text-sm"
+                style={{ color: 'var(--color-maritime-fog)' }}
+              >
+                Distributed registry system that indexes your AI services,
+                making them discoverable to intelligent agents and partner
+                networks across the web.
+              </p>
+
+              {/* Technical specs */}
+              <div
+                className="space-y-2 text-xs font-mono"
+                style={{ color: 'var(--color-maritime-fog)' }}
+              >
+                <div className="flex justify-between">
+                  <span>Network</span>
+                  <span style={{ color: 'var(--color-navigation-green)' }}>
+                    Global
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Indexing</span>
+                  <span style={{ color: 'var(--color-navigation-green)' }}>
+                    Real-time
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Protocol</span>
+                  <span style={{ color: 'var(--color-navigation-green)' }}>
+                    Open
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Neural Search Engine */}
+          <div className="group relative">
+            <div
+              className="border rounded-lg p-8 transition-all duration-200 hover:shadow-lg"
+              style={{
+                backgroundColor: 'var(--color-lighthouse-structure)',
+                borderColor: 'var(--color-maritime-border)',
+              }}
+            >
+              {/* System indicator */}
+              <div className="flex items-center justify-between mb-6">
+                <div
+                  className="text-xs font-mono tracking-wider uppercase"
+                  style={{ color: 'var(--color-beacon-light)' }}
+                >
+                  03 • Neural Search
+                </div>
+                <div
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: 'var(--color-navigation-green)' }}
+                ></div>
+              </div>
+
+              {/* Icon */}
+              <div
+                className="w-12 h-12 mb-6 flex items-center justify-center rounded"
+                style={{ backgroundColor: 'rgba(96, 165, 250, 0.1)' }}
+              >
+                <svg
+                  className="w-6 h-6"
+                  style={{ color: 'var(--color-beacon-light)' }}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
+                </svg>
+              </div>
+
+              <h3
+                className="text-xl font-medium mb-4 leading-tight"
+                style={{ color: 'var(--color-lighthouse-beam)' }}
+              >
+                Semantic Search Interface
+              </h3>
+
+              <p
+                className="leading-relaxed mb-6 text-sm"
+                style={{ color: 'var(--color-maritime-fog)' }}
+              >
+                Advanced neural search infrastructure that enables contextual,
+                semantic content discovery for both human users and AI agents
+                navigating your site.
+              </p>
+
+              {/* Technical specs */}
+              <div
+                className="space-y-2 text-xs font-mono"
+                style={{ color: 'var(--color-maritime-fog)' }}
+              >
+                <div className="flex justify-between">
+                  <span>Algorithm</span>
+                  <span style={{ color: 'var(--color-navigation-green)' }}>
+                    Vector-based
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Context</span>
+                  <span style={{ color: 'var(--color-navigation-green)' }}>
+                    Semantic
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Interface</span>
+                  <span style={{ color: 'var(--color-navigation-green)' }}>
+                    Universal
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* Technical Implementation Section */}
+    <section
+      className="relative py-24"
+      style={{ backgroundColor: 'var(--color-ocean-deep)' }}
+    >
+      {/* Subtle technical grid background */}
+      <div className="absolute inset-0 opacity-5">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `linear-gradient(var(--color-maritime-border) 1px, transparent 1px),
+                                linear-gradient(90deg, var(--color-maritime-border) 1px, transparent 1px)`,
+            backgroundSize: '40px 40px',
+          }}
+        ></div>
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-6">
+        <div className="text-center mb-20">
+          <div
+            className="inline-flex items-center px-3 py-1 rounded border text-xs font-mono tracking-wider uppercase mb-8"
+            style={{
+              borderColor: 'var(--color-maritime-border)',
+              backgroundColor: 'rgba(51, 65, 85, 0.3)',
+              color: 'var(--color-beacon-light)',
+            }}
+          >
+            <span className="w-1 h-1 bg-current rounded-full mr-2"></span>
+            Technical Implementation
+          </div>
+          <h2
+            className="text-4xl md:text-5xl font-light leading-tight mb-6"
+            style={{ color: 'var(--color-lighthouse-beam)' }}
+          >
+            Comprehensive Navigation{' '}
+            <span style={{ color: 'var(--color-beacon-light)' }}>
+              Infrastructure
+            </span>
+          </h2>
+          <p
+            className="text-lg max-w-3xl mx-auto leading-relaxed"
+            style={{ color: 'var(--color-maritime-fog)' }}
+          >
+            Five integrated modules that establish your WordPress sites as
+            navigable waypoints in the evolving AI-powered web ecosystem.
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Module 1: Site Management */}
+          <div
+            className="border-l-2 pl-6"
+            style={{ borderColor: 'var(--color-navigation-blue)' }}
+          >
+            <div className="space-y-6">
+              <div className="flex items-center space-x-4">
+                <div
+                  className="text-xs font-mono tracking-wider uppercase px-2 py-1 rounded border"
+                  style={{
+                    borderColor: 'var(--color-navigation-blue)',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    color: 'var(--color-navigation-blue)',
+                  }}
+                >
+                  Module 01
+                </div>
+                <div
+                  className="h-px flex-1"
+                  style={{ backgroundColor: 'var(--color-maritime-border)' }}
+                ></div>
+              </div>
+
+              <h3
+                className="text-2xl font-medium leading-tight"
+                style={{ color: 'var(--color-lighthouse-beam)' }}
+              >
+                Centralized Site Management Console
+              </h3>
+
+              <p
+                className="text-base leading-relaxed"
+                style={{ color: 'var(--color-maritime-fog)' }}
+              >
+                Unified command center for monitoring and controlling multiple
+                WordPress installations. Real-time diagnostics, performance
+                metrics, and automated maintenance protocols.
+              </p>
+
+              <div className="space-y-4">
+                <div className="space-y-3">
+                  <h4
+                    className="text-sm font-mono uppercase tracking-wider"
+                    style={{ color: 'var(--color-beacon-light)' }}
+                  >
+                    Multi-Site Coordination
+                  </h4>
+                  <ul
+                    className="space-y-2 text-sm"
+                    style={{ color: 'var(--color-maritime-fog)' }}
+                  >
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Real-time performance monitoring</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Centralized security protocols</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Automated backup systems</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="space-y-3">
+                  <h4
+                    className="text-sm font-mono uppercase tracking-wider"
+                    style={{ color: 'var(--color-beacon-light)' }}
+                  >
+                    Plugin Deployment
+                  </h4>
+                  <ul
+                    className="space-y-2 text-sm"
+                    style={{ color: 'var(--color-maritime-fog)' }}
+                  >
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>One-click AI plugin installation</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Automated configuration setup</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Continuous update management</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Module 2: Plugin Marketplace */}
+          <div
+            className="border-l-2 pl-6"
+            style={{ borderColor: 'var(--color-navigation-green)' }}
+          >
+            <div className="space-y-6">
+              <div className="flex items-center space-x-4">
+                <div
+                  className="text-xs font-mono tracking-wider uppercase px-2 py-1 rounded border"
+                  style={{
+                    borderColor: 'var(--color-navigation-green)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    color: 'var(--color-navigation-green)',
+                  }}
+                >
+                  Module 02
+                </div>
+                <div
+                  className="h-px flex-1"
+                  style={{ backgroundColor: 'var(--color-maritime-border)' }}
+                ></div>
+              </div>
+
+              <h3
+                className="text-2xl font-medium leading-tight"
+                style={{ color: 'var(--color-lighthouse-beam)' }}
+              >
+                AI Plugin Distribution Network
+              </h3>
+
+              <p
+                className="text-base leading-relaxed"
+                style={{ color: 'var(--color-maritime-fog)' }}
+              >
+                Curated collection of specialized AI plugins engineered for Web
+                4.0 compatibility. Each plugin is tested, optimized, and
+                configured for seamless agent integration.
+              </p>
+
+              <div className="space-y-4">
+                <div className="space-y-3">
+                  <h4
+                    className="text-sm font-mono uppercase tracking-wider"
+                    style={{ color: 'var(--color-beacon-light)' }}
+                  >
+                    Curated Selection
+                  </h4>
+                  <ul
+                    className="space-y-2 text-sm"
+                    style={{ color: 'var(--color-maritime-fog)' }}
+                  >
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Agent Discoverability plugins</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Neural search interfaces</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Semantic content processors</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="space-y-3">
+                  <h4
+                    className="text-sm font-mono uppercase tracking-wider"
+                    style={{ color: 'var(--color-beacon-light)' }}
+                  >
+                    Integration Protocol
+                  </h4>
+                  <ul
+                    className="space-y-2 text-sm"
+                    style={{ color: 'var(--color-maritime-fog)' }}
+                  >
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Automated dependency resolution</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Configuration-free deployment</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Version compatibility checking</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Module 3: Neural Search */}
+          <div
+            className="border-l-2 pl-6"
+            style={{ borderColor: 'var(--color-beacon-light)' }}
+          >
+            <div className="space-y-6">
+              <div className="flex items-center space-x-4">
+                <div
+                  className="text-xs font-mono tracking-wider uppercase px-2 py-1 rounded border"
+                  style={{
+                    borderColor: 'var(--color-beacon-light)',
+                    backgroundColor: 'rgba(96, 165, 250, 0.1)',
+                    color: 'var(--color-beacon-light)',
+                  }}
+                >
+                  Module 03
+                </div>
+                <div
+                  className="h-px flex-1"
+                  style={{ backgroundColor: 'var(--color-maritime-border)' }}
+                ></div>
+              </div>
+
+              <h3
+                className="text-2xl font-medium leading-tight"
+                style={{ color: 'var(--color-lighthouse-beam)' }}
+              >
+                Semantic Search Engine
+              </h3>
+
+              <p
+                className="text-base leading-relaxed"
+                style={{ color: 'var(--color-maritime-fog)' }}
+              >
+                Vector-based search infrastructure that enables contextual
+                content discovery for both human users and AI agents navigating
+                your site.
+              </p>
+
+              <div className="space-y-4">
+                <div className="space-y-3">
+                  <h4
+                    className="text-sm font-mono uppercase tracking-wider"
+                    style={{ color: 'var(--color-beacon-light)' }}
+                  >
+                    Search Infrastructure
+                  </h4>
+                  <ul
+                    className="space-y-2 text-sm"
+                    style={{ color: 'var(--color-maritime-fog)' }}
+                  >
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Vector-based algorithm processing</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Real-time content indexing</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Contextual result ranking</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="space-y-3">
+                  <h4
+                    className="text-sm font-mono uppercase tracking-wider"
+                    style={{ color: 'var(--color-beacon-light)' }}
+                  >
+                    Agent Interface
+                  </h4>
+                  <ul
+                    className="space-y-2 text-sm"
+                    style={{ color: 'var(--color-maritime-fog)' }}
+                  >
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Structured API endpoints</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Semantic query processing</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Machine-readable responses</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Module 4: Analytics */}
+          <div
+            className="border-l-2 pl-6"
+            style={{ borderColor: 'var(--color-signal-amber)' }}
+          >
+            <div className="space-y-6">
+              <div className="flex items-center space-x-4">
+                <div
+                  className="text-xs font-mono tracking-wider uppercase px-2 py-1 rounded border"
+                  style={{
+                    borderColor: 'var(--color-signal-amber)',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    color: 'var(--color-signal-amber)',
+                  }}
+                >
+                  Module 04
+                </div>
+                <div
+                  className="h-px flex-1"
+                  style={{ backgroundColor: 'var(--color-maritime-border)' }}
+                ></div>
+              </div>
+
+              <h3
+                className="text-2xl font-medium leading-tight"
+                style={{ color: 'var(--color-lighthouse-beam)' }}
+              >
+                Navigation Analytics
+              </h3>
+
+              <p
+                className="text-base leading-relaxed"
+                style={{ color: 'var(--color-maritime-fog)' }}
+              >
+                Track agent interactions, monitor discoverability metrics, and
+                optimize navigation patterns across your site network.
+              </p>
+
+              <div className="space-y-4">
+                <div className="space-y-3">
+                  <h4
+                    className="text-sm font-mono uppercase tracking-wider"
+                    style={{ color: 'var(--color-beacon-light)' }}
+                  >
+                    Traffic Analysis
+                  </h4>
+                  <ul
+                    className="space-y-2 text-sm"
+                    style={{ color: 'var(--color-maritime-fog)' }}
+                  >
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Agent interaction tracking</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Human user analytics</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Search pattern analysis</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="space-y-3">
+                  <h4
+                    className="text-sm font-mono uppercase tracking-wider"
+                    style={{ color: 'var(--color-beacon-light)' }}
+                  >
+                    Performance Metrics
+                  </h4>
+                  <ul
+                    className="space-y-2 text-sm"
+                    style={{ color: 'var(--color-maritime-fog)' }}
+                  >
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Real-time reporting dashboard</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Discoverability optimization</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <div
+                        className="w-1 h-1 rounded-full"
+                        style={{
+                          backgroundColor: 'var(--color-navigation-green)',
+                        }}
+                      ></div>
+                      <span>Network performance insights</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* Navigation Protocol Section */}
+    <section
+      className="relative py-24"
+      style={{ backgroundColor: 'var(--color-ocean-surface)' }}
+    >
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <div
+            className="inline-flex items-center px-3 py-1 rounded border text-xs font-mono tracking-wider uppercase mb-8"
+            style={{
+              borderColor: 'var(--color-maritime-border)',
+              backgroundColor: 'rgba(51, 65, 85, 0.3)',
+              color: 'var(--color-beacon-light)',
+            }}
+          >
+            <span className="w-1 h-1 bg-current rounded-full mr-2"></span>
+            Navigation Protocol
+          </div>
+          <h2
+            className="text-4xl md:text-5xl font-light leading-tight mb-6"
+            style={{ color: 'var(--color-lighthouse-beam)' }}
+          >
+            Deployment{' '}
+            <span style={{ color: 'var(--color-beacon-light)' }}>Sequence</span>
+          </h2>
+          <p
+            className="text-lg max-w-3xl mx-auto leading-relaxed"
+            style={{ color: 'var(--color-maritime-fog)' }}
+          >
+            Five-phase implementation protocol for establishing your WordPress
+            sites as navigable waypoints in the AI-powered web infrastructure.
+          </p>
+        </div>
+
+        <div className="relative">
+          {/* Connection line */}
+          <div
+            className="hidden lg:block absolute top-8 left-0 w-full h-px"
+            style={{ backgroundColor: 'var(--color-maritime-border)' }}
+          >
+            <div
+              className="absolute top-1/2 left-1/4 w-1 h-1 rounded-full transform -translate-y-1/2"
+              style={{ backgroundColor: 'var(--color-beacon-light)' }}
+            ></div>
+            <div
+              className="absolute top-1/2 left-2/4 w-1 h-1 rounded-full transform -translate-y-1/2"
+              style={{ backgroundColor: 'var(--color-beacon-light)' }}
+            ></div>
+            <div
+              className="absolute top-1/2 left-3/4 w-1 h-1 rounded-full transform -translate-y-1/2"
+              style={{ backgroundColor: 'var(--color-beacon-light)' }}
+            ></div>
+          </div>
+
+          <div className="grid lg:grid-cols-5 gap-8">
+            {[
+              {
+                phase: '01',
+                title: 'System Integration',
+                description:
+                  'Establish secure API connection between Lighthouse control center and your WordPress installations.',
+                status: 'Initialize',
+              },
+              {
+                phase: '02',
+                title: 'Plugin Deployment',
+                description:
+                  'Install and configure AI-ready plugins optimized for agent interaction and semantic indexing.',
+                status: 'Deploy',
+              },
+              {
+                phase: '03',
+                title: 'Readiness Diagnostic',
+                description:
+                  'Run comprehensive analysis to identify optimization opportunities and compatibility issues.',
+                status: 'Analyze',
+              },
+              {
+                phase: '04',
+                title: 'Optimization Protocol',
+                description:
+                  'Implement neural search, structured data, and agent discovery interfaces across your network.',
+                status: 'Optimize',
+              },
+              {
+                phase: '05',
+                title: 'Monitoring System',
+                description:
+                  'Activate real-time analytics, performance tracking, and automated maintenance protocols.',
+                status: 'Monitor',
+              },
+            ].map((item, index) => (
+              <div key={index} className="relative">
+                <div className="text-center">
+                  {/* Phase indicator */}
+                  <div className="relative mb-6">
+                    <div
+                      className="w-16 h-16 mx-auto rounded border-2 flex items-center justify-center relative z-10"
+                      style={{
+                        backgroundColor: 'var(--color-lighthouse-structure)',
+                        borderColor: 'var(--color-navigation-blue)',
+                      }}
+                    >
+                      <span
+                        className="text-lg font-mono font-medium"
+                        style={{ color: 'var(--color-navigation-blue)' }}
+                      >
+                        {item.phase}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Status */}
+                  <div
+                    className="text-xs font-mono tracking-wider uppercase mb-3"
+                    style={{ color: 'var(--color-beacon-light)' }}
+                  >
+                    {item.status}
+                  </div>
+
+                  {/* Title */}
+                  <h3
+                    className="text-lg font-medium mb-3 leading-tight"
+                    style={{ color: 'var(--color-lighthouse-beam)' }}
+                  >
+                    {item.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p
+                    className="text-sm leading-relaxed"
+                    style={{ color: 'var(--color-maritime-fog)' }}
+                  >
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* Technical Documentation Section */}
+    <section
+      className="relative py-24"
+      style={{ backgroundColor: 'var(--color-ocean-deep)' }}
+    >
+      <div className="max-w-4xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <div
+            className="inline-flex items-center px-3 py-1 rounded border text-xs font-mono tracking-wider uppercase mb-8"
+            style={{
+              borderColor: 'var(--color-maritime-border)',
+              backgroundColor: 'rgba(51, 65, 85, 0.3)',
+              color: 'var(--color-beacon-light)',
+            }}
+          >
+            <span className="w-1 h-1 bg-current rounded-full mr-2"></span>
+            Technical Documentation
+          </div>
+          <h2
+            className="text-4xl md:text-5xl font-light leading-tight mb-6"
+            style={{ color: 'var(--color-lighthouse-beam)' }}
+          >
+            System{' '}
+            <span style={{ color: 'var(--color-beacon-light)' }}>
+              Specifications
+            </span>
+          </h2>
+          <p
+            className="text-lg leading-relaxed"
+            style={{ color: 'var(--color-maritime-fog)' }}
+          >
+            Common implementation questions and technical requirements for Web
+            4.0 navigation systems.
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          {[
+            {
+              query: 'What defines Web 4.0 architecture?',
+              response:
+                'Web 4.0 represents the semantic, AI-driven internet layer built on intelligent agents, contextual understanding, and decentralized data structures. Lighthouse provides the infrastructure tools necessary for site compatibility with these emerging protocols.',
+            },
+            {
+              query: 'How does agent access control function?',
+              response:
+                'The AI Readiness module includes granular access control for automated agents. Configure which crawlers, indexers, and AI systems can access your content without modifying server configurations or .htaccess files.',
+            },
+            {
+              query:
+                'What advantages does neural search provide over keyword matching?',
+              response:
+                'Neural search operates on vector embeddings, enabling semantic understanding rather than literal string matching. This allows contextual queries to return relevant results even when exact keywords are absent, improving both human and agent navigation efficiency.',
+            },
+            {
+              query: 'How does content indexing update with site changes?',
+              response:
+                'The neural search infrastructure monitors content changes through WordPress hooks, automatically reprocessing and reindexing modified content. Updates propagate to the search layer without manual intervention or batch processing delays.',
+            },
+            {
+              query: 'Which entities can utilize the search interfaces?',
+              response:
+                'The search system is designed for dual access: human users through traditional web interfaces, and AI agents through structured API endpoints. This enables your content to be discoverable by both current users and emerging intelligent navigation systems.',
+            },
+          ].map((item, index) => (
+            <div
+              key={index}
+              className="border rounded-lg"
+              style={{
+                backgroundColor: 'var(--color-lighthouse-structure)',
+                borderColor: 'var(--color-maritime-border)',
+              }}
+            >
+              <div className="p-6">
+                <div className="flex items-start space-x-4">
+                  <div
+                    className="text-xs font-mono tracking-wider uppercase px-2 py-1 rounded border mt-1"
+                    style={{
+                      borderColor: 'var(--color-beacon-light)',
+                      backgroundColor: 'rgba(96, 165, 250, 0.1)',
+                      color: 'var(--color-beacon-light)',
+                    }}
+                  >
+                    Q{String(index + 1).padStart(2, '0')}
+                  </div>
+                  <div className="flex-1">
+                    <h3
+                      className="text-lg font-medium mb-3 leading-tight"
+                      style={{ color: 'var(--color-lighthouse-beam)' }}
+                    >
+                      {item.query}
+                    </h3>
+                    <p
+                      className="leading-relaxed"
+                      style={{ color: 'var(--color-maritime-fog)' }}
+                    >
+                      {item.response}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* Navigation Ready Section */}
+    <section
+      className="relative py-24"
+      style={{ backgroundColor: 'var(--color-ocean-surface)' }}
+    >
+      {/* Subtle lighthouse beam effect */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial from-blue-400/2 via-blue-400/1 to-transparent rounded-full"></div>
+      </div>
+
+      <div className="relative max-w-4xl mx-auto px-6 text-center">
+        <div className="space-y-12">
+          <div className="space-y-8">
+            {/* Status indicator */}
+            <div
+              className="inline-flex items-center px-3 py-1 rounded border text-xs font-mono tracking-wider uppercase"
+              style={{
+                borderColor: 'var(--color-navigation-green)',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                color: 'var(--color-navigation-green)',
+              }}
+            >
+              <span className="w-2 h-2 bg-current rounded-full mr-2 animate-pulse"></span>
+              System Ready For Deployment
+            </div>
+
+            <h2
+              className="text-4xl md:text-5xl font-light leading-tight"
+              style={{ color: 'var(--color-lighthouse-beam)' }}
+            >
+              Ready to establish{' '}
+              <span style={{ color: 'var(--color-beacon-light)' }}>
+                navigation beacons
+              </span>
+              <br />
+              for your web infrastructure?
+            </h2>
+
+            <p
+              className="text-lg max-w-3xl mx-auto leading-relaxed"
+              style={{ color: 'var(--color-maritime-fog)' }}
+            >
+              Deploy Lighthouse navigation systems across your WordPress
+              network. Enable AI agent discovery and semantic search
+              capabilities.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+            <Link href="/register">
+              <Button
+                size="lg"
+                className="font-medium px-8 py-4 text-lg rounded transition-all duration-200 hover:shadow-lg"
+                style={{
+                  backgroundColor: 'var(--color-navigation-blue)',
+                  color: 'white',
+                  border: 'none',
+                }}
+              >
+                Initialize Navigation System
               </Button>
             </Link>
             <Link href="/contact">
               <Button
+                variant="outline"
                 size="lg"
-                variant="ghost"
-                className="px-8 py-4 text-lg transition-all duration-300"
-                style={{ color: 'var(--color-text-secondary)' }}
+                className="px-8 py-4 text-lg font-medium rounded transition-all duration-200"
+                style={{
+                  borderColor: 'var(--color-maritime-border)',
+                  color: 'var(--color-lighthouse-beam)',
+                  backgroundColor: 'transparent',
+                }}
               >
-                Request a Demo
+                Technical Consultation
               </Button>
             </Link>
           </div>
-        </div>
-      </section>
 
-      {/* Footer */}
-      <footer
-        className="relative border-t backdrop-blur-xl"
-        style={{
-          borderColor: 'var(--color-border)',
-          backgroundColor: 'var(--color-bg-card)',
-        }}
-      >
-        <div className="max-w-7xl mx-auto py-16 px-6">
-          <div className="grid md:grid-cols-4 gap-12">
-            {/* Company Info */}
-            <div className="md:col-span-2">
-              <div className="flex items-center space-x-3 mb-6">
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center"
-                  style={{ backgroundColor: 'var(--color-accent)' }}
-                >
-                  <span className="font-bold text-white text-lg">L</span>
-                </div>
-                <span
-                  className="text-xl font-semibold"
-                  style={{ color: 'var(--color-text-primary)' }}
-                >
-                  Lighthouse Dashboard
-                </span>
-              </div>
-              <p
-                className="mb-6 leading-relaxed"
-                style={{ color: 'var(--color-text-secondary)' }}
-              >
-                The ultimate AI-powered portal for managing WordPress sites,
-                plugins, and billing—optimized for Web 4.0 agent
-                discoverability.
-              </p>
-              <div className="flex space-x-6">
-                <Link
-                  href="/privacy"
-                  className="transition-colors"
-                  style={{ color: 'var(--color-text-muted)' }}
-                >
-                  Privacy Policy
-                </Link>
-                <Link
-                  href="/terms"
-                  className="transition-colors"
-                  style={{ color: 'var(--color-text-muted)' }}
-                >
-                  Terms of Service
-                </Link>
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div>
-              <h3
-                className="font-semibold mb-6"
-                style={{ color: 'var(--color-text-primary)' }}
-              >
-                Quick Links
-              </h3>
-              <ul className="space-y-3">
-                {['Features', 'Pricing', 'Documentation', 'Support'].map(
-                  item => (
-                    <li key={item}>
-                      <Link
-                        href={`/${item.toLowerCase()}`}
-                        className="transition-colors"
-                        style={{ color: 'var(--color-text-muted)' }}
-                      >
-                        {item}
-                      </Link>
-                    </li>
-                  )
-                )}
-              </ul>
-            </div>
-
-            {/* Resources */}
-            <div>
-              <h3
-                className="font-semibold mb-6"
-                style={{ color: 'var(--color-text-primary)' }}
-              >
-                Resources
-              </h3>
-              <ul className="space-y-3">
-                {['Blog', 'Case Studies', 'API Documentation', 'Community'].map(
-                  item => (
-                    <li key={item}>
-                      <Link
-                        href={`/${item.toLowerCase().replace(' ', '-')}`}
-                        className="transition-colors"
-                        style={{ color: 'var(--color-text-muted)' }}
-                      >
-                        {item}
-                      </Link>
-                    </li>
-                  )
-                )}
-              </ul>
-            </div>
-          </div>
-
+          {/* Network status */}
           <div
-            className="mt-12 pt-8 border-t"
-            style={{ borderColor: 'var(--color-border)' }}
+            className="pt-16 border-t"
+            style={{ borderColor: 'var(--color-maritime-border)' }}
           >
-            <div className="text-center">
-              <p style={{ color: 'var(--color-text-muted)' }}>
-                &copy; 2025 Lighthouse Studios. All rights reserved.
-              </p>
+            <div
+              className="text-xs font-mono tracking-wider uppercase mb-4"
+              style={{ color: 'var(--color-beacon-light)' }}
+            >
+              Network Status
+            </div>
+            <div className="grid grid-cols-3 gap-8 max-w-lg mx-auto">
+              <div className="text-center">
+                <div
+                  className="text-2xl font-mono font-medium mb-1"
+                  style={{ color: 'var(--color-lighthouse-beam)' }}
+                >
+                  10K+
+                </div>
+                <div
+                  className="text-xs font-mono uppercase tracking-wider"
+                  style={{ color: 'var(--color-maritime-fog)' }}
+                >
+                  Sites Connected
+                </div>
+              </div>
+              <div className="text-center">
+                <div
+                  className="text-2xl font-mono font-medium mb-1"
+                  style={{ color: 'var(--color-lighthouse-beam)' }}
+                >
+                  99.9%
+                </div>
+                <div
+                  className="text-xs font-mono uppercase tracking-wider"
+                  style={{ color: 'var(--color-maritime-fog)' }}
+                >
+                  System Uptime
+                </div>
+              </div>
+              <div className="text-center">
+                <div
+                  className="text-2xl font-mono font-medium mb-1"
+                  style={{ color: 'var(--color-lighthouse-beam)' }}
+                >
+                  24/7
+                </div>
+                <div
+                  className="text-xs font-mono uppercase tracking-wider"
+                  style={{ color: 'var(--color-maritime-fog)' }}
+                >
+                  Monitoring
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </footer>
-    </div>
+      </div>
+    </section>
+
+    {/* System Footer */}
+    <footer
+      className="relative border-t"
+      style={{
+        borderColor: 'var(--color-maritime-border)',
+        backgroundColor: 'var(--color-ocean-deep)',
+      }}
+    >
+      <div className="max-w-7xl mx-auto py-12 px-6">
+        <div className="grid md:grid-cols-4 gap-8">
+          {/* Navigation Control */}
+          <div className="md:col-span-2">
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="w-8 h-8 flex items-center justify-center">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 2L8 8H16L12 2Z"
+                    fill="var(--color-beacon-light)"
+                  />
+                  <rect
+                    x="10"
+                    y="8"
+                    width="4"
+                    height="12"
+                    fill="var(--color-lighthouse-beam)"
+                    fillOpacity="0.9"
+                  />
+                  <rect
+                    x="8"
+                    y="20"
+                    width="8"
+                    height="2"
+                    fill="var(--color-lighthouse-structure)"
+                  />
+                  <circle
+                    cx="12"
+                    cy="5"
+                    r="1"
+                    fill="var(--color-navigation-blue)"
+                  />
+                </svg>
+              </div>
+              <span
+                className="text-lg font-medium"
+                style={{ color: 'var(--color-lighthouse-beam)' }}
+              >
+                Lighthouse Studios
+              </span>
+            </div>
+            <p
+              className="mb-6 leading-relaxed text-sm"
+              style={{ color: 'var(--color-maritime-fog)' }}
+            >
+              Navigation infrastructure for AI-powered web discovery.
+              Specialized tools for WordPress site optimization and agent
+              discoverability protocols.
+            </p>
+            <div className="flex space-x-6 text-xs">
+              <Link
+                href="/privacy"
+                className="transition-colors font-mono tracking-wider uppercase"
+                style={{ color: 'var(--color-maritime-fog)' }}
+              >
+                Privacy
+              </Link>
+              <Link
+                href="/terms"
+                className="transition-colors font-mono tracking-wider uppercase"
+                style={{ color: 'var(--color-maritime-fog)' }}
+              >
+                Terms
+              </Link>
+            </div>
+          </div>
+
+          {/* Navigation Links */}
+          <div>
+            <h3
+              className="text-sm font-mono tracking-wider uppercase mb-4"
+              style={{ color: 'var(--color-beacon-light)' }}
+            >
+              Navigation
+            </h3>
+            <ul className="space-y-2 text-sm">
+              {['Systems', 'Documentation', 'Technical Support', 'Status'].map(
+                item => (
+                  <li key={item}>
+                    <Link
+                      href={`/${item.toLowerCase().replace(' ', '-')}`}
+                      className="transition-colors"
+                      style={{ color: 'var(--color-maritime-fog)' }}
+                    >
+                      {item}
+                    </Link>
+                  </li>
+                )
+              )}
+            </ul>
+          </div>
+
+          {/* Technical Resources */}
+          <div>
+            <h3
+              className="text-sm font-mono tracking-wider uppercase mb-4"
+              style={{ color: 'var(--color-beacon-light)' }}
+            >
+              Resources
+            </h3>
+            <ul className="space-y-2 text-sm">
+              {[
+                'API Reference',
+                'Implementation Guide',
+                'Network Status',
+                'Technical Blog',
+              ].map(item => (
+                <li key={item}>
+                  <Link
+                    href={`/${item.toLowerCase().replace(/\s/g, '-')}`}
+                    className="transition-colors"
+                    style={{ color: 'var(--color-maritime-fog)' }}
+                  >
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div
+          className="mt-8 pt-6 border-t"
+          style={{ borderColor: 'var(--color-maritime-border)' }}
+        >
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <p
+              className="text-xs font-mono tracking-wider"
+              style={{ color: 'var(--color-maritime-fog)' }}
+            >
+              © 2025 LIGHTHOUSE STUDIOS • NAVIGATION SYSTEMS DIVISION
+            </p>
+            <div className="flex items-center space-x-4 mt-4 md:mt-0">
+              <div
+                className="flex items-center space-x-2 text-xs font-mono tracking-wider"
+                style={{ color: 'var(--color-maritime-fog)' }}
+              >
+                <div
+                  className="w-1 h-1 rounded-full"
+                  style={{ backgroundColor: 'var(--color-navigation-green)' }}
+                ></div>
+                <span>System Operational</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
 );
 
 export default HomePage;
