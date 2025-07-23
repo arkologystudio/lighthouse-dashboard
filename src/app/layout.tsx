@@ -34,7 +34,8 @@ const RootLayout = ({
 }>) => (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-lighthouse-surface`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{ backgroundColor: 'var(--color-bg-main)' }}
       >
         <AuthProvider>
           {children}

@@ -24,10 +24,9 @@ export const Button: React.FC<ButtonProps> = ({
 
     switch (variant) {
       case 'primary':
-        styles.background =
-          'linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%)';
-        styles.color = 'var(--color-text-primary)';
-        styles.borderColor = 'var(--color-accent)';
+        styles.backgroundColor = 'var(--color-navigation-blue)';
+        styles.color = 'var(--color-lighthouse-beam)';
+        styles.borderColor = 'var(--color-navigation-blue)';
         break;
       case 'secondary':
         styles.backgroundColor = 'var(--color-bg-surface)';
@@ -36,8 +35,8 @@ export const Button: React.FC<ButtonProps> = ({
         break;
       case 'outline':
         styles.backgroundColor = 'transparent';
-        styles.color = 'var(--color-accent)';
-        styles.borderColor = 'var(--color-accent)';
+        styles.color = 'var(--color-dashboard-accent)';
+        styles.borderColor = 'var(--color-dashboard-accent)';
         break;
       case 'ghost':
         styles.backgroundColor = 'transparent';
