@@ -45,6 +45,20 @@ body {
   font-weight: 400;
 }
 
+/* Custom animations */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
 /* Font utilities */
 .font-raleway {
   font-family: 'Raleway', sans-serif;
