@@ -2,30 +2,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap');
 
 :root {
-  /* New integrated color palette */
-  --color-primary: #424769;
-  --color-primary-light: #6b7aa0;
-  --color-primary-dark: #2d3748;
-  --color-accent: #f6ad8a;
-  --color-accent-light: #f9c4a8;
+  /* Lighthouse-inspired sophisticated palette */
+  --color-ocean-deep: #0f172a;      /* Deep ocean - main background */
+  --color-ocean-surface: #1e293b;    /* Ocean surface - secondary background */
+  --color-lighthouse-structure: #334155; /* Lighthouse concrete - cards */
+  --color-lighthouse-beam: #f8fafc;   /* Lighthouse beam - primary text */
+  --color-maritime-fog: #cbd5e1;     /* Maritime fog - secondary text */
+  --color-navigation-blue: #2563eb;   /* Navigation signals - primary actions */
+  --color-beacon-light: #60a5fa;     /* Beacon light - focused accents */
+  --color-navigation-green: #10b981;  /* All clear signal - success states */
+  --color-signal-amber: #f59e0b;     /* Caution signal - warnings */
+  --color-maritime-border: #475569;  /* Subtle borders */
   
-  /* Background colors */
-  --color-bg-main: #2d3748;
-  --color-bg-secondary: #21213577;
-  --color-bg-card: #4a5568;
-  --color-bg-card-hover: #556080;
-  --color-bg-surface: #3a4359;
-  
-  /* Text colors */
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #e2e8f0;
-  --color-text-muted: #a0aec0;
-  --color-text-accent: #f6ad8a;
-  --color-text-error: #ff6b6b;
-  
-  /* Border colors */
-  --color-border: #556080;
-  --color-border-light: #6b7aa0;
+  /* Semantic color mapping */
+  --color-primary: var(--color-navigation-blue);
+  --color-accent: var(--color-beacon-light);
+  --color-bg-main: var(--color-ocean-deep);
+  --color-bg-secondary: var(--color-ocean-surface);
+  --color-bg-card: var(--color-lighthouse-structure);
+  --color-text-primary: var(--color-lighthouse-beam);
+  --color-text-secondary: var(--color-maritime-fog);
+  --color-text-muted: #94a3b8;
+  --color-border: var(--color-maritime-border);
   
   --background: var(--color-bg-main);
   --foreground: var(--color-text-primary);
@@ -57,6 +55,11 @@ body {
 
 .animate-spin-slow {
   animation: spin-slow 20s linear infinite;
+}
+
+/* Lighthouse beam effects */
+.bg-gradient-radial {
+  background: radial-gradient(circle, var(--tw-gradient-stops));
 }
 
 /* Font utilities */
