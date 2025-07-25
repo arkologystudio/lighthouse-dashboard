@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '../components/ui/Button';
 import { TypewriterText } from '../components/TypewriterText';
 
@@ -119,6 +120,17 @@ const HomePage: React.FC = () => (
         <div className="absolute top-32 left-1/2 transform -translate-x-1/2 w-[600px] h-[600px] bg-gradient-radial from-blue-400/1 to-transparent rounded-full"></div>
         {/* Subtle horizon line effect */}
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/20 to-transparent"></div>
+      </div>
+
+      {/* Technical lighthouse sketch - positioned behind content */}
+      <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-[700px] h-[700px] opacity-15 pointer-events-none hidden lg:block">
+        <Image
+          src="/lighthouse_sketch.png"
+          alt="Lighthouse Technical Sketch"
+          width={700}
+          height={700}
+          className="w-full h-full object-contain"
+        />
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
@@ -294,9 +306,9 @@ const HomePage: React.FC = () => (
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Plugin Management System */}
-          <div className="group relative">
+          <div className="group relative h-full">
             <div
-              className="border rounded-lg p-8 transition-all duration-200 hover:shadow-lg"
+              className="border rounded-lg p-8 transition-all duration-200 hover:shadow-lg h-full flex flex-col"
               style={{
                 backgroundColor: 'var(--color-lighthouse-structure)',
                 borderColor: 'var(--color-maritime-border)',
@@ -319,11 +331,11 @@ const HomePage: React.FC = () => (
               {/* Icon - geometric, purposeful */}
               <div
                 className="w-12 h-12 mb-6 flex items-center justify-center rounded"
-                style={{ backgroundColor: 'rgba(37, 99, 235, 0.1)' }}
+                style={{ backgroundColor: 'rgba(96, 165, 250, 0.2)' }}
               >
                 <svg
                   className="w-6 h-6"
-                  style={{ color: 'var(--color-navigation-blue)' }}
+                  style={{ color: 'var(--color-beacon-light)' }}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -345,7 +357,7 @@ const HomePage: React.FC = () => (
               </h3>
 
               <p
-                className="leading-relaxed mb-6 text-sm"
+                className="leading-relaxed mb-6 text-sm flex-grow"
                 style={{ color: 'var(--color-maritime-fog)' }}
               >
                 Automated deployment and configuration of AI-ready WordPress
@@ -355,7 +367,7 @@ const HomePage: React.FC = () => (
 
               {/* Technical specs */}
               <div
-                className="space-y-2 text-xs font-mono"
+                className="space-y-2 text-xs font-mono mt-auto"
                 style={{ color: 'var(--color-maritime-fog)' }}
               >
                 <div className="flex justify-between">
@@ -381,9 +393,9 @@ const HomePage: React.FC = () => (
           </div>
 
           {/* Discovery Registry */}
-          <div className="group relative lg:mt-8">
+          <div className="group relative h-full">
             <div
-              className="border rounded-lg p-8 transition-all duration-200 hover:shadow-lg"
+              className="border rounded-lg p-8 transition-all duration-200 hover:shadow-lg h-full flex flex-col"
               style={{
                 backgroundColor: 'var(--color-lighthouse-structure)',
                 borderColor: 'var(--color-maritime-border)',
@@ -432,7 +444,7 @@ const HomePage: React.FC = () => (
               </h3>
 
               <p
-                className="leading-relaxed mb-6 text-sm"
+                className="leading-relaxed mb-6 text-sm flex-grow"
                 style={{ color: 'var(--color-maritime-fog)' }}
               >
                 Distributed registry system that indexes your AI services,
@@ -442,7 +454,7 @@ const HomePage: React.FC = () => (
 
               {/* Technical specs */}
               <div
-                className="space-y-2 text-xs font-mono"
+                className="space-y-2 text-xs font-mono mt-auto"
                 style={{ color: 'var(--color-maritime-fog)' }}
               >
                 <div className="flex justify-between">
@@ -468,9 +480,9 @@ const HomePage: React.FC = () => (
           </div>
 
           {/* Neural Search Engine */}
-          <div className="group relative">
+          <div className="group relative h-full">
             <div
-              className="border rounded-lg p-8 transition-all duration-200 hover:shadow-lg"
+              className="border rounded-lg p-8 transition-all duration-200 hover:shadow-lg h-full flex flex-col"
               style={{
                 backgroundColor: 'var(--color-lighthouse-structure)',
                 borderColor: 'var(--color-maritime-border)',
@@ -519,7 +531,7 @@ const HomePage: React.FC = () => (
               </h3>
 
               <p
-                className="leading-relaxed mb-6 text-sm"
+                className="leading-relaxed mb-6 text-sm flex-grow"
                 style={{ color: 'var(--color-maritime-fog)' }}
               >
                 Advanced neural search infrastructure that enables contextual,
@@ -529,7 +541,7 @@ const HomePage: React.FC = () => (
 
               {/* Technical specs */}
               <div
-                className="space-y-2 text-xs font-mono"
+                className="space-y-2 text-xs font-mono mt-auto"
                 style={{ color: 'var(--color-maritime-fog)' }}
               >
                 <div className="flex justify-between">
