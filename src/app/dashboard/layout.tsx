@@ -221,6 +221,21 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                       />
                     </svg>
                   )}
+                  {item.name === 'Activities' && (
+                    <svg
+                      className="lh-icon-md"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 4v16m8-8H4"
+                      />
+                    </svg>
+                  )}
                 </div>
                 {!sidebarCollapsed && <span className="ml-3">{item.name}</span>}
               </Link>

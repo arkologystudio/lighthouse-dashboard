@@ -31,10 +31,10 @@ export const NAVIGATION_ITEMS = [
   { name: 'Overview', href: '/dashboard' },
   { name: 'Sites', href: '/dashboard/sites' },
   { name: 'Products', href: '/dashboard/products' },
-  { name: 'Activities', href: '/dashboard/activities' },
   { name: 'Billing', href: '/dashboard/billing' },
   { name: 'Diagnostics', href: '/dashboard/diagnostics' },
   { name: 'Insights', href: '/dashboard/insights' },
+  { name: 'Activities', href: '/dashboard/activities' },
 ] as const;
 
 // Products (hardcoded for MVP)

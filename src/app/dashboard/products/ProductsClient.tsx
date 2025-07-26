@@ -141,10 +141,22 @@ const ProductsClient: React.FC<ProductsClientProps> = ({
     }
   };
 
-  if (sitesLoading || (productsLoading && products.length === 0)) {
+  // Show skeleton loading if we have no data and are loading
+  if ((sitesLoading && sites.length === 0) || (productsLoading && products.length === 0)) {
     return (
-      <div className="lh-loading-container min-h-64">
-        <div className="lh-spinner lh-spinner-lg" />
+      <div className="lh-page-container">
+        <div className="lh-page-header">
+          <div>
+            <div className="h-8 bg-gray-200 rounded w-40 mb-2 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded w-80 animate-pulse"></div>
+          </div>
+        </div>
+        
+        <div className="lh-grid-cards">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <ProductCardSkeleton key={`loading-skeleton-${index}`} />
+          ))}
+        </div>
       </div>
     );
   }

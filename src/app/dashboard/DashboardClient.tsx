@@ -186,45 +186,51 @@ const DashboardClient: React.FC<DashboardClientProps> = ({
     activities_by_type: {},
   },
 }) => {
-  const { user } = useAuth();
+  const { user, prefetchedSites } = useAuth();
   
   // Use hooks to get current data, with initial data as fallback
-  const { sites } = useSites(initialSites.length > 0 ? initialSites : undefined);
-  const { activities, stats, isLoading, error } = useActivities();
+  const { sites, isLoading: sitesLoading } = useSites(initialSites.length > 0 ? initialSites : undefined);
+  const { activities, stats, isLoading: activitiesLoading, error } = useActivities();
 
-  // Use the most current data available
-  const currentSites = sites.length > 0 ? sites : initialSites;
+  // Use the most current data available - prioritize prefetched data
+  const currentSites = prefetchedSites || (sites.length > 0 ? sites : initialSites);
   const currentActivities = activities.length > 0 ? activities : initialActivities;
   const currentStats = stats || initialStats;
+  
+  // Determine if we should show loading state for stats
+  const isStatsLoading = (sitesLoading && !prefetchedSites) || activitiesLoading;
 
 
   const stats_data = [
     {
       name: 'Total Sites',
-      value: currentSites.length.toString(),
+      value: isStatsLoading ? '—' : currentSites.length.toString(),
       description: 'WordPress sites registered',
       href: '/dashboard/sites',
       action: 'Manage Sites',
-      trend: `+${currentSites.length}`,
+      trend: isStatsLoading ? '...' : `+${currentSites.length}`,
       trendUp: true,
+      isLoading: isStatsLoading,
     },
     {
       name: 'Active Products',
-      value: '0', // TODO: Calculate from products data
+      value: isStatsLoading ? '—' : '0', // TODO: Calculate from products data
       description: 'Lighthouse products registered',
       href: '/dashboard/products',
       action: 'View Products',
-      trend: '+0%',
+      trend: isStatsLoading ? '...' : '+0%',
       trendUp: true,
+      isLoading: isStatsLoading,
     },
     {
       name: 'Recent Activities',
-      value: currentStats.recent_activity_count?.toString() || '0',
+      value: isStatsLoading ? '—' : (currentStats.recent_activity_count?.toString() || '0'),
       description: 'Actions in the last 30 days',
       href: '#recent-activity',
       action: 'View Details',
-      trend: `+${currentStats.recent_activity_count || 0}`,
+      trend: isStatsLoading ? '...' : `+${currentStats.recent_activity_count || 0}`,
       trendUp: true,
+      isLoading: isStatsLoading,
     },
   ];
 
@@ -333,7 +339,7 @@ const DashboardClient: React.FC<DashboardClientProps> = ({
                   <span
                     className={`lh-badge ${
                       stat.trendUp ? 'lh-badge-green' : 'lh-badge-red'
-                    }`}
+                    } ${stat.isLoading ? 'animate-pulse' : ''}`}
                   >
                     {stat.trend}
                   </span>
@@ -342,7 +348,9 @@ const DashboardClient: React.FC<DashboardClientProps> = ({
               <CardContent className="pt-2">
                 <div className="lh-flex-between">
                   <div>
-                    <p className="lh-text-stat">{stat.value}</p>
+                    <p className={`lh-text-stat ${stat.isLoading ? 'animate-pulse' : ''}`}>
+                      {stat.value}
+                    </p>
                     <p className="lh-text-muted mt-1">{stat.description}</p>
                   </div>
                 </div>
@@ -351,6 +359,7 @@ const DashboardClient: React.FC<DashboardClientProps> = ({
                     <Button
                       variant="outline"
                       className="w-full lh-text-link border-lighthouse-primary hover:bg-lighthouse-primary hover:text-white lh-transition font-medium"
+                      disabled={stat.isLoading}
                     >
                       {stat.action}
                     </Button>
@@ -419,7 +428,7 @@ const DashboardClient: React.FC<DashboardClientProps> = ({
 
         <Card className="lh-card overflow-hidden">
           <CardContent className="p-0">
-            {isLoading ? (
+            {activitiesLoading ? (
               <div className="lh-empty-state">
                 <div className="lh-spinner lh-spinner-lg" />
                 <p className="lh-text-description mt-4">Loading activities...</p>
