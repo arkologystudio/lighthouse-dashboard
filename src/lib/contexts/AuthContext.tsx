@@ -6,10 +6,10 @@ import React, {
   useEffect,
   type ReactNode,
 } from 'react';
-import { authApi, matchResult, setGlobalLogoutCallback } from '../api';
+import { authApi, sitesApi, matchResult, setGlobalLogoutCallback } from '../api';
 import Cookies from 'js-cookie';
-import { STORAGE_KEYS, MESSAGES } from '../constants';
-import type { AuthState, User } from '../../types';
+import { STORAGE_KEYS, MESSAGES, API_BASE_URL } from '../constants';
+import type { AuthState, User, Site, EcosystemProduct } from '../../types';
 import toast from 'react-hot-toast';
 
 // Auth actions
@@ -18,6 +18,8 @@ type AuthAction =
   | { type: 'SET_USER'; payload: User | null }
   | { type: 'SET_TOKEN'; payload: string | null }
   | { type: 'SET_ERROR'; payload: string | null }
+  | { type: 'SET_PREFETCHED_SITES'; payload: Site[] }
+  | { type: 'SET_PREFETCHED_PRODUCTS'; payload: EcosystemProduct[] }
   | { type: 'LOGOUT' };
 
 // Auth reducer
@@ -31,12 +33,18 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
       return { ...state, token: action.payload };
     case 'SET_ERROR':
       return { ...state, error: action.payload, isLoading: false };
+    case 'SET_PREFETCHED_SITES':
+      return { ...state, prefetchedSites: action.payload };
+    case 'SET_PREFETCHED_PRODUCTS':
+      return { ...state, prefetchedProducts: action.payload };
     case 'LOGOUT':
       return {
         user: null,
         token: null,
         isLoading: false,
         error: null,
+        prefetchedSites: undefined,
+        prefetchedProducts: undefined,
       };
     default:
       return state;
@@ -49,6 +57,8 @@ const initialState: AuthState = {
   token: null,
   isLoading: true,
   error: null,
+  prefetchedSites: undefined,
+  prefetchedProducts: undefined,
 };
 
 // Context type
@@ -70,6 +80,64 @@ interface AuthProviderProps {
 // Auth provider component
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
+
+  // Helper function to prefetch essential data after login
+  const prefetchEssentialData = async (token: string): Promise<void> => {
+    // Get auth token for API requests
+    const getAuthToken = (): string | null => {
+      if (typeof window === 'undefined') return null;
+      return (
+        Cookies.get('lighthouse_auth_token') ||
+        localStorage.getItem('lighthouse_auth_token') ||
+        token
+      );
+    };
+
+    // Prefetch sites data
+    const prefetchSites = async (): Promise<void> => {
+      try {
+        const result = await sitesApi.getAll();
+        matchResult(result, {
+          success: (sites) => {
+            dispatch({ type: 'SET_PREFETCHED_SITES', payload: sites });
+          },
+          error: () => {
+            // Silently fail for prefetch - user can still navigate and load manually
+          },
+        });
+      } catch {
+        // Silently fail for prefetch
+      }
+    };
+
+    // Prefetch products data  
+    const prefetchProducts = async (): Promise<void> => {
+      try {
+        const authToken = getAuthToken();
+        if (!authToken) return;
+
+        const url = `${API_BASE_URL}/api/ecosystem/products`;
+        const response = await fetch(url, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+
+        if (response.ok) {
+          const apiResponse = await response.json();
+          if (apiResponse.success && apiResponse.data?.products) {
+            dispatch({ type: 'SET_PREFETCHED_PRODUCTS', payload: apiResponse.data.products });
+          }
+        }
+      } catch {
+        // Silently fail for prefetch
+      }
+    };
+
+    // Start both prefetch operations in parallel
+    await Promise.allSettled([prefetchSites(), prefetchProducts()]);
+  };
 
   // Force logout function (for expired tokens)
   const forceLogout = (): void => {
@@ -137,7 +205,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const result = await authApi.login({ email, password });
 
     matchResult(result, {
-      success: data => {
+      success: async data => {
         // Convert AuthResponse.user to full User with timestamps
         const fullUser: User = {
           ...data.user,
@@ -155,8 +223,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         dispatch({ type: 'SET_LOADING', payload: false });
         toast.success(MESSAGES.SUCCESS.LOGIN);
+
+        // Prefetch essential data in the background
+        prefetchEssentialData(data.token).catch(() => {
+          // Silently fail - prefetch errors shouldn't affect login success
+        });
       },
-      error: error => {
+      error: async error => {
         dispatch({ type: 'SET_ERROR', payload: error.message });
         toast.error(error.message || MESSAGES.ERROR.LOGIN_FAILED);
       },

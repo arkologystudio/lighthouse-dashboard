@@ -118,11 +118,16 @@ interface UseProductsReturn {
 }
 
 export const useProducts = (initialProducts?: EcosystemProduct[]): UseProductsReturn => {
-  const [products, setProducts] = useState<EcosystemProduct[]>(initialProducts || []);
+  const { prefetchedProducts, forceLogout } = useAuth();
+  
+  // Use prefetched data if available, otherwise fall back to initialProducts
+  const dataToUse = prefetchedProducts || initialProducts || [];
+  const hasData = prefetchedProducts || initialProducts;
+  
+  const [products, setProducts] = useState<EcosystemProduct[]>(dataToUse);
   const [siteProducts, setSiteProducts] = useState<SiteProduct[]>([]);
-  const [isLoading, setIsLoading] = useState(!initialProducts);
+  const [isLoading, setIsLoading] = useState(!hasData);
   const [error, setError] = useState<string | null>(null);
-  const { forceLogout } = useAuth();
 
   const refreshProducts = useCallback(async () => {
     setIsLoading(true);
@@ -303,12 +308,20 @@ export const useProducts = (initialProducts?: EcosystemProduct[]): UseProductsRe
     [forceLogout]
   );
 
-  // Load products on mount only if we don't have initial data
+  // Update products when prefetched data becomes available
   useEffect(() => {
-    if (!initialProducts) {
+    if (prefetchedProducts && prefetchedProducts.length > 0) {
+      setProducts(prefetchedProducts);
+      setIsLoading(false);
+    }
+  }, [prefetchedProducts]);
+
+  // Load products on mount only if we don't have any data (initial or prefetched)
+  useEffect(() => {
+    if (!hasData) {
       refreshProducts();
     }
-  }, [refreshProducts, initialProducts]);
+  }, [refreshProducts, hasData]);
 
   return {
     products,

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { sitesApi, matchResult } from '../api';
 import { MESSAGES } from '../constants';
 import type { Site, CreateSiteRequest } from '../../types';
+import { useAuth } from './useAuth';
 import toast from 'react-hot-toast';
 
 interface UseSitesReturn {
@@ -14,8 +15,14 @@ interface UseSitesReturn {
 }
 
 export const useSites = (initialSites?: Site[]): UseSitesReturn => {
-  const [sites, setSites] = useState<Site[]>(initialSites || []);
-  const [isLoading, setIsLoading] = useState(!initialSites);
+  const { prefetchedSites } = useAuth();
+  
+  // Use prefetched data if available, otherwise fall back to initialSites
+  const dataToUse = prefetchedSites || initialSites || [];
+  const hasData = prefetchedSites || initialSites;
+  
+  const [sites, setSites] = useState<Site[]>(dataToUse);
+  const [isLoading, setIsLoading] = useState(!hasData);
   const [error, setError] = useState<string | null>(null);
 
   const fetchSites = useCallback(async () => {
@@ -37,12 +44,20 @@ export const useSites = (initialSites?: Site[]): UseSitesReturn => {
     });
   }, []);
 
+  // Update sites when prefetched data becomes available
   useEffect(() => {
-    // Only fetch if we don't have initial data
-    if (!initialSites) {
+    if (prefetchedSites && prefetchedSites.length > 0) {
+      setSites(prefetchedSites);
+      setIsLoading(false);
+    }
+  }, [prefetchedSites]);
+
+  useEffect(() => {
+    // Only fetch if we don't have any data (initial or prefetched)
+    if (!hasData) {
       fetchSites();
     }
-  }, [fetchSites, initialSites]);
+  }, [fetchSites, hasData]);
 
   const createSite = async (siteData: CreateSiteRequest): Promise<boolean> => {
     const result = await sitesApi.create(siteData);

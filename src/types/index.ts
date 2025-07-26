@@ -32,6 +32,8 @@ export interface AuthState {
   token: string | null;
   isLoading: boolean;
   error: string | null;
+  prefetchedSites?: Site[];
+  prefetchedProducts?: EcosystemProduct[];
 }
 
 // Site management types - matching backend exactly
