@@ -197,7 +197,6 @@ const DashboardClient: React.FC<DashboardClientProps> = ({
   const currentActivities = activities.length > 0 ? activities : initialActivities;
   const currentStats = stats || initialStats;
 
-  console.log('🎯 Dashboard render:', { activities: activities.length, stats: currentStats?.recent_activity_count, isLoading, error });
 
   const stats_data = [
     {

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useActivities } from '../../../lib/hooks/useActivities';
-import { Card, CardHeader, CardContent } from '../../../components/ui/Card';
+import { Card, CardContent } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import type { ActivityLog } from '../../../types';
 
