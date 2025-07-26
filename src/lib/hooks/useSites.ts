@@ -13,9 +13,9 @@ interface UseSitesReturn {
   refreshSites: () => Promise<void>;
 }
 
-export const useSites = (): UseSitesReturn => {
-  const [sites, setSites] = useState<Site[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export const useSites = (initialSites?: Site[]): UseSitesReturn => {
+  const [sites, setSites] = useState<Site[]>(initialSites || []);
+  const [isLoading, setIsLoading] = useState(!initialSites);
   const [error, setError] = useState<string | null>(null);
 
   const fetchSites = useCallback(async () => {
@@ -38,8 +38,11 @@ export const useSites = (): UseSitesReturn => {
   }, []);
 
   useEffect(() => {
-    fetchSites();
-  }, [fetchSites]);
+    // Only fetch if we don't have initial data
+    if (!initialSites) {
+      fetchSites();
+    }
+  }, [fetchSites, initialSites]);
 
   const createSite = async (siteData: CreateSiteRequest): Promise<boolean> => {
     const result = await sitesApi.create(siteData);

@@ -117,7 +117,7 @@ src/
 
 ### Environment Variables
 ```bash
-NEXT_PUBLIC_API_URL=https://api.lighthouse.dev  # Backend API URL
+NEXT_PUBLIC_API_URL=https://api.lighthousestudios.xyz  # Backend API URL
 NEXTAUTH_SECRET=your-secure-random-string       # JWT secret
 ```
 

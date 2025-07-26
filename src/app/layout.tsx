@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '../lib/contexts/AuthContext';
-import { Toaster } from 'react-hot-toast';
+import { ToasterWrapper } from '../components/ToasterWrapper';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -15,16 +15,72 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Lighthouse Dashboard',
-  description: 'Manage your WordPress plugins with the Lighthouse Dashboard',
+  metadataBase: new URL('https://lighthousestudios.xyz'),
+  title: {
+    default:
+      'Lighthouse Dashboard | AI WordPress Plugins & Web 4.0 Agent Discoverability',
+    template: '%s | Lighthouse Dashboard',
+  },
+  description:
+    'Discover Lighthouse Dashboard—your all-in-one AI-powered portal for managing WordPress sites, installing AI website plugins, billing, and unlocking advanced agent discoverability with neural & semantic search for Web 4.0.',
   keywords: [
-    'WordPress',
-    'plugins',
-    'dashboard',
-    'lighthouse',
-    'neural search',
-    'AI',
+    'AI WordPress plugins',
+    'AI website builder',
+    'Agent discoverability',
+    'Web 4.0 dashboard',
+    'Neural search integration',
+    'Semantic search tools',
+    'AI site management',
+    'AI Plugin marketplace',
+    'AI WordPress plugins',
+    'WordPress AI optimization',
+    'Lighthouse Studios',
   ],
+  authors: [{ name: 'Lighthouse Studios' }],
+  creator: 'Lighthouse Studios',
+  publisher: 'Lighthouse Studios',
+  category: 'Technology',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://lighthousestudios.xyz',
+    title:
+      'Lighthouse Dashboard | AI WordPress Plugins & Web 4.0 Agent Discoverability',
+    description:
+      'Discover Lighthouse Dashboard—your all-in-one AI-powered portal for managing WordPress sites, installing AI website plugins, billing, and unlocking advanced agent discoverability with neural & semantic search for Web 4.0.',
+    siteName: 'Lighthouse Dashboard',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Lighthouse Dashboard - AI WordPress Plugins & Web 4.0 Agent Discoverability',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title:
+      'Lighthouse Dashboard | AI WordPress Plugins & Web 4.0 Agent Discoverability',
+    description:
+      'Discover Lighthouse Dashboard—your all-in-one AI-powered portal for managing WordPress sites, installing AI website plugins, billing, and unlocking advanced agent discoverability with neural & semantic search for Web 4.0.',
+    images: ['/og-image.png'],
+    creator: '@lighthousestudios',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION,
+  },
 };
 
 const RootLayout = ({
@@ -32,40 +88,17 @@ const RootLayout = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        style={{ backgroundColor: 'var(--color-bg-main)' }}
-      >
-        <AuthProvider>
-          {children}
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: '#fff',
-                color: '#374151',
-                boxShadow:
-                  '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-              },
-              success: {
-                iconTheme: {
-                  primary: '#10B981',
-                  secondary: '#fff',
-                },
-              },
-              error: {
-                iconTheme: {
-                  primary: '#EF4444',
-                  secondary: '#fff',
-                },
-              },
-            }}
-          />
-        </AuthProvider>
-      </body>
-    </html>
-  );
+  <html lang="en">
+    <body
+      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      style={{ backgroundColor: 'var(--color-bg-main)' }}
+    >
+      <AuthProvider>
+        {children}
+        <ToasterWrapper />
+      </AuthProvider>
+    </body>
+  </html>
+);
 
 export default RootLayout;

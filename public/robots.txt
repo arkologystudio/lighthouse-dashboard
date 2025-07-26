@@ -1,0 +1,29 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /api/*
+Disallow: /dashboard/*
+Disallow: /_next/*
+Disallow: /admin
+
+# Googlebot
+User-agent: Googlebot
+Allow: /
+Disallow: /api/*
+Disallow: /dashboard/*
+Disallow: /_next/*
+Disallow: /admin
+
+# Bingbot
+User-agent: Bingbot
+Allow: /
+Disallow: /api/*
+Disallow: /dashboard/*
+Disallow: /_next/*
+Disallow: /admin
+
+# Host
+Host: https://lighthousestudios.xyz
+
+# Sitemaps
+Sitemap: https://lighthousestudios.xyz/sitemap.xml

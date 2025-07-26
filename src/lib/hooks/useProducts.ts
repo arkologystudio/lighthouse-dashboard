@@ -117,10 +117,10 @@ interface UseProductsReturn {
   ) => Promise<{ has_product: boolean; enabled: boolean } | null>;
 }
 
-export const useProducts = (): UseProductsReturn => {
-  const [products, setProducts] = useState<EcosystemProduct[]>([]);
+export const useProducts = (initialProducts?: EcosystemProduct[]): UseProductsReturn => {
+  const [products, setProducts] = useState<EcosystemProduct[]>(initialProducts || []);
   const [siteProducts, setSiteProducts] = useState<SiteProduct[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(!initialProducts);
   const [error, setError] = useState<string | null>(null);
   const { forceLogout } = useAuth();
 
@@ -161,7 +161,6 @@ export const useProducts = (): UseProductsReturn => {
 
   const refreshSiteProducts = useCallback(
     async (siteId: string) => {
-      setIsLoading(true);
       setError(null);
 
       try {
@@ -181,8 +180,6 @@ export const useProducts = (): UseProductsReturn => {
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error occurred');
-      } finally {
-        setIsLoading(false);
       }
     },
     [forceLogout]
@@ -306,10 +303,12 @@ export const useProducts = (): UseProductsReturn => {
     [forceLogout]
   );
 
-  // Load products on mount
+  // Load products on mount only if we don't have initial data
   useEffect(() => {
-    refreshProducts();
-  }, [refreshProducts]);
+    if (!initialProducts) {
+      refreshProducts();
+    }
+  }, [refreshProducts, initialProducts]);
 
   return {
     products,

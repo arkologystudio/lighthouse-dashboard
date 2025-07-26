@@ -134,7 +134,11 @@ export const useActivities = (): UseActivitiesReturn => {
           forceLogout
         );
 
+        console.log('🔍 Activities API call:', { endpoint, result });
+
         if (result.success && result.data) {
+          console.log('✅ Activities data received:', result.data);
+          console.log('📊 Activities array:', result.data.activities);
           if (options?.offset && options.offset > 0) {
             // Append to existing activities for pagination
             setActivities(prev => [...prev, ...result.data.activities]);
@@ -147,6 +151,7 @@ export const useActivities = (): UseActivitiesReturn => {
             (options?.offset || 0) + result.data.activities.length
           );
         } else {
+          console.error('❌ Activities API failed:', result);
           setError(
             !result.success
               ? result.error.message
@@ -210,10 +215,10 @@ export const useActivities = (): UseActivitiesReturn => {
 
   // Load initial data on mount
   useEffect(() => {
-    // For development: Use empty data instead of trying to fetch
-    setActivities([]);
+    console.log('🚀 useActivities mount effect triggered');
+    refreshActivities({ limit: currentLimit });
     refreshStats();
-  }, [refreshStats]);
+  }, []); // Only run on mount
 
   return {
     activities,

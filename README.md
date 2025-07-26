@@ -39,7 +39,7 @@ A modern dashboard for managing WordPress plugins and AI-powered features. Built
    
    Edit `.env.local` with your configuration:
    ```bash
-   NEXT_PUBLIC_API_URL=https://api.lighthouse.dev
+   NEXT_PUBLIC_API_URL=https://api.lighthousestudios.xyz
    NEXTAUTH_SECRET=your-secure-random-string
    ```
 
@@ -55,7 +55,7 @@ A modern dashboard for managing WordPress plugins and AI-powered features. Built
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
-| `NEXT_PUBLIC_API_URL` | Backend API URL | Yes | `https://api.lighthouse.dev` |
+| `NEXT_PUBLIC_API_URL` | Backend API URL | Yes | `https://api.lighthousestudios.xyz` |
 | `NEXTAUTH_SECRET` | JWT secret for authentication | Yes | - |
 | `NODE_ENV` | Environment mode | No | `development` |
 
