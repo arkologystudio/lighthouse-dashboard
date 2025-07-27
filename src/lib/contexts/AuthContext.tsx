@@ -221,13 +221,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, data.token);
         }
 
-        dispatch({ type: 'SET_LOADING', payload: false });
         toast.success(MESSAGES.SUCCESS.LOGIN);
 
         // Prefetch essential data in the background
         prefetchEssentialData(data.token).catch(() => {
           // Silently fail - prefetch errors shouldn't affect login success
         });
+
+        dispatch({ type: 'SET_LOADING', payload: false });
       },
       error: async error => {
         dispatch({ type: 'SET_ERROR', payload: error.message });

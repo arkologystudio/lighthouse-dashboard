@@ -232,7 +232,23 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M12 4v16m8-8H4"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  )}
+                  {/* Default icon for any items without specific icons */}
+                  {!['Overview', 'Sites', 'Products', 'Billing', 'Diagnostics', 'Insights', 'Activities'].includes(item.name) && (
+                    <svg
+                      className="lh-icon-md"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 9l3 3-3 3m5 0h3"
                       />
                     </svg>
                   )}
