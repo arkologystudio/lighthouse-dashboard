@@ -664,8 +664,9 @@ const HomePage: React.FC = () => {
               className="text-lg max-w-3xl mx-auto leading-relaxed"
               style={{ color: 'var(--color-maritime-fog)' }}
             >
-              Four integrated modules that establish your WordPress sites as
-              navigable waypoints in the evolving AI-powered web ecosystem.
+              Lighthouse Studios packages a comprehensive suite of tools to
+              transform your WordPress sites into navigable waypoints in the
+              evolving AI-powered web ecosystem.
             </p>
           </div>
 
