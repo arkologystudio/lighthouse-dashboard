@@ -55,7 +55,7 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
 const initialState: AuthState = {
   user: null,
   token: null,
-  isLoading: true,
+  isLoading: false,
   error: null,
   prefetchedSites: undefined,
   prefetchedProducts: undefined,
@@ -140,7 +140,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Force logout function (for expired tokens)
-  const forceLogout = (): void => {
+  const forceLogout = React.useCallback((): void => {
     // Clear localStorage (only on client side)
     if (typeof window !== 'undefined') {
       localStorage.removeItem(STORAGE_KEYS.USER);
@@ -157,12 +157,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (typeof window !== 'undefined') {
       window.location.href = '/login';
     }
-  };
+  }, []);
 
   // Register global logout callback
   useEffect(() => {
     setGlobalLogoutCallback(forceLogout);
-  }, []);
+  }, [forceLogout]);
 
   // Initialize auth state from localStorage
   useEffect(() => {
@@ -170,7 +170,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         // Only access localStorage on client side
         if (typeof window === 'undefined') {
-          dispatch({ type: 'SET_LOADING', payload: false });
           return;
         }
 
@@ -189,8 +188,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           localStorage.removeItem(STORAGE_KEYS.USER);
           localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
         }
-      } finally {
-        dispatch({ type: 'SET_LOADING', payload: false });
       }
     };
 
@@ -198,7 +195,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   // Login function
-  const login = async (email: string, password: string): Promise<void> => {
+  const login = React.useCallback(async (email: string, password: string): Promise<void> => {
     dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'SET_ERROR', payload: null });
 
@@ -235,10 +232,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         toast.error(error.message || MESSAGES.ERROR.LOGIN_FAILED);
       },
     });
-  };
+  }, []);
 
   // Register function
-  const register = async (
+  const register = React.useCallback(async (
     email: string,
     password: string,
     name: string
@@ -273,10 +270,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         toast.error(error.message || MESSAGES.ERROR.REGISTER_FAILED);
       },
     });
-  };
+  }, []);
 
   // Logout function
-  const logout = (): void => {
+  const logout = React.useCallback((): void => {
     dispatch({ type: 'SET_LOADING', payload: true });
 
     // Clear auth state
@@ -295,15 +292,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (typeof window !== 'undefined') {
       window.location.href = '/login';
     }
-  };
+  }, []);
 
-  const value: AuthContextType = {
+  const value: AuthContextType = React.useMemo(() => ({
     ...state,
     login,
     register,
     logout,
     forceLogout,
-  };
+  }), [state, login, register, logout, forceLogout]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

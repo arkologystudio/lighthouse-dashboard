@@ -11,11 +11,15 @@ import { PasswordField } from '../../../components/forms/PasswordField';
 
 const LoginPage: React.FC = () => {
   const router = useRouter();
-  const { login, isLoading, error } = useAuth();
+  const { login, isLoading: contextLoading, error } = useAuth();
+  const [localLoading, setLocalLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
+
+  // Use either context loading or local loading
+  const isLoading = contextLoading || localLoading;
 
   const handleInputChange =
     (field: keyof typeof formData) =>
@@ -26,13 +30,22 @@ const LoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Basic client-side validation
+    if (!formData.email || !formData.password) {
+      return;
+    }
+
     try {
       const { email, password } = formData;
+      setLocalLoading(true);
       await login(email, password);
       // Redirect to dashboard after successful login
       router.push('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
+      // Error is handled by the AuthContext (toast notification)
+    } finally {
+      setLocalLoading(false);
     }
   };
 
