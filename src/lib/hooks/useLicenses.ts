@@ -102,12 +102,33 @@ interface UseLicensesReturn {
   ) => Promise<ValidateLicenseResponse | null>;
   getLicense: (licenseId: string) => Promise<License | null>;
   getLicenseByProduct: (productSlug: string) => License | undefined;
+  assignLicense: (licenseId: string, siteId: string) => Promise<{
+    success: boolean;
+    error?: string;
+  }>;
+  unassignLicense: (licenseId: string) => Promise<{
+    success: boolean;
+    error?: string;
+  }>;
+  getAvailableLicensesForSite: (siteId: string) => Promise<{
+    success: boolean;
+    data?: {
+      assigned_license: License | null;
+      unassigned_licenses: License[];
+    };
+    error?: string;
+  }>;
+  getLicenseUsage: (licenseId: string) => Promise<{
+    success: boolean;
+    data?: {usage: {queries_used?: number; sites_used?: number; downloads_used?: number}};
+    error?: string;
+  }>;
 }
 
 export const useLicenses = (): UseLicensesReturn => {
   const [licenses, setLicenses] = useState<License[]>([]);
   const [stats, setStats] = useState<UserLicenseStats | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { forceLogout } = useAuth();
 
@@ -117,14 +138,15 @@ export const useLicenses = (): UseLicensesReturn => {
 
     try {
       const result = await licenseApiRequest<{ licenses: License[] }>(
-        '/licenses/me',
+        '/licenses/my',
         {},
         forceLogout
       );
 
       if (result.success && result.data) {
-        setLicenses(result.data.licenses);
+        setLicenses(Array.isArray(result.data.licenses) ? result.data.licenses : []);
       } else {
+        setLicenses([]);
         setError(
           result.success === false
             ? result.error.message
@@ -132,6 +154,7 @@ export const useLicenses = (): UseLicensesReturn => {
         );
       }
     } catch (_err) {
+      setLicenses([]);
       setError(_err instanceof Error ? _err.message : 'Unknown error occurred');
     } finally {
       setIsLoading(false);
@@ -141,7 +164,7 @@ export const useLicenses = (): UseLicensesReturn => {
   const refreshStats = useCallback(async () => {
     try {
       const result = await licenseApiRequest<{ stats: UserLicenseStats }>(
-        '/licenses/me/stats',
+        '/licenses/my/stats',
         {},
         forceLogout
       );
@@ -185,7 +208,7 @@ export const useLicenses = (): UseLicensesReturn => {
     async (licenseId: string): Promise<License | null> => {
       try {
         const result = await licenseApiRequest<{ license: License }>(
-          `/licenses/me/${licenseId}`,
+          `/licenses/my/${licenseId}`,
           {},
           forceLogout
         );
@@ -217,6 +240,139 @@ export const useLicenses = (): UseLicensesReturn => {
     refreshStats();
   }, [refreshLicenses, refreshStats]);
 
+  const assignLicense = useCallback(
+    async (licenseId: string, siteId: string): Promise<{
+      success: boolean;
+      error?: string;
+    }> => {
+      try {
+        const result = await licenseApiRequest<{ license: License }>(
+          `/licenses/${licenseId}/assign-site`,
+          {
+            method: 'POST',
+            body: JSON.stringify({ site_id: siteId }),
+          },
+          forceLogout
+        );
+
+        if (result.success) {
+          // Refresh licenses to get updated assignment info
+          await refreshLicenses();
+          return { success: true };
+        } else {
+          return {
+            success: false,
+            error: result.success === false ? result.error.message : 'Assignment failed',
+          };
+        }
+      } catch (_err) {
+        return {
+          success: false,
+          error: _err instanceof Error ? _err.message : 'Unknown error occurred',
+        };
+      }
+    },
+    [forceLogout, refreshLicenses]
+  );
+
+  const unassignLicense = useCallback(
+    async (licenseId: string): Promise<{
+      success: boolean;
+      error?: string;
+    }> => {
+      try {
+        const result = await licenseApiRequest<{ license: License }>(
+          `/licenses/${licenseId}/unassign-site`,
+          {
+            method: 'DELETE',
+          },
+          forceLogout
+        );
+
+        if (result.success) {
+          // Refresh licenses to get updated assignment info
+          await refreshLicenses();
+          return { success: true };
+        } else {
+          return {
+            success: false,
+            error: result.success === false ? result.error.message : 'Unassignment failed',
+          };
+        }
+      } catch (_err) {
+        return {
+          success: false,
+          error: _err instanceof Error ? _err.message : 'Unknown error occurred',
+        };
+      }
+    },
+    [forceLogout, refreshLicenses]
+  );
+
+  const getAvailableLicensesForSite = useCallback(
+    async (siteId: string): Promise<{
+      success: boolean;
+      data?: {
+        assigned_license: License | null;
+        unassigned_licenses: License[];
+      };
+      error?: string;
+    }> => {
+      try {
+        const result = await licenseApiRequest<{
+          assigned_license: License | null;
+          unassigned_licenses: License[];
+        }>(`/licenses/available-for-site/${siteId}`, {}, forceLogout);
+
+        if (result.success && result.data) {
+          return { success: true, data: result.data };
+        } else {
+          return {
+            success: false,
+            error: result.success === false ? result.error.message : 'Failed to fetch available licenses',
+          };
+        }
+      } catch (_err) {
+        return {
+          success: false,
+          error: _err instanceof Error ? _err.message : 'Unknown error occurred',
+        };
+      }
+    },
+    [forceLogout]
+  );
+
+  const getLicenseUsage = useCallback(
+    async (licenseId: string): Promise<{
+      success: boolean;
+      data?: {usage: {queries_used?: number; sites_used?: number; downloads_used?: number}};
+      error?: string;
+    }> => {
+      try {
+        const result = await licenseApiRequest<{usage: {queries_used?: number; sites_used?: number; downloads_used?: number}}>(
+          `/licenses/${licenseId}/usage`,
+          {},
+          forceLogout
+        );
+
+        if (result.success && result.data) {
+          return { success: true, data: result.data };
+        } else {
+          return {
+            success: false,
+            error: result.success === false ? result.error.message : 'Failed to fetch license usage',
+          };
+        }
+      } catch (_err) {
+        return {
+          success: false,
+          error: _err instanceof Error ? _err.message : 'Unknown error occurred',
+        };
+      }
+    },
+    [forceLogout]
+  );
+
   return {
     licenses,
     stats,
@@ -227,5 +383,9 @@ export const useLicenses = (): UseLicensesReturn => {
     validateLicense,
     getLicense,
     getLicenseByProduct,
+    assignLicense,
+    unassignLicense,
+    getAvailableLicensesForSite,
+    getLicenseUsage,
   };
 };

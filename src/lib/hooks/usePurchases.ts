@@ -159,7 +159,7 @@ export const usePurchases = (): UsePurchasesReturn => {
     try {
       const result = await purchaseApiRequest<{
         purchases: PurchaseHistoryItem[];
-      }>('/purchases/history', {}, forceLogout);
+      }>('/purchases/user/history', {}, forceLogout);
 
       if (result.success && result.data) {
         setPurchaseHistory(result.data.purchases);

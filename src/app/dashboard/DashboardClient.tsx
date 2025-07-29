@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '../../lib/hooks/useAuth';
 import { useSites } from '../../lib/hooks/useSites';
 import { useActivities } from '../../lib/hooks/useActivities';
+import { useLicenses } from '../../lib/hooks/useLicenses';
 import { Card, CardHeader, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import type { ActivityLog, ActivityStatsResponse, Site } from '../../types';
@@ -191,14 +192,20 @@ const DashboardClient: React.FC<DashboardClientProps> = ({
   // Use hooks to get current data, with initial data as fallback
   const { sites, isLoading: sitesLoading } = useSites(initialSites.length > 0 ? initialSites : undefined);
   const { activities, stats, isLoading: activitiesLoading, error } = useActivities();
+  const { licenses, isLoading: licensesLoading } = useLicenses();
 
   // Use the most current data available - prioritize prefetched data
   const currentSites = prefetchedSites || (sites.length > 0 ? sites : initialSites);
   const currentActivities = activities.length > 0 ? activities : initialActivities;
   const currentStats = stats || initialStats;
   
+  // Calculate active products (assigned licenses)
+  const activeProducts = licenses.filter(license => 
+    license.status === 'active' && license.metadata?.assigned_site_id
+  ).length;
+  
   // Determine if we should show loading state for stats
-  const isStatsLoading = (sitesLoading && !prefetchedSites) || activitiesLoading;
+  const isStatsLoading = (sitesLoading && !prefetchedSites) || activitiesLoading || licensesLoading;
 
 
   const stats_data = [
@@ -214,11 +221,11 @@ const DashboardClient: React.FC<DashboardClientProps> = ({
     },
     {
       name: 'Active Products',
-      value: isStatsLoading ? '—' : '0', // TODO: Calculate from products data
-      description: 'Lighthouse products registered',
+      value: isStatsLoading ? '—' : activeProducts.toString(),
+      description: 'Lighthouse products assigned',
       href: '/dashboard/products',
       action: 'View Products',
-      trend: isStatsLoading ? '...' : '+0%',
+      trend: isStatsLoading ? '...' : `+${activeProducts}`,
       trendUp: true,
       isLoading: isStatsLoading,
     },

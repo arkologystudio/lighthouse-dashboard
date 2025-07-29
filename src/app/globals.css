@@ -1781,3 +1781,893 @@ a {
   }
 }
 
+/* ==========================================================================
+   LICENSE & ASSIGNMENT SYSTEM STYLES
+   ========================================================================== */
+
+/* License Status Cards */
+.lh-license-status-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.lh-license-count {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  font-family: 'Raleway', sans-serif;
+  margin-bottom: 0.5rem;
+}
+
+.lh-license-count-label {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1rem;
+}
+
+/* License Status Badges */
+.lh-license-available {
+  background: rgba(81, 207, 102, 0.1);
+  border: 1px solid rgba(81, 207, 102, 0.2);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.lh-license-available-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-success);
+  margin-bottom: 0.25rem;
+}
+
+.lh-license-available-subtitle {
+  font-size: 0.75rem;
+  color: #059669;
+}
+
+.lh-license-assigned {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.lh-license-assigned-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-signal-amber);
+  margin-bottom: 0.25rem;
+}
+
+.lh-license-assigned-subtitle {
+  font-size: 0.75rem;
+  color: #d97706;
+}
+
+.lh-license-none {
+  background: rgba(107, 114, 128, 0.1);
+  border: 1px solid rgba(107, 114, 128, 0.2);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.lh-license-none-title {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+/* Active Assignment Cards */
+.lh-assignment-card {
+  background: rgba(81, 207, 102, 0.05);
+  border: 1px solid rgba(81, 207, 102, 0.2);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.lh-assignment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.lh-assignment-site-name {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.lh-assignment-site-url {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.lh-assignment-license-type {
+  font-size: 0.875rem;
+  color: var(--color-text-success);
+  font-weight: 500;
+}
+
+.lh-assignment-status {
+  padding: 0.25rem 0.75rem;
+  background: rgba(81, 207, 102, 0.2);
+  color: var(--color-text-success);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.lh-assignment-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(81, 207, 102, 0.2);
+}
+
+/* Site Products Modal Styles */
+.lh-site-product-assigned {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+
+.lh-site-product-assigned:hover {
+  background: var(--color-bg-surface);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.lh-site-product-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.lh-site-product-info {
+  flex: 1;
+}
+
+.lh-site-product-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.lh-site-product-name {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.lh-product-badge-assigned {
+  padding: 0.25rem 0.5rem;
+  background: var(--color-accent);
+  color: white;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.lh-product-badge-active {
+  padding: 0.25rem 0.5rem;
+  background: rgba(81, 207, 102, 0.2);
+  color: var(--color-text-success);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.lh-product-badge-beta {
+  padding: 0.25rem 0.5rem;
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.lh-site-product-description {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.lh-site-product-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.lh-meta-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.lh-meta-label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.lh-meta-value {
+  font-weight: 500;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+}
+
+/* License Info Panel */
+.lh-license-info-panel {
+  background: var(--color-bg-surface);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.lh-license-info-header {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.lh-license-status-licensed {
+  font-weight: 600;
+  color: var(--color-text-success);
+  margin-bottom: 0.25rem;
+}
+
+.lh-license-key-display {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-family: monospace;
+  margin-bottom: 0.25rem;
+}
+
+.lh-license-usage-info {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.lh-license-usage-remaining {
+  color: var(--color-text-success);
+}
+
+.lh-license-usage-none {
+  color: var(--color-signal-amber);
+}
+
+.lh-license-status-none {
+  font-weight: 600;
+  color: var(--color-signal-amber);
+  margin-bottom: 0.25rem;
+}
+
+.lh-license-help-text {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* Available Products Section */
+.lh-available-product {
+  background: var(--color-bg-card);
+  border: 2px dashed var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+
+.lh-available-product:hover {
+  border-color: var(--color-accent);
+  background: var(--color-bg-surface);
+}
+
+.lh-available-product-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.lh-available-product-info {
+  flex: 1;
+}
+
+.lh-available-product-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.lh-available-product-name {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.lh-product-price-badge {
+  padding: 0.25rem 0.5rem;
+  background: rgba(81, 207, 102, 0.2);
+  color: var(--color-text-success);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.lh-available-product-features {
+  margin-top: 0.75rem;
+}
+
+.lh-features-label {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.lh-features-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.lh-feature-tag {
+  padding: 0.25rem 0.5rem;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+}
+
+.lh-feature-tag-more {
+  padding: 0.25rem 0.5rem;
+  background: rgba(107, 114, 128, 0.1);
+  color: var(--color-text-muted);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+}
+
+/* Assignment Actions */
+.lh-assignment-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
+.lh-assign-license-btn {
+  background: var(--color-accent);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.lh-assign-license-btn:hover {
+  background: var(--color-accent-light);
+  transform: translateY(-1px);
+}
+
+.lh-assign-license-btn:disabled {
+  background: var(--color-text-muted);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.lh-no-license-available {
+  background: var(--color-text-muted);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  cursor: not-allowed;
+  min-width: 120px;
+}
+
+.lh-no-license-help {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  margin-top: 0.25rem;
+}
+
+.lh-remove-assignment-btn {
+  background: transparent;
+  color: var(--color-text-error);
+  border: 1px solid var(--color-text-error);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.lh-remove-assignment-btn:hover {
+  background: var(--color-text-error);
+  color: white;
+}
+
+.lh-remove-assignment-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Section Headers */
+.lh-section-header-assignments {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+  font-family: 'Raleway', sans-serif;
+}
+
+.lh-section-header-available {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+  font-family: 'Raleway', sans-serif;
+}
+
+/* Empty States for Assignments */
+.lh-no-assignments {
+  background: var(--color-bg-surface);
+  border-radius: 0.75rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.lh-no-assignments-title {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.lh-no-assignments-subtitle {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* Mobile Responsiveness for License UI */
+@media (max-width: 767px) {
+  .lh-site-product-header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .lh-assignment-action {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  .lh-assign-license-btn,
+  .lh-no-license-available,
+  .lh-remove-assignment-btn {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .lh-available-product-header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .lh-site-product-meta {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .lh-assignment-actions {
+    flex-direction: column;
+  }
+}
+
+/* ==========================================================================
+   SITE CREDENTIALS MODAL STYLES
+   ========================================================================== */
+
+/* Setup Status Card */
+.lh-setup-status-complete {
+  background: rgba(81, 207, 102, 0.1);
+  border: 1px solid rgba(81, 207, 102, 0.2);
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+.lh-setup-status-incomplete {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+.lh-setup-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.lh-setup-status-dot-complete {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background-color: var(--color-text-success);
+  flex-shrink: 0;
+}
+
+.lh-setup-status-dot-incomplete {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background-color: var(--color-signal-amber);
+  flex-shrink: 0;
+}
+
+.lh-setup-status-text {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.lh-setup-next-steps {
+  margin-top: 1rem;
+}
+
+.lh-setup-next-steps-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.lh-setup-steps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.lh-setup-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.lh-setup-step-bullet {
+  color: var(--color-text-muted);
+  margin-top: 0.125rem;
+}
+
+/* Credentials Card */
+.lh-credentials-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.lh-credentials-card-header {
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.lh-credentials-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-family: 'Raleway', sans-serif;
+}
+
+.lh-credentials-card-content {
+  padding: 1.5rem;
+}
+
+/* Site Info Display */
+.lh-site-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.lh-site-info-item {
+  background: var(--color-bg-surface);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+
+.lh-site-info-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.lh-site-info-value {
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  font-weight: 500;
+  word-break: break-all;
+}
+
+/* Credential Fields */
+.lh-credential-field {
+  margin-bottom: 1rem;
+}
+
+.lh-credential-field:last-child {
+  margin-bottom: 0;
+}
+
+.lh-credential-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.lh-credential-value {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lh-credential-display {
+  flex: 1;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  font-family: monospace;
+  word-break: break-all;
+}
+
+.lh-credential-copy-btn {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.lh-credential-copy-btn:hover {
+  background: var(--color-bg-surface);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.lh-credential-copy-btn.copied {
+  background: var(--color-text-success);
+  border-color: var(--color-text-success);
+  color: white;
+}
+
+.lh-credential-help-text {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 0.5rem;
+}
+
+/* Scopes Display */
+.lh-scopes-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.lh-scope-badge {
+  padding: 0.25rem 0.5rem;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Empty State */
+.lh-credential-empty-state {
+  text-align: center;
+  padding: 2rem;
+}
+
+.lh-credential-empty-title {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.lh-credential-empty-subtitle {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1rem;
+}
+
+/* Available Licenses */
+.lh-available-licenses {
+  margin-top: 1rem;
+}
+
+.lh-available-licenses-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.lh-available-license-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  background: var(--color-bg-surface);
+}
+
+.lh-available-license-info {
+  flex: 1;
+}
+
+.lh-available-license-type {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.lh-available-license-details {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+/* Usage Stats */
+.lh-usage-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.lh-usage-stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.lh-usage-stat-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.lh-usage-stat-value {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+/* WordPress Config */
+.lh-wp-config-container {
+  position: relative;
+}
+
+.lh-wp-config-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.lh-wp-config-code {
+  background: var(--color-bg-main);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  overflow-x: auto;
+  white-space: pre;
+  line-height: 1.4;
+  position: relative;
+}
+
+.lh-wp-config-copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(0, 0, 0, 0.7);
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.lh-wp-config-copy-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+  color: var(--color-text-primary);
+}
+
+.lh-setup-instructions {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.lh-setup-instructions-title {
+  font-weight: 600;
+  color: #3b82f6;
+  margin-bottom: 0.5rem;
+}
+
+.lh-setup-instructions-list {
+  list-style: decimal;
+  list-style-position: inside;
+  color: #3b82f6;
+  font-size: 0.875rem;
+}
+
+.lh-setup-instructions-item {
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 767px) {
+  .lh-site-info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .lh-usage-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .lh-credential-value {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .lh-credential-copy-btn {
+    margin-top: 0.5rem;
+  }
+  
+  .lh-available-license-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+}
+

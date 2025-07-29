@@ -98,6 +98,7 @@ interface UseProductsReturn {
   error: string | null;
   refreshProducts: () => Promise<void>;
   refreshSiteProducts: (siteId: string) => Promise<void>;
+  refreshAllSiteProducts: () => Promise<void>;
   registerProduct: (
     siteId: string,
     request: RegisterSiteProductRequest
@@ -190,6 +191,52 @@ export const useProducts = (initialProducts?: EcosystemProduct[]): UseProductsRe
     [forceLogout]
   );
 
+  const refreshAllSiteProducts = useCallback(async () => {
+    setError(null);
+
+    try {
+      // First get all user sites
+      const sitesResult = await ecosystemApiRequest<{ sites: Array<{ id: string }> }>(
+        '/users/sites',
+        {},
+        forceLogout
+      );
+
+      if (!sitesResult.success || !sitesResult.data || !sitesResult.data.sites || !Array.isArray(sitesResult.data.sites)) {
+        console.warn('Failed to fetch user sites or no sites found');
+        setSiteProducts([]); // Set to empty array instead of keeping undefined
+        return;
+      }
+
+      // Then fetch site products for all sites in parallel
+      const siteProductPromises = sitesResult.data.sites.map(async (site) => {
+        try {
+          const result = await ecosystemApiRequest<SiteProductsResponse>(
+            `/sites/${site.id}/products`,
+            {},
+            forceLogout
+          );
+          return result.success && result.data && result.data.products ? result.data.products : [];
+        } catch (err) {
+          console.warn(`Failed to fetch products for site ${site.id}:`, err);
+          return [];
+        }
+      });
+
+      const allSiteProductsArrays = await Promise.all(siteProductPromises);
+      // Flatten the array of arrays with defensive programming
+      const allSiteProducts = Array.isArray(allSiteProductsArrays) 
+        ? allSiteProductsArrays.filter(Array.isArray).flat()
+        : [];
+      
+      setSiteProducts(Array.isArray(allSiteProducts) ? allSiteProducts : []);
+    } catch (err) {
+      console.error('refreshAllSiteProducts error:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+      setSiteProducts([]); // Ensure we always have an array
+    }
+  }, [forceLogout]);
+
   const registerProduct = useCallback(
     async (
       siteId: string,
@@ -206,8 +253,8 @@ export const useProducts = (initialProducts?: EcosystemProduct[]): UseProductsRe
         );
 
         if (result.success) {
-          // Refresh site products after successful registration
-          await refreshSiteProducts(siteId);
+          // Refresh all site products after successful registration
+          await refreshAllSiteProducts();
           return { success: true };
         } else {
           return { success: false, error: result.error.message };
@@ -219,7 +266,7 @@ export const useProducts = (initialProducts?: EcosystemProduct[]): UseProductsRe
         };
       }
     },
-    [refreshSiteProducts, forceLogout]
+    [refreshAllSiteProducts, forceLogout]
   );
 
   const updateProduct = useCallback(
@@ -239,8 +286,8 @@ export const useProducts = (initialProducts?: EcosystemProduct[]): UseProductsRe
         );
 
         if (result.success) {
-          // Refresh site products after successful update
-          await refreshSiteProducts(siteId);
+          // Refresh all site products after successful update
+          await refreshAllSiteProducts();
           return { success: true };
         } else {
           return { success: false, error: result.error.message };
@@ -252,7 +299,7 @@ export const useProducts = (initialProducts?: EcosystemProduct[]): UseProductsRe
         };
       }
     },
-    [refreshSiteProducts, forceLogout]
+    [refreshAllSiteProducts, forceLogout]
   );
 
   const unregisterProduct = useCallback(
@@ -270,8 +317,8 @@ export const useProducts = (initialProducts?: EcosystemProduct[]): UseProductsRe
         );
 
         if (result.success) {
-          // Refresh site products after successful unregistration
-          await refreshSiteProducts(siteId);
+          // Refresh all site products after successful unregistration
+          await refreshAllSiteProducts();
           return { success: true };
         } else {
           return { success: false, error: result.error.message };
@@ -283,7 +330,7 @@ export const useProducts = (initialProducts?: EcosystemProduct[]): UseProductsRe
         };
       }
     },
-    [refreshSiteProducts, forceLogout]
+    [refreshAllSiteProducts, forceLogout]
   );
 
   const checkProductStatus = useCallback(
@@ -323,6 +370,12 @@ export const useProducts = (initialProducts?: EcosystemProduct[]): UseProductsRe
     }
   }, [refreshProducts, hasData]);
 
+  // Load all site products on mount (only once)
+  useEffect(() => {
+    refreshAllSiteProducts();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array to run only once
+
   return {
     products,
     siteProducts,
@@ -330,6 +383,7 @@ export const useProducts = (initialProducts?: EcosystemProduct[]): UseProductsRe
     error,
     refreshProducts,
     refreshSiteProducts,
+    refreshAllSiteProducts,
     registerProduct,
     updateProduct,
     unregisterProduct,

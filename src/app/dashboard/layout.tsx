@@ -10,6 +10,7 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
+// Updated: 2025-07-28 13:15 - Removed Licenses from navigation
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const pathname = usePathname();
   const router = useRouter();
@@ -109,6 +110,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
         {/* Navigation */}
         <nav className="lh-sidebar-nav">
+          {/* Debug: Navigation items count = {NAVIGATION_ITEMS.length} */}
           {NAVIGATION_ITEMS.map(item => {
             // Fix active state detection - Overview should only be active when exactly on /dashboard
             const isActive =
@@ -221,6 +223,21 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                       />
                     </svg>
                   )}
+                  {item.name === 'Usage' && (
+                    <svg
+                      className="lh-icon-md"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                      />
+                    </svg>
+                  )}
                   {item.name === 'Activities' && (
                     <svg
                       className="lh-icon-md"
@@ -237,7 +254,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                     </svg>
                   )}
                   {/* Default icon for any items without specific icons */}
-                  {!['Overview', 'Sites', 'Products', 'Billing', 'Diagnostics', 'Insights', 'Activities'].includes(item.name) && (
+                  {![
+                    'Overview',
+                    'Sites',
+                    'Products',
+                    'Billing',
+                    'Usage',
+                    'Diagnostics',
+                    'Insights',
+                    'Activities',
+                  ].includes(item.name) && (
                     <svg
                       className="lh-icon-md"
                       fill="none"

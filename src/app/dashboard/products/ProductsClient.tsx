@@ -78,12 +78,16 @@ const ProductsClient: React.FC<ProductsClientProps> = ({
 
   // Implement progressive loading of products
   useEffect(() => {
-    setVisibleProducts(products.slice(0, loadedCount));
+    if (Array.isArray(products)) {
+      setVisibleProducts(products.slice(0, loadedCount));
+    } else {
+      setVisibleProducts([]);
+    }
   }, [products, loadedCount]);
 
   const loadMoreProducts = useCallback(() => {
-    setLoadedCount(prev => Math.min(prev + 6, products.length));
-  }, [products.length]);
+    setLoadedCount(prev => Math.min(prev + 6, Array.isArray(products) ? products.length : 0));
+  }, [products]);
 
   const handleRefreshProducts = useCallback(async () => {
     toast.loading('Refreshing products...');
@@ -142,7 +146,7 @@ const ProductsClient: React.FC<ProductsClientProps> = ({
   };
 
   // Show skeleton loading if we have no data and are loading
-  if ((sitesLoading && sites.length === 0) || (productsLoading && products.length === 0)) {
+  if ((sitesLoading && (!Array.isArray(sites) || sites.length === 0)) || (productsLoading && (!Array.isArray(products) || products.length === 0))) {
     return (
       <div className="lh-page-container">
         <div className="lh-page-header">
@@ -204,30 +208,32 @@ const ProductsClient: React.FC<ProductsClientProps> = ({
             {productsLoading ? 'Refreshing...' : 'Refresh'}
           </Button>
           <div className="lh-text-muted">
-            {sites.length} {sites.length === 1 ? 'site' : 'sites'} available
+            {Array.isArray(sites) ? sites.length : 0} {(Array.isArray(sites) ? sites.length : 0) === 1 ? 'site' : 'sites'} available
           </div>
         </div>
       </div>
 
       {/* Products Grid */}
       <div className="lh-grid-cards">
-        {visibleProducts.map((product, index) => (
-          <Suspense key={product.id} fallback={<ProductCardSkeleton />}>
-            <ProductCard
-              product={product}
-              sites={sites}
-              siteProducts={siteProducts}
-              onActivate={handleActivateProduct}
-              onDeactivate={handleDeactivateProduct}
-              isProcessing={isProcessing}
-              priority={index < 3} // Prioritize first 3 products
-            />
-          </Suspense>
-        ))}
+        {Array.isArray(visibleProducts) && visibleProducts.map((product, index) => 
+          product ? (
+            <Suspense key={product.id} fallback={<ProductCardSkeleton />}>
+              <ProductCard
+                product={product}
+                sites={Array.isArray(sites) ? sites : []}
+                siteProducts={Array.isArray(siteProducts) ? siteProducts : []}
+                onActivate={handleActivateProduct}
+                onDeactivate={handleDeactivateProduct}
+                isProcessing={isProcessing}
+                priority={index < 3} // Prioritize first 3 products
+              />
+            </Suspense>
+          ) : null
+        )}
       </div>
 
       {/* Load More Button */}
-      {loadedCount < products.length && (
+      {Array.isArray(products) && loadedCount < products.length && (
         <div className="flex justify-center mt-8">
           <Button
             onClick={loadMoreProducts}
@@ -247,7 +253,7 @@ const ProductsClient: React.FC<ProductsClientProps> = ({
                 d="M19 9l-7 7-7-7"
               />
             </svg>
-            Load More Products ({products.length - loadedCount} remaining)
+            Load More Products ({Array.isArray(products) ? products.length - loadedCount : 0} remaining)
           </Button>
         </div>
       )}

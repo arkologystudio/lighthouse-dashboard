@@ -17,6 +17,9 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
 }) => {
+  if (!product) {
+    return <div>Error: No product data</div>;
+  }
 
   const getProductIcon = (productSlug: string) => {
     switch (productSlug) {
@@ -157,7 +160,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div className="mb-6 flex-1">
           <h4 className="lh-table-cell-content mb-3">Features:</h4>
           <div className="min-h-[8rem]">
-            {product.features && product.features.length > 0 ? (
+            {Array.isArray(product.features) && product.features.length > 0 ? (
               <ul className="lh-text-muted space-y-2">
                 {product.features.slice(0, 4).map((feature, index) => (
                   <li key={index} className="lh-flex-icon-text">

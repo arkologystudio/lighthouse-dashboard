@@ -8,6 +8,8 @@ import { Card, CardHeader, CardContent } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { TextField } from '../../../components/forms/TextField';
 import type { CreateSiteRequest, Site } from '../../../types';
+import SiteCredentialsModal from './SiteCredentialsModal';
+import SiteProductsModal from './SiteProductsModal';
 
 // Lazy load the modal component to improve initial load
 const Modal = lazy(() => import('../../../components/ui/Modal').then(module => ({ default: module.Modal })));
@@ -31,6 +33,14 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [credentialsModal, setCredentialsModal] = useState<{
+    isOpen: boolean;
+    site: Site | null;
+  }>({ isOpen: false, site: null });
+  const [productsModal, setProductsModal] = useState<{
+    isOpen: boolean;
+    site: Site | null;
+  }>({ isOpen: false, site: null });
 
   const [formData, setFormData] = useState<CreateSiteRequest>({
     name: '',
@@ -239,8 +249,19 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
                         </td>
                         <td className="lh-table-cell text-right text-sm font-medium">
                           <div className="flex items-center space-x-2">
-                            <Button variant="ghost" size="sm">
-                              Manage Plugins
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => setProductsModal({ isOpen: true, site })}
+                            >
+                              Products
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => setCredentialsModal({ isOpen: true, site })}
+                            >
+                              Credentials
                             </Button>
                             <Button
                               variant="ghost"
@@ -328,6 +349,24 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
             </form>
           </Modal>
         </Suspense>
+      )}
+
+      {/* Site Products Modal */}
+      {productsModal.isOpen && productsModal.site && (
+        <SiteProductsModal
+          site={productsModal.site}
+          isOpen={productsModal.isOpen}
+          onClose={() => setProductsModal({ isOpen: false, site: null })}
+        />
+      )}
+
+      {/* Site Credentials Modal */}
+      {credentialsModal.isOpen && credentialsModal.site && (
+        <SiteCredentialsModal
+          site={credentialsModal.site}
+          isOpen={credentialsModal.isOpen}
+          onClose={() => setCredentialsModal({ isOpen: false, site: null })}
+        />
       )}
     </div>
   );

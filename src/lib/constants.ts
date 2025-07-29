@@ -26,12 +26,13 @@ export const ENDPOINTS = {
   },
 } as const;
 
-// Navigation Items
+// Navigation Items (Updated - Licenses removed)
 export const NAVIGATION_ITEMS = [
   { name: 'Overview', href: '/dashboard' },
   { name: 'Sites', href: '/dashboard/sites' },
-  { name: 'Products', href: '/dashboard/products' },
   { name: 'Billing', href: '/dashboard/billing' },
+  { name: 'Products', href: '/dashboard/products' },
+  { name: 'Usage', href: '/dashboard/usage' },
   { name: 'Diagnostics', href: '/dashboard/diagnostics' },
   { name: 'Insights', href: '/dashboard/insights' },
   { name: 'Activities', href: '/dashboard/activities' },
