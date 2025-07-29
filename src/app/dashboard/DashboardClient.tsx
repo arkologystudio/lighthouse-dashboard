@@ -6,8 +6,7 @@ import { useAuth } from '../../lib/hooks/useAuth';
 import { useSites } from '../../lib/hooks/useSites';
 import { useActivities } from '../../lib/hooks/useActivities';
 import { useLicenses } from '../../lib/hooks/useLicenses';
-import { Card, CardHeader, CardContent } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
+import { Card, CardContent } from '../../components/ui/Card';
 import type { ActivityLog, ActivityStatsResponse, Site } from '../../types';
 
 const formatTimeAgo = (dateString: string): string => {
@@ -128,49 +127,50 @@ const getActivityIcon = (activityType: string) => {
   }
 };
 
-const getActivityColor = (activityType: string) => {
-  switch (activityType) {
-    case 'user_login':
-      return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
-    case 'site_created':
-    case 'product_registered':
-      return 'bg-blue-500/10 text-blue-400 border border-blue-500/20';
-    case 'search_performed':
-      return 'bg-violet-500/10 text-violet-400 border border-violet-500/20';
-    case 'site_updated':
-      return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
-    default:
-      return 'bg-gray-500/10 text-gray-400 border border-gray-500/20';
-  }
-};
 
 interface ActivityItemProps {
   activity: ActivityLog;
 }
 
-const ActivityItem: React.FC<ActivityItemProps> = ({ activity }) => (
-  <div className="lh-flex-start p-6 hover:bg-white/5 lh-transition-colors border-b border-white/10 last:border-b-0">
-    <div
-      className={`flex-shrink-0 lh-icon-xl lh-icon-circle ${getActivityColor(activity.activity_type)} shadow-sm`}
-    >
-      {getActivityIcon(activity.activity_type)}
-    </div>
-    <div className="flex-1 min-w-0 ml-1">
-      <p className="lh-table-cell-content font-medium">{activity.title}</p>
-      {activity.description && (
-        <p className="lh-text-description mt-1 text-gray-400">{activity.description}</p>
-      )}
-      <div className="lh-flex-icon-text mt-3">
-        <span className="lh-text-small text-gray-500 font-medium">
-          {formatTimeAgo(activity.created_at)}
-        </span>
-        {activity.site && (
-          <span className="text-xs text-gray-500 ml-2">• {activity.site.name}</span>
+const ActivityItem: React.FC<ActivityItemProps> = ({ activity }) => {
+  const getActivityIconClass = (activityType: string) => {
+    switch (activityType) {
+      case 'user_login':
+        return 'lh-activity-icon-login';
+      case 'site_created':
+      case 'product_registered':
+        return 'lh-activity-icon-site';
+      case 'search_performed':
+        return 'lh-activity-icon-search';
+      case 'site_updated':
+        return 'lh-activity-icon-update';
+      default:
+        return 'lh-activity-icon-default';
+    }
+  };
+
+  return (
+    <div className="lh-activity-item">
+      <div className={`lh-activity-icon ${getActivityIconClass(activity.activity_type)}`}>
+        {getActivityIcon(activity.activity_type)}
+      </div>
+      <div className="lh-activity-content">
+        <p className="lh-activity-title">{activity.title}</p>
+        {activity.description && (
+          <p className="lh-activity-description">{activity.description}</p>
         )}
+        <div className="lh-activity-meta">
+          <span className="font-medium">
+            {formatTimeAgo(activity.created_at)}
+          </span>
+          {activity.site && (
+            <span>• {activity.site.name}</span>
+          )}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 interface DashboardClientProps {
   initialSites?: Site[];
@@ -316,17 +316,14 @@ const DashboardClient: React.FC<DashboardClientProps> = ({
   return (
     <div className="lh-page-container">
       {/* Welcome Section */}
-      <div className="lh-card lh-card-content">
+      <div className="lh-welcome-section lh-section-spacing">
         <div className="lh-flex-icon-text">
-          <div className="flex-shrink-0">
-            <div className="w-12 h-12 rounded-xl lh-flex-center" 
-                 style={{ backgroundColor: 'var(--color-dashboard-accent)' }}>
-              <span className="text-white text-xl">👋</span>
-            </div>
+          <div className="lh-welcome-icon-container">
+            <span className="text-white text-xl">👋</span>
           </div>
-          <div>
-            <h1 className="lh-title-page">Welcome, {user?.name || 'che'}!</h1>
-            <p className="lh-text-description mt-1">
+          <div className="lh-welcome-content">
+            <h1 className="lh-title-page lh-no-spacing">Welcome, {user?.name || 'che'}!</h1>
+            <p className="lh-text-description lh-element-spacing-sm">
               Manage your WordPress sites and Lighthouse plugins from this
               dashboard.
             </p>
@@ -335,100 +332,93 @@ const DashboardClient: React.FC<DashboardClientProps> = ({
       </div>
 
       {/* Stats Overview */}
-      <div>
-        <h2 className="lh-title-section mb-6">Overview</h2>
+      <div className="lh-section-spacing">
+        <h2 className="lh-title-section lh-element-spacing">Overview</h2>
         <div className="lh-grid-stats">
           {stats_data.map(stat => (
-            <Card key={stat.name} className="lh-card-hover lh-card">
-              <CardHeader className="pb-2">
+            <div key={stat.name} className="lh-stat-card">
+              <div className="lh-stat-card-header">
                 <div className="lh-flex-between">
                   <h3 className="lh-text-stat-label">{stat.name}</h3>
                   <span
-                    className={`lh-badge ${
-                      stat.trendUp ? 'lh-badge-green' : 'lh-badge-red'
+                    className={`lh-stat-trend-badge ${
+                      !stat.trendUp ? 'lh-stat-trend-badge-negative' : ''
                     } ${stat.isLoading ? 'animate-pulse' : ''}`}
                   >
                     {stat.trend}
                   </span>
                 </div>
-              </CardHeader>
-              <CardContent className="pt-2">
+              </div>
+              <div className="lh-stat-card-content">
                 <div className="lh-flex-between">
                   <div>
                     <p className={`lh-text-stat ${stat.isLoading ? 'animate-pulse' : ''}`}>
                       {stat.value}
                     </p>
-                    <p className="lh-text-muted mt-1">{stat.description}</p>
+                    <p className="lh-text-muted">{stat.description}</p>
                   </div>
                 </div>
-                <div className="mt-4">
+                <div style={{ marginTop: '1rem' }}>
                   <Link href={stat.href}>
-                    <Button
-                      variant="outline"
-                      className="w-full lh-text-link border-lighthouse-primary hover:bg-lighthouse-primary hover:text-white lh-transition font-medium"
+                    <button
+                      className="lh-btn lh-btn-outline lh-btn-full-width"
                       disabled={stat.isLoading}
                     >
                       {stat.action}
-                    </Button>
+                    </button>
                   </Link>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div>
-        <div className="lh-flex-between mb-6">
-          <h2 className="lh-title-section">Quick Actions</h2>
-          <p className="lh-text-muted">Get started with these common tasks</p>
+      <div className="lh-section-spacing">
+        <div className="lh-flex-between lh-element-spacing">
+          <h2 className="lh-title-section lh-no-spacing">Quick Actions</h2>
+          <p className="lh-text-muted lh-no-spacing">Get started with these common tasks</p>
         </div>
         <div className="lh-grid-cards">
           {quickActions.map(action => (
-            <Card key={action.title} className="lh-card-hover group lh-card">
-              <CardHeader className="pb-4">
+            <div key={action.title} className="lh-quick-action-card">
+              <div className="lh-quick-action-header">
                 <div className="lh-flex-icon-text">
-                  <div
-                    className="flex-shrink-0 w-12 h-12 rounded-xl lh-flex-center text-white shadow-sm group-hover:shadow-md lh-transition-shadow"
-                    style={{ backgroundColor: 'var(--color-dashboard-accent)' }}
-                  >
+                  <div className="lh-quick-action-icon-container" style={{ backgroundColor: 'var(--color-dashboard-accent)' }}>
                     {action.icon}
                   </div>
                   <div>
-                    <h3 className="lh-title-card lh-transition-colors">
+                    <h3 className="lh-title-card">
                       {action.title}
                     </h3>
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <p className="lh-text-description mb-6 leading-relaxed">
+              </div>
+              <div className="lh-quick-action-content">
+                <p className="lh-quick-action-description">
                   {action.description}
                 </p>
                 <Link href={action.href}>
-                  <Button
-                    variant="outline"
-                    className="w-full font-medium"
-                  >
+                  <button className="lh-btn lh-btn-outline lh-btn-full-width">
                     {action.buttonText}
-                  </Button>
+                  </button>
                 </Link>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       </div>
 
       {/* Recent Activity */}
-      <div id="recent-activity">
-        <div className="lh-flex-between mb-6">
-          <h2 className="lh-title-section">Recent Activity</h2>
+      <div id="recent-activity" className="lh-section-spacing">
+        <div className="lh-flex-between lh-element-spacing">
+          <h2 className="lh-title-section lh-no-spacing">Recent Activity</h2>
           {currentActivities.length > 0 && (
             <Link href="/dashboard/activities">
-              <Button variant="ghost" className="lh-text-link hover:bg-white/5">
+              <button className="lh-btn lh-btn-ghost lh-btn-sm">
                 View All
-              </Button>
+              </button>
             </Link>
           )}
         </div>

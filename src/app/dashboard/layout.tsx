@@ -36,10 +36,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div
-      className="min-h-screen flex"
-      style={{ background: 'var(--color-bg-main)' }}
-    >
+    <div className="min-h-screen flex lh-dashboard-container">
       {/* Mobile sidebar backdrop */}
       {mobileMenuOpen && (
         <div
@@ -50,13 +47,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
       {/* Sidebar */}
       <div
-        className={`${sidebarCollapsed ? 'w-16 lh-sidebar-collapsed' : 'w-64'} shadow-xl transform lh-transition lg:translate-x-0 ${
+        className={`${sidebarCollapsed ? 'w-16 lh-sidebar-collapsed' : 'w-64'} lh-sidebar-container shadow-xl transform lh-transition lg:translate-x-0 ${
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         } flex-col h-screen flex lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lh-mobile-sidebar ${mobileMenuOpen ? 'open' : ''}`}
-        style={{
-          backgroundColor: 'var(--color-bg-card)',
-          borderRight: '1px solid var(--color-border)',
-        }}
       >
         {/* Logo and collapse button */}
         <div className="lh-sidebar-header">
@@ -433,7 +426,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
       {/* Main content container */}
       <div
-        className={`flex-1 flex flex-col lh-transition ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'}`}
+        className={`lh-main-content-area lh-transition ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'}`}
       >
         {/* Mobile top bar */}
         <header className="lh-mobile-only lh-mobile-header">
