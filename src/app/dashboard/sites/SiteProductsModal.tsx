@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useSites } from '../../../lib/hooks/useSites';
+
 import { useLicenses } from '../../../lib/hooks/useLicenses';
 import { useProducts } from '../../../lib/hooks/useProducts';
 import { Modal } from '../../../components/ui/Modal';
 import { Button } from '../../../components/ui/Button';
-import { Card, CardContent } from '../../../components/ui/Card';
+
 import { Site, EcosystemProduct, SiteProduct, License } from '../../../types';
 
 interface SiteProductsModalProps {
@@ -28,11 +28,17 @@ const SiteProductsModal: React.FC<SiteProductsModalProps> = ({
   const { assignLicense, unassignLicense } = useLicenses();
   const { licenses } = useLicenses();
   const { products } = useProducts();
-  const [siteProducts, setSiteProducts] = useState<SiteProductWithDetails[]>([]);
-  const [availableProducts, setAvailableProducts] = useState<EcosystemProduct[]>([]);
+  const [siteProducts, setSiteProducts] = useState<SiteProductWithDetails[]>(
+    []
+  );
+  const [availableProducts, setAvailableProducts] = useState<
+    EcosystemProduct[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [processingProduct, setProcessingProduct] = useState<string | null>(null);
+  const [processingProduct, setProcessingProduct] = useState<string | null>(
+    null
+  );
 
   const loadSiteProducts = useCallback(async () => {
     setIsLoading(true);
@@ -40,46 +46,53 @@ const SiteProductsModal: React.FC<SiteProductsModalProps> = ({
 
     try {
       // Find licenses assigned to this site and create "installed" products from them
-      const assignedLicenses = licenses.filter(license => 
-        license.metadata?.assigned_site_id === site.id &&
-        license.status === 'active'
+      const assignedLicenses = licenses.filter(
+        license =>
+          license.metadata?.assigned_site_id === site.id &&
+          license.status === 'active'
       );
 
       // Create site products from assigned licenses
-      const enhancedProducts: SiteProductWithDetails[] = assignedLicenses.map(license => {
-        const product = products.find(p => 
-          p.slug === license.product?.slug || 
-          p.slug === license.metadata?.product_slug
-        );
-        
-        if (!product) {
-          return null;
-        }
+      const enhancedProducts: SiteProductWithDetails[] = assignedLicenses
+        .map(license => {
+          const product = products.find(
+            p =>
+              p.slug === license.product?.slug ||
+              p.slug === license.metadata?.product_slug
+          );
 
-        return {
-          id: `${site.id}-${product.slug}`,
-          site_id: site.id,
-          product_id: product.id,
-          is_enabled: true, // Assigned licenses are considered enabled
-          enabled_at: license.metadata?.assigned_at || license.updated_at,
-          config: {},
-          usage_count: 0,
-          created_at: license.created_at,
-          updated_at: license.updated_at,
-          product,
-          assigned_license: license,
-        };
-      }).filter(Boolean) as SiteProductWithDetails[];
+          if (!product) {
+            return null;
+          }
+
+          return {
+            id: `${site.id}-${product.slug}`,
+            site_id: site.id,
+            product_id: product.id,
+            is_enabled: true, // Assigned licenses are considered enabled
+            enabled_at: license.metadata?.assigned_at || license.updated_at,
+            config: {},
+            usage_count: 0,
+            created_at: license.created_at,
+            updated_at: license.updated_at,
+            product,
+            assigned_license: license,
+          };
+        })
+        .filter(Boolean) as SiteProductWithDetails[];
 
       setSiteProducts(enhancedProducts);
 
       // Filter out products that already have assigned licenses
-      const assignedProductSlugs = assignedLicenses.map(license => 
-        license.product?.slug || license.metadata?.product_slug
-      ).filter(Boolean);
-      const available = products.filter(p => !assignedProductSlugs.includes(p.slug));
+      const assignedProductSlugs = assignedLicenses
+        .map(license => license.product?.slug || license.metadata?.product_slug)
+        .filter(Boolean);
+      const available = products.filter(
+        p => !assignedProductSlugs.includes(p.slug)
+      );
       setAvailableProducts(available);
     } catch (err) {
+      console.error(err);
       setError('Failed to load site products');
       setAvailableProducts(products);
     } finally {
@@ -99,10 +112,12 @@ const SiteProductsModal: React.FC<SiteProductsModalProps> = ({
 
     try {
       // Find an available license for this product
-      const availableLicense = licenses.find(license => 
-        license.status === 'active' && 
-        (license.product?.slug === productSlug || license.metadata?.product_slug === productSlug) &&
-        !license.metadata?.assigned_site_id
+      const availableLicense = licenses.find(
+        license =>
+          license.status === 'active' &&
+          (license.product?.slug === productSlug ||
+            license.metadata?.product_slug === productSlug) &&
+          !license.metadata?.assigned_site_id
       );
 
       if (!availableLicense) {
@@ -111,7 +126,7 @@ const SiteProductsModal: React.FC<SiteProductsModalProps> = ({
       }
 
       const result = await assignLicense(availableLicense.id, site.id);
-      
+
       if (result.success) {
         await loadSiteProducts(); // Refresh the list
       } else {
@@ -122,8 +137,15 @@ const SiteProductsModal: React.FC<SiteProductsModalProps> = ({
     }
   };
 
-  const handleUnassignLicense = async (licenseId: string, productName: string) => {
-    if (!confirm(`Are you sure you want to remove ${productName} from this site? The license will become available for other sites.`)) {
+  const handleUnassignLicense = async (
+    licenseId: string,
+    productName: string
+  ) => {
+    if (
+      !confirm(
+        `Are you sure you want to remove ${productName} from this site? The license will become available for other sites.`
+      )
+    ) {
       return;
     }
 
@@ -132,7 +154,7 @@ const SiteProductsModal: React.FC<SiteProductsModalProps> = ({
 
     try {
       const result = await unassignLicense(licenseId);
-      
+
       if (result.success) {
         await loadSiteProducts(); // Refresh the list
       } else {
@@ -143,51 +165,52 @@ const SiteProductsModal: React.FC<SiteProductsModalProps> = ({
     }
   };
 
-  const getLicenseInfo = () => {
-    // Check if there's a license assigned to this site
-    const assignedLicense = licenses.find(license => 
-      license.metadata?.assigned_site_id === site.id &&
-      license.status === 'active'
-    );
+  // const getLicenseInfo = () => {
+  //   // Check if there's a license assigned to this site
+  //   const assignedLicense = licenses.find(
+  //     license =>
+  //       license.metadata?.assigned_site_id === site.id &&
+  //       license.status === 'active'
+  //   );
 
-    if (!assignedLicense) {
-      return {
-        hasLicense: false,
-        message: 'No license assigned to this site',
-        remainingInstalls: 0,
-      };
-    }
+  //   if (!assignedLicense) {
+  //     return {
+  //       hasLicense: false,
+  //       message: 'No license assigned to this site',
+  //       remainingInstalls: 0,
+  //     };
+  //   }
 
-    // Calculate remaining installations based on max_sites
-    const usedSites = licenses.filter(license => 
-      license.id === assignedLicense.id && 
-      license.metadata?.assigned_site_id
-    ).length;
+  //   // Calculate remaining installations based on max_sites
+  //   const usedSites = licenses.filter(
+  //     license =>
+  //       license.id === assignedLicense.id && license.metadata?.assigned_site_id
+  //   ).length;
 
-    const remainingInstalls = assignedLicense.max_sites - usedSites;
+  //   const remainingInstalls = assignedLicense.max_sites - usedSites;
 
-    return {
-      hasLicense: true,
-      license: assignedLicense,
-      remainingInstalls: Math.max(0, remainingInstalls),
-      totalSites: assignedLicense.max_sites,
-      usedSites,
-    };
-  };
+  //   return {
+  //     hasLicense: true,
+  //     license: assignedLicense,
+  //     remainingInstalls: Math.max(0, remainingInstalls),
+  //     totalSites: assignedLicense.max_sites,
+  //     usedSites,
+  //   };
+  // };
 
   const canInstallProduct = (productSlug: string) => {
     // Check if user has any active license for this specific product
-    const activeLicenses = licenses.filter(license => 
-      license.status === 'active' && (
-        license.product?.slug === productSlug ||
-        license.metadata?.product_slug === productSlug
-      )
+    const activeLicenses = licenses.filter(
+      license =>
+        license.status === 'active' &&
+        (license.product?.slug === productSlug ||
+          license.metadata?.product_slug === productSlug)
     );
 
     for (const license of activeLicenses) {
       // Count how many sites this license is assigned to
-      const assignedSitesCount = licenses.filter(l => 
-        l.id === license.id && l.metadata?.assigned_site_id
+      const assignedSitesCount = licenses.filter(
+        l => l.id === license.id && l.metadata?.assigned_site_id
       ).length;
 
       // If this license has remaining site capacity
@@ -225,24 +248,42 @@ const SiteProductsModal: React.FC<SiteProductsModalProps> = ({
 
         {/* Assigned Products */}
         <div>
-          <h3 className="lh-section-header-assignments">Assigned Products ({siteProducts.length})</h3>
-          
+          <h3 className="lh-section-header-assignments">
+            Assigned Products ({siteProducts.length})
+          </h3>
+
           {siteProducts.length === 0 ? (
             <div className="lh-no-assignments">
-              <div className="lh-no-assignments-title">No products assigned</div>
-              <div className="lh-no-assignments-subtitle">Assign a product license below to get started</div>
+              <div className="lh-no-assignments-title">
+                No products assigned
+              </div>
+              <div className="lh-no-assignments-subtitle">
+                Assign a product license below to get started
+              </div>
             </div>
           ) : (
             <div className="space-y-4">
               {siteProducts.map(siteProduct => {
-                const licenseInfo = getLicenseInfo();
-                
+                const assignedLicense = siteProduct.assigned_license;
+                if (!assignedLicense) {
+                  console.error(
+                    'No assigned license found for site product',
+                    siteProduct
+                  );
+                  return null;
+                }
+
                 return (
-                  <div key={siteProduct.id} className="lh-site-product-assigned">
+                  <div
+                    key={siteProduct.id}
+                    className="lh-site-product-assigned"
+                  >
                     <div className="lh-site-product-header">
                       <div className="lh-site-product-info">
                         <div className="lh-site-product-title">
-                          <h4 className="lh-site-product-name">{siteProduct.product.name}</h4>
+                          <h4 className="lh-site-product-name">
+                            {siteProduct.product.name}
+                          </h4>
                           <span className="lh-product-badge-assigned">
                             Assigned
                           </span>
@@ -250,49 +291,69 @@ const SiteProductsModal: React.FC<SiteProductsModalProps> = ({
                             {siteProduct.is_enabled ? 'Active' : 'Inactive'}
                           </span>
                           {siteProduct.product.is_beta && (
-                            <span className="lh-product-badge-beta">
-                              Beta
-                            </span>
+                            <span className="lh-product-badge-beta">Beta</span>
                           )}
                         </div>
-                        
-                        <p className="lh-site-product-description">{siteProduct.product.description}</p>
-                        
+
+                        <p className="lh-site-product-description">
+                          {siteProduct.product.description}
+                        </p>
+
                         <div className="lh-site-product-meta">
                           <div className="lh-meta-item">
                             <span className="lh-meta-label">Category:</span>
-                            <div className="lh-meta-value">{siteProduct.product.category}</div>
+                            <div className="lh-meta-value">
+                              {siteProduct.product.category}
+                            </div>
                           </div>
-                          
+
                           <div className="lh-meta-item">
                             <span className="lh-meta-label">Version:</span>
-                            <div className="lh-meta-value">{siteProduct.product.version}</div>
+                            <div className="lh-meta-value">
+                              {siteProduct.product.version}
+                            </div>
                           </div>
-                          
+
                           <div className="lh-meta-item">
                             <span className="lh-meta-label">Assigned:</span>
                             <div className="lh-meta-value">
-                              {new Date(siteProduct.enabled_at).toLocaleDateString()}
+                              {new Date(
+                                siteProduct.enabled_at
+                              ).toLocaleDateString()}
                             </div>
                           </div>
                         </div>
 
                         {/* License Information */}
                         <div className="lh-license-info-panel">
-                          <div className="lh-license-info-header">License Status:</div>
+                          <div className="lh-license-info-header">
+                            License Status:
+                          </div>
                           {siteProduct.assigned_license ? (
                             <div>
                               <div className="lh-license-status-licensed">
-                                Licensed ({siteProduct.assigned_license.license_type.replace('_', ' ').toUpperCase()})
+                                Licensed (
+                                {siteProduct.assigned_license.license_type
+                                  .replace('_', ' ')
+                                  .toUpperCase()}
+                                )
                               </div>
                               <div className="lh-license-key-display">
-                                Key: {siteProduct.assigned_license.license_key.substring(0, 8)}...
+                                Key:{' '}
+                                {siteProduct.assigned_license.license_key.substring(
+                                  0,
+                                  8
+                                )}
+                                ...
                               </div>
                               <div className="lh-license-usage-info">
-                                Sites: {1} / {siteProduct.assigned_license.max_sites} used
+                                Sites: {1} /{' '}
+                                {siteProduct.assigned_license.max_sites} used
                                 {siteProduct.assigned_license.max_sites > 1 ? (
                                   <span className="lh-license-usage-remaining">
-                                    ({siteProduct.assigned_license.max_sites - 1} remaining)
+                                    (
+                                    {siteProduct.assigned_license.max_sites - 1}{' '}
+                                    remaining)
                                   </span>
                                 ) : (
                                   <span className="lh-license-usage-none">
@@ -303,7 +364,9 @@ const SiteProductsModal: React.FC<SiteProductsModalProps> = ({
                             </div>
                           ) : (
                             <div>
-                              <div className="lh-license-status-none">No License Assigned</div>
+                              <div className="lh-license-status-none">
+                                No License Assigned
+                              </div>
                               <div className="lh-license-help-text">
                                 This site needs a license to use this product
                               </div>
@@ -315,11 +378,18 @@ const SiteProductsModal: React.FC<SiteProductsModalProps> = ({
                       {/* Actions */}
                       <div className="lh-assignment-action">
                         <button
-                          onClick={() => handleUnassignLicense(siteProduct.assigned_license!.id, siteProduct.product.name)}
-                          disabled={processingProduct === siteProduct.assigned_license!.id}
+                          onClick={() =>
+                            handleUnassignLicense(
+                              assignedLicense.id,
+                              siteProduct.product.name
+                            )
+                          }
+                          disabled={processingProduct === assignedLicense.id}
                           className="lh-remove-assignment-btn"
                         >
-                          {processingProduct === siteProduct.assigned_license!.id ? 'Processing...' : 'Remove'}
+                          {processingProduct === assignedLicense.id
+                            ? 'Processing...'
+                            : 'Remove'}
                         </button>
                       </div>
                     </div>
@@ -333,19 +403,21 @@ const SiteProductsModal: React.FC<SiteProductsModalProps> = ({
         {/* Available Products */}
         {availableProducts.length > 0 && (
           <div>
-            <h3 className="lh-section-header-available">Available Products ({availableProducts.length})</h3>
-            
+            <h3 className="lh-section-header-available">
+              Available Products ({availableProducts.length})
+            </h3>
+
             <div className="space-y-4">
               {availableProducts.map(product => (
                 <div key={product.id} className="lh-available-product">
                   <div className="lh-available-product-header">
                     <div className="lh-available-product-info">
                       <div className="lh-available-product-title">
-                        <h4 className="lh-available-product-name">{product.name}</h4>
+                        <h4 className="lh-available-product-name">
+                          {product.name}
+                        </h4>
                         {product.is_beta && (
-                          <span className="lh-product-badge-beta">
-                            Beta
-                          </span>
+                          <span className="lh-product-badge-beta">Beta</span>
                         )}
                         {product.base_price && (
                           <span className="lh-product-price-badge">
@@ -353,15 +425,19 @@ const SiteProductsModal: React.FC<SiteProductsModalProps> = ({
                           </span>
                         )}
                       </div>
-                      
-                      <p className="lh-site-product-description">{product.description}</p>
-                      
+
+                      <p className="lh-site-product-description">
+                        {product.description}
+                      </p>
+
                       <div className="lh-site-product-meta">
                         <div className="lh-meta-item">
                           <span className="lh-meta-label">Category:</span>
-                          <div className="lh-meta-value">{product.category}</div>
+                          <div className="lh-meta-value">
+                            {product.category}
+                          </div>
                         </div>
-                        
+
                         <div className="lh-meta-item">
                           <span className="lh-meta-label">Version:</span>
                           <div className="lh-meta-value">{product.version}</div>
@@ -372,14 +448,13 @@ const SiteProductsModal: React.FC<SiteProductsModalProps> = ({
                         <div className="lh-available-product-features">
                           <div className="lh-features-label">Features:</div>
                           <div className="lh-features-list">
-                            {product.features.slice(0, 3).map((feature, index) => (
-                              <span
-                                key={index}
-                                className="lh-feature-tag"
-                              >
-                                {feature}
-                              </span>
-                            ))}
+                            {product.features
+                              .slice(0, 3)
+                              .map((feature, index) => (
+                                <span key={index} className="lh-feature-tag">
+                                  {feature}
+                                </span>
+                              ))}
                             {product.features.length > 3 && (
                               <span className="lh-feature-tag-more">
                                 +{product.features.length - 3} more
@@ -398,7 +473,9 @@ const SiteProductsModal: React.FC<SiteProductsModalProps> = ({
                           disabled={processingProduct === product.slug}
                           className="lh-assign-license-btn"
                         >
-                          {processingProduct === product.slug ? 'Assigning...' : 'Assign License'}
+                          {processingProduct === product.slug
+                            ? 'Assigning...'
+                            : 'Assign License'}
                         </button>
                       ) : (
                         <div>
@@ -420,7 +497,11 @@ const SiteProductsModal: React.FC<SiteProductsModalProps> = ({
 
         {/* Actions */}
         <div className="flex justify-end space-x-3">
-          <Button variant="ghost" onClick={loadSiteProducts} disabled={isLoading}>
+          <Button
+            variant="ghost"
+            onClick={loadSiteProducts}
+            disabled={isLoading}
+          >
             Refresh
           </Button>
           <Button onClick={onClose}>Close</Button>
