@@ -488,3 +488,56 @@ export type LicenseType =
   | 'enterprise';
 export type BillingPeriod = 'monthly' | 'annual';
 export type LicenseStatus = 'active' | 'expired' | 'revoked' | 'suspended';
+
+// Diagnostics Types
+export type DiagnosticStatus = 'pass' | 'warn' | 'fail';
+export type AccessIntent = 'allow' | 'partial' | 'block';
+
+export interface DiagnosticIndicator {
+  id: string;
+  name: string;
+  status: DiagnosticStatus;
+  score: number;
+  max_score: number;
+  why_it_matters: string; // ≤ 120 chars per spec
+  fix_recommendation: string;
+  details?: Record<string, unknown>;
+}
+
+export interface DiagnosticReport {
+  id: string;
+  site_id: string;
+  overall_score: number;
+  max_possible_score: number;
+  access_intent: AccessIntent; // Based on robots/noai tags
+  indicators: DiagnosticIndicator[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DiagnosticPageScore {
+  id: string;
+  site_id: string;
+  url: string;
+  path: string;
+  score: number;
+  max_possible_score: number;
+  indicators_summary: {
+    pass: number;
+    warn: number;
+    fail: number;
+  };
+  last_analyzed_at: string;
+}
+
+export interface TriggerRescoreRequest {
+  site_id: string;
+  force?: boolean;
+}
+
+export interface TriggerRescoreResponse {
+  success: boolean;
+  message: string;
+  job_id?: string;
+  estimated_completion_time?: number; // seconds
+}

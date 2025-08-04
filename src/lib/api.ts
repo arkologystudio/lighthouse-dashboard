@@ -9,6 +9,10 @@ import type {
   CreateSiteRequest,
   ApiError,
   ApiResponse,
+  DiagnosticReport,
+  DiagnosticPageScore,
+  TriggerRescoreRequest,
+  TriggerRescoreResponse,
 } from '../types';
 import Cookies from 'js-cookie';
 
@@ -300,3 +304,43 @@ export const matchResult = <T, U>(
   }
 ): U =>
   result.success ? handlers.success(result.data) : handlers.error(result.error);
+
+// Diagnostics API functions
+export const diagnosticsApi = {
+  getSiteScore: async (siteId: string): Promise<Result<DiagnosticReport>> => {
+    const result = await authenticatedRequest<DiagnosticReport>(
+      ENDPOINTS.DIAGNOSTICS.SITE_SCORE(siteId)
+    );
+
+    // No additional validation needed as the backend returns the correct format
+    return result;
+  },
+
+  getPageScores: async (siteId: string): Promise<Result<DiagnosticPageScore[]>> => {
+    const result = await authenticatedRequest<DiagnosticPageScore[]>(
+      `${ENDPOINTS.DIAGNOSTICS.PAGE_SCORES}?site_id=${siteId}`
+    );
+
+    return result;
+  },
+
+  triggerRescore: async (
+    siteId: string,
+    force?: boolean
+  ): Promise<Result<TriggerRescoreResponse>> => {
+    const requestData: TriggerRescoreRequest = {
+      site_id: siteId,
+      ...(force !== undefined && { force }),
+    };
+
+    const result = await authenticatedRequest<TriggerRescoreResponse>(
+      ENDPOINTS.DIAGNOSTICS.TRIGGER_RESCORE(siteId),
+      {
+        method: 'POST',
+        body: JSON.stringify(requestData),
+      }
+    );
+
+    return result;
+  },
+};

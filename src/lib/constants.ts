@@ -24,6 +24,11 @@ export const ENDPOINTS = {
     UPDATE_PROFILE: '/api/users/profile',
     SITES: '/api/users/sites',
   },
+  DIAGNOSTICS: {
+    SITE_SCORE: (id: string) => `/v1/sites/${id}/score`,
+    PAGE_SCORES: '/v1/pages',
+    TRIGGER_RESCORE: (id: string) => `/v1/sites/${id}/trigger-rescore`,
+  },
 } as const;
 
 // Navigation Items (Updated - Licenses removed)
