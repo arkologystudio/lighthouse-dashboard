@@ -212,7 +212,7 @@ const DashboardClient: React.FC<DashboardClientProps> = ({
     {
       name: 'Total Sites',
       value: isStatsLoading ? '—' : currentSites.length.toString(),
-      description: 'WordPress sites registered',
+      description: 'websites registered',
       href: '/dashboard/sites',
       action: 'Manage Sites',
       trend: isStatsLoading ? '...' : `+${currentSites.length}`,
@@ -245,7 +245,7 @@ const DashboardClient: React.FC<DashboardClientProps> = ({
     {
       title: 'Add Your First Site',
       description:
-        'Connect your WordPress site to get started with Lighthouse plugins.',
+        'Connect your website to get started with Lighthouse plugins.',
       href: '/dashboard/sites',
       buttonText: 'Add Site',
       color: 'dashboard-primary',
@@ -327,7 +327,7 @@ const DashboardClient: React.FC<DashboardClientProps> = ({
           <div>
             <h1 className="lh-title-page">Welcome, {user?.name || 'che'}!</h1>
             <p className="lh-text-description mt-1">
-              Manage your WordPress sites and Lighthouse plugins from this
+              Manage your websites and Lighthouse plugins from this
               dashboard.
             </p>
           </div>

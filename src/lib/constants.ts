@@ -44,7 +44,7 @@ export const PRODUCTS = [
     id: 'lumen-search-product',
     name: 'Lumen Search - Product',
     description:
-      'AI-powered product search functionality for your eCommerce WordPress site',
+      'AI-powered product search functionality for your eCommerce website',
     isInstalled: false,
     category: 'Search',
   },

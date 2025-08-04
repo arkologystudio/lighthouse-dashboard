@@ -149,7 +149,7 @@ const SiteCredentialsModal: React.FC<SiteCredentialsModalProps> = ({
     }
   };
 
-  const generateWordPressConfig = () => {
+  const generateSiteConfig = () => {
     if (
       !credentialsData?.credentials.api_key ||
       !credentialsData?.credentials.license
@@ -157,7 +157,7 @@ const SiteCredentialsModal: React.FC<SiteCredentialsModalProps> = ({
       return '';
     }
 
-    return `// Add these configuration values to your WordPress wp-config.php file:
+    return `// Add these configuration values to your site's wp-config.php file:
 
 // Lighthouse API Configuration
 define('LIGHTHOUSE_API_KEY', '${credentialsData.credentials.api_key.key_prefix}...');
@@ -441,12 +441,12 @@ define('LIGHTHOUSE_DEBUG', false);`;
               </CardContent>
             </Card>
 
-            {/* WordPress Configuration */}
+            {/* Site Configuration */}
             {credentialsData.setup_complete && (
               <Card>
                 <CardHeader>
                   <h3 className="text-lg font-semibold">
-                    WordPress Configuration
+                    Site Configuration
                   </h3>
                 </CardHeader>
                 <CardContent>
@@ -457,7 +457,7 @@ define('LIGHTHOUSE_DEBUG', false);`;
                       </label>
                       <div className="relative">
                         <pre className="text-xs bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto">
-                          {generateWordPressConfig()}
+                          {generateSiteConfig()}
                         </pre>
                         <Button
                           size="sm"
@@ -465,7 +465,7 @@ define('LIGHTHOUSE_DEBUG', false);`;
                           className="absolute top-2 right-2 text-gray-300 hover:text-white"
                           onClick={() =>
                             copyToClipboard(
-                              generateWordPressConfig(),
+                              generateSiteConfig(),
                               'wp_config'
                             )
                           }
@@ -480,7 +480,7 @@ define('LIGHTHOUSE_DEBUG', false);`;
                         <strong>Setup Instructions:</strong>
                         <ol className="mt-2 space-y-1 list-decimal list-inside">
                           <li>
-                            Install the Lighthouse plugin on your WordPress site
+                            Install the Lighthouse plugin on your website
                           </li>
                           <li>
                             Add the configuration above to your wp-config.php
