@@ -1,11 +1,10 @@
-import React from 'react';
-import { ComingSoon } from '../../../components/ui/ComingSoon';
+import React, { Suspense } from 'react';
+import DiagnosticsClient from './DiagnosticsClient';
 
 const DiagnosticsPage: React.FC = () => (
-  <ComingSoon
-    title="Site Diagnostics"
-    description="Run comprehensive AI readiness checks, monitor site performance, and get actionable insights to optimize your websites for AI crawlers."
-  />
+  <Suspense fallback={<div>Loading...</div>}>
+    <DiagnosticsClient />
+  </Suspense>
 );
 
 export default DiagnosticsPage;

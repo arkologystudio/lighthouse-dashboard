@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '../components/ui/Button';
 import { TypewriterText } from '../components/TypewriterText';
+import DiagnosticsSection from '../components/diagnostics/DiagnosticsSection';
 import {
   StructuredData,
   organizationSchema,
@@ -317,11 +318,14 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
+      {/* AI Readiness Diagnostics Section */}
+      <DiagnosticsSection />
+
       {/* Core Systems Section */}
       <section
         id="features"
         className="relative py-24"
-        style={{ backgroundColor: 'var(--color-ocean-surface)' }}
+        style={{ backgroundColor: 'var(--color-ocean-deep)' }}
       >
         <div className="max-w-7xl mx-auto px-6">
           {/* Section header */}
