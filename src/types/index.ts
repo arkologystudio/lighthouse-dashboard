@@ -541,3 +541,76 @@ export interface TriggerRescoreResponse {
   job_id?: string;
   estimated_completion_time?: number; // seconds
 }
+
+// Free Diagnostics Scan Types (matching backend spec)
+export interface DiagnosticScanRequest {
+  siteId?: string; // Optional for authenticated users
+  url?: string; // Required for free/anonymous scans
+  options?: {
+    auditType?: 'full' | 'quick' | 'scheduled' | 'on_demand';
+    includeSitemap?: boolean; // Pro only
+    maxPages?: number; // Free: max 5, Pro: max 20
+    storeRawData?: boolean; // Pro only
+    skipCache?: boolean;
+  };
+}
+
+export type AIReadinessLevel = 'excellent' | 'good' | 'needs_improvement' | 'poor';
+
+export interface DiagnosticScanResponse {
+  message: string;
+  auditId: string;
+  status: 'completed' | 'failed';
+  duration: number; // seconds
+  result: {
+    siteScore: {
+      overall: number;
+      breakdown?: { // Pro only
+        standards: number;
+        structured_data: number;
+        seo: number;
+        accessibility: number;
+      };
+    };
+    aiReadiness: AIReadinessLevel;
+    accessIntent: AccessIntent;
+    summary: {
+      totalIndicators: number;
+      passedIndicators: number;
+      warnedIndicators?: number; // Pro only
+      failedIndicators: number;
+      topIssues?: string[]; // Pro only
+      topRecommendations?: string[]; // Pro only
+    };
+  };
+}
+
+export interface DiagnosticCategoryScore {
+  category: 'standards' | 'structured_data' | 'seo' | 'accessibility';
+  score: number;
+  weight: number;
+  indicatorCount: number;
+}
+
+export interface DiagnosticAuditDetails {
+  id: string;
+  siteId: string;
+  siteName: string;
+  siteUrl: string;
+  auditType: 'full' | 'quick' | 'scheduled' | 'on_demand';
+  status: 'completed' | 'failed';
+  siteScore: number;
+  aiReadiness: AIReadinessLevel;
+  accessIntent: AccessIntent;
+  startedAt: string;
+  completedAt: string;
+  errorMessage?: string;
+  pages?: Array<{
+    id: string;
+    url: string;
+    title: string;
+    pageScore: number;
+    indicatorCount: number;
+  }>;
+  categoryScores?: DiagnosticCategoryScore[];
+}

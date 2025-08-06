@@ -1,4 +1,4 @@
-'use client';
+
 
 import React from 'react';
 import { DiagnosticsUrlInput } from './DiagnosticsUrlInput';
@@ -55,11 +55,11 @@ const DiagnosticsSection: React.FC = () => (
             className="text-lg max-w-3xl mx-auto leading-relaxed mb-12"
             style={{ color: 'var(--color-maritime-fog)' }}
           >
-            Get an analysis of your website&apos;s readiness for AI agents. 
-            Our comprehensive diagnostic system scans check for AI standards compliance, 
+            Get an instant analysis of your website&apos;s readiness for AI agents. 
+            Our comprehensive diagnostic scans check for AI standards compliance, 
             structured data implementation, and discoverability optimization. 
             Receive actionable insights to make your site visible to the next 
-            generation of AI agents & services.
+            generation of intelligent web crawlers.
           </p>
         </div>
 

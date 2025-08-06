@@ -10,7 +10,63 @@ import { AccessIntentBanner } from '../../../components/diagnostics/AccessIntent
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { useAuth } from '../../../lib/hooks/useAuth';
-import type { DiagnosticReport } from '../../../types';
+import { diagnosticsApi, matchResult } from '../../../lib/api';
+import toast from 'react-hot-toast';
+import type { DiagnosticReport, DiagnosticScanResponse, DiagnosticScanRequest, DiagnosticIndicator } from '../../../types';
+
+// Convert backend scan response to frontend DiagnosticReport format
+const convertScanResponseToReport = (scanResponse: DiagnosticScanResponse): DiagnosticReport => {
+  // Create indicators from the backend summary
+  const indicators: DiagnosticIndicator[] = [];
+  
+  // Add basic indicators based on the summary
+  if (scanResponse.result.summary.passedIndicators > 0) {
+    indicators.push({
+      id: 'passed-indicators',
+      name: 'Passed Standards',
+      status: 'pass',
+      score: 10,
+      max_score: 10,
+      why_it_matters: 'These standards help AI agents understand and access your content properly',
+      fix_recommendation: 'Great! These standards are properly implemented.'
+    });
+  }
+  
+  if (scanResponse.result.summary.failedIndicators > 0) {
+    indicators.push({
+      id: 'failed-indicators',
+      name: 'Failed Standards',
+      status: 'fail',
+      score: 0,
+      max_score: 10,
+      why_it_matters: 'Missing standards prevent AI agents from understanding your content',
+      fix_recommendation: scanResponse.result.summary.topRecommendations?.[0] || 'Review and implement missing AI-readiness standards'
+    });
+  }
+  
+  if (scanResponse.result.summary.warnedIndicators && scanResponse.result.summary.warnedIndicators > 0) {
+    indicators.push({
+      id: 'warned-indicators',
+      name: 'Partial Standards',
+      status: 'warn',
+      score: 5,
+      max_score: 10,
+      why_it_matters: 'These standards are partially implemented and could be improved',
+      fix_recommendation: scanResponse.result.summary.topRecommendations?.[1] || 'Improve existing implementation for better AI compatibility'
+    });
+  }
+
+  return {
+    id: scanResponse.auditId,
+    site_id: 'free-scan', // No site ID for free scans
+    overall_score: scanResponse.result.siteScore.overall,
+    max_possible_score: 100,
+    access_intent: scanResponse.result.accessIntent,
+    indicators,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+};
 
 const DiagnosticsClient: React.FC = () => {
   const searchParams = useSearchParams();
@@ -19,89 +75,82 @@ const DiagnosticsClient: React.FC = () => {
   
   const [targetUrl, setTargetUrl] = useState<string | null>(urlParam);
   const [isRunningDiagnostics, setIsRunningDiagnostics] = useState(false);
-  const [mockReport, setMockReport] = useState<DiagnosticReport | null>(null);
+  const [report, setReport] = useState<DiagnosticReport | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock diagnostics for demonstration (since backend is not integrated yet)
+  // Real diagnostics API integration
   useEffect(() => {
-    if (targetUrl && !mockReport) {
-      setIsRunningDiagnostics(true);
-      
-      // Simulate diagnostics process
-      const timer = setTimeout(() => {
-        const report: DiagnosticReport = {
-          id: `report-${Date.now()}`,
-          site_id: 'mock-site',
-          overall_score: 72,
-          max_possible_score: 100,
-          access_intent: 'partial',
-          indicators: [
-            {
-              id: 'llms-txt',
-              name: 'llms.txt',
-              status: 'pass',
-              score: 10,
-              max_score: 10,
-              why_it_matters: 'Enables AI agents to understand your content boundaries and access permissions',
-              fix_recommendation: 'File found and properly configured. Consider adding more detailed agent instructions.',
-            },
-            {
-              id: 'agent-json',
-              name: 'agent.json',
-              status: 'fail',
-              score: 0,
-              max_score: 10,
-              why_it_matters: 'Provides structured information about available AI services and endpoints',
-              fix_recommendation: 'Create an agent.json file in your root directory with service definitions.',
-            },
-            {
-              id: 'structured-data',
-              name: 'Structured Data',
-              status: 'warn',
-              score: 6,
-              max_score: 10,
-              why_it_matters: 'Helps AI agents understand page content and relationships between data',
-              fix_recommendation: 'Add more comprehensive JSON-LD markup for better content understanding.',
-            },
-            {
-              id: 'robots-txt',
-              name: 'robots.txt',
-              status: 'pass',
-              score: 10,
-              max_score: 10,
-              why_it_matters: 'Controls which parts of your site can be accessed by automated agents',
-              fix_recommendation: 'Configuration looks good. Consider adding specific AI agent directives.',
-            },
-            {
-              id: 'meta-description',
-              name: 'Meta Descriptions',
-              status: 'warn',
-              score: 7,
-              max_score: 10,
-              why_it_matters: 'Provides context for AI agents to understand page purpose and content',
-              fix_recommendation: 'Enhance meta descriptions with more semantic keywords and clear purpose statements.',
-            },
-          ],
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-        
-        setMockReport(report);
-        setIsRunningDiagnostics(false);
-      }, 5000); // 5 second simulation
-
-      return () => clearTimeout(timer);
+    if (targetUrl && !report) {
+      runDiagnostics(targetUrl);
     }
-  }, [targetUrl, mockReport]);
+  }, [targetUrl, report]);
+
+  const runDiagnostics = async (url: string) => {
+    console.log('🔍 Starting diagnostics scan for:', url);
+    setIsRunningDiagnostics(true);
+    setError(null);
+    
+    const scanRequest: DiagnosticScanRequest = {
+      url,
+    };
+
+    console.log('📡 Scan request payload:', scanRequest);
+    console.log('🌐 API Base URL:', process.env.NEXT_PUBLIC_API_URL);
+    console.log('📍 Endpoint:', '/api/v1/diagnostics/scan-url');
+    console.log('🔗 Full URL will be:', `${process.env.NEXT_PUBLIC_API_URL}/api/v1/diagnostics/scan-url`);
+
+    const result = await diagnosticsApi.scan(scanRequest);
+    console.log('📥 API response result:', result);
+    
+    matchResult(result, {
+      success: (scanResponse) => {
+        const diagnosticReport = convertScanResponseToReport(scanResponse);
+        setReport(diagnosticReport);
+        setIsRunningDiagnostics(false);
+      },
+      error: (apiError) => {
+        let userFriendlyMessage = apiError.message;
+        
+        // Handle specific error codes and messages
+        if (apiError.code === 'RATE_LIMIT_EXCEEDED' || apiError.message.toLowerCase().includes('rate limit')) {
+          userFriendlyMessage = 'You have reached the daily limit of 10 free scans. Please try again tomorrow or upgrade to Pro for unlimited scans.';
+          toast.error('Rate limit exceeded');
+        } else if (apiError.code === 'SITE_NOT_ACCESSIBLE' || apiError.message.includes('404')) {
+          userFriendlyMessage = 'Unable to access this website. Please ensure the URL is correct and publicly accessible.';
+          toast.error('Website not accessible');
+        } else if (apiError.code === 'INVALID_URL') {
+          userFriendlyMessage = 'Please enter a valid website URL (e.g., https://example.com)';
+          toast.error('Invalid URL format');
+        } else if (apiError.code === 'SCAN_TIMEOUT') {
+          userFriendlyMessage = 'The scan took too long to complete. This may happen with very large websites. Please try again.';
+          toast.error('Scan timeout');
+        } else if (apiError.code === 'NETWORK_ERROR') {
+          userFriendlyMessage = 'Network connection error. Please check your internet connection and try again.';
+          toast.error('Network error');
+        } else {
+          // Generic error handling
+          userFriendlyMessage = apiError.message || 'An unexpected error occurred while running diagnostics.';
+          toast.error('Diagnostics failed');
+        }
+        
+        setError(userFriendlyMessage);
+        setIsRunningDiagnostics(false);
+      },
+    });
+  };
 
   const handleNewDiagnostic = (url: string) => {
     setTargetUrl(url);
-    setMockReport(null);
-    setIsRunningDiagnostics(true);
+    setReport(null);
+    setError(null);
   };
 
   const handleRetryDiagnostic = () => {
-    setMockReport(null);
-    setIsRunningDiagnostics(true);
+    if (targetUrl) {
+      setReport(null);
+      setError(null);
+      runDiagnostics(targetUrl);
+    }
   };
 
   // Show loading state while running diagnostics
@@ -109,9 +158,100 @@ const DiagnosticsClient: React.FC = () => {
     return <DiagnosticsLoading url={targetUrl || undefined} />;
   }
 
+  // Show error state if there's an error
+  if (error && !isRunningDiagnostics) {
+    const isRateLimited = error.includes('daily limit') || error.includes('rate limit');
+    
+    return (
+      <div className="max-w-4xl mx-auto p-6 text-center">
+        <h1
+          className="text-3xl md:text-4xl font-light mb-6"
+          style={{ color: 'var(--color-lighthouse-beam)' }}
+        >
+          {isRateLimited ? 'Daily Limit Reached' : 'Diagnostics Failed'}
+        </h1>
+        <Card className="p-8">
+          <div className="mb-6">
+            {isRateLimited ? (
+              <div className="text-center">
+                <div 
+                  className="text-6xl mb-4"
+                  style={{ color: 'var(--color-signal-yellow)' }}
+                >
+                  ⏰
+                </div>
+                <p
+                  className="text-lg mb-4"
+                  style={{ color: 'var(--color-maritime-fog)' }}
+                >
+                  {error}
+                </p>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <h3 className="font-medium text-blue-900 mb-2">Upgrade to Pro for:</h3>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• Unlimited daily scans</li>
+                    <li>• Detailed page-level analysis</li>
+                    <li>• Advanced recommendations</li>
+                    <li>• Automated monitoring</li>
+                  </ul>
+                </div>
+              </div>
+            ) : (
+              <p
+                className="text-lg"
+                style={{ color: 'var(--color-signal-red)' }}
+              >
+                {error}
+              </p>
+            )}
+          </div>
+          <div className="flex gap-3 justify-center">
+            {!isRateLimited && (
+              <Button
+                onClick={handleRetryDiagnostic}
+                className="px-6 py-2"
+                style={{
+                  backgroundColor: 'var(--color-navigation-blue)',
+                  color: 'white',
+                }}
+              >
+                Try Again
+              </Button>
+            )}
+            {isRateLimited && (
+              <Button
+                className="px-6 py-2"
+                style={{
+                  backgroundColor: 'var(--color-navigation-blue)',
+                  color: 'white',
+                }}
+              >
+                Upgrade to Pro
+              </Button>
+            )}
+            <Button
+              onClick={() => {
+                setTargetUrl(null);
+                setError(null);
+              }}
+              variant="outline"
+              className="px-6 py-2"
+              style={{
+                borderColor: 'var(--color-maritime-border)',
+                color: 'var(--color-lighthouse-beam)',
+              }}
+            >
+              Analyze Different URL
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   // Show results if we have a report
-  if (mockReport && targetUrl) {
-    const percentage = Math.round((mockReport.overall_score / mockReport.max_possible_score) * 100);
+  if (report && targetUrl) {
+    const percentage = Math.round((report.overall_score / report.max_possible_score) * 100);
     const isPro = user?.subscription_tier === 'pro';
     
     return (
@@ -145,7 +285,7 @@ const DiagnosticsClient: React.FC = () => {
         <Card className="p-8 text-center">
           <div className="flex flex-col md:flex-row items-center justify-center gap-8">
             <div>
-              <Gauge score={mockReport.overall_score} maxScore={mockReport.max_possible_score} size={200} />
+              <Gauge score={report.overall_score} maxScore={report.max_possible_score} size={200} />
             </div>
             <div className="text-left">
               <h2
@@ -190,49 +330,147 @@ const DiagnosticsClient: React.FC = () => {
         </Card>
 
         {/* Access Intent Banner */}
-        <AccessIntentBanner accessIntent={mockReport.access_intent} />
+        <AccessIntentBanner accessIntent={report.access_intent} />
 
         {/* Indicators Grid */}
         <div>
-          <h2
-            className="text-2xl font-medium mb-6"
-            style={{ color: 'var(--color-lighthouse-beam)' }}
-          >
-            Diagnostic Details
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2
+              className="text-2xl font-medium"
+              style={{ color: 'var(--color-lighthouse-beam)' }}
+            >
+              Diagnostic Details
+            </h2>
+            {!isPro && (
+              <div className="text-sm text-gray-500">
+                Free scan • {report.indicators.length} of 24+ indicators shown
+              </div>
+            )}
+          </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockReport.indicators.map((indicator) => (
+            {report.indicators.map((indicator) => (
               <IndicatorCard key={indicator.id} indicator={indicator} />
             ))}
+            
+            {/* Pro Locked Indicators Preview */}
+            {!isPro && (
+              <>
+                <Card className="p-4 border-2 border-dashed border-gray-300 bg-gray-50 relative">
+                  <div className="text-center opacity-60">
+                    <div className="text-2xl mb-2">🔒</div>
+                    <h4 className="font-medium text-gray-700 mb-2">llms.txt Analysis</h4>
+                    <p className="text-sm text-gray-600">
+                      Detailed analysis of your AI agent configuration file
+                    </p>
+                  </div>
+                  <div className="absolute inset-0 bg-white/75 flex items-center justify-center rounded">
+                    <div className="bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium">
+                      Pro Only
+                    </div>
+                  </div>
+                </Card>
+                
+                <Card className="p-4 border-2 border-dashed border-gray-300 bg-gray-50 relative">
+                  <div className="text-center opacity-60">
+                    <div className="text-2xl mb-2">🔒</div>
+                    <h4 className="font-medium text-gray-700 mb-2">Structured Data</h4>
+                    <p className="text-sm text-gray-600">
+                      JSON-LD and schema.org markup analysis
+                    </p>
+                  </div>
+                  <div className="absolute inset-0 bg-white/75 flex items-center justify-center rounded">
+                    <div className="bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium">
+                      Pro Only
+                    </div>
+                  </div>
+                </Card>
+                
+                <Card className="p-4 border-2 border-dashed border-gray-300 bg-gray-50 relative">
+                  <div className="text-center opacity-60">
+                    <div className="text-2xl mb-2">🔒</div>
+                    <h4 className="font-medium text-gray-700 mb-2">SEO Analysis</h4>
+                    <p className="text-sm text-gray-600">
+                      Title tags, meta descriptions, and semantic markup
+                    </p>
+                  </div>
+                  <div className="absolute inset-0 bg-white/75 flex items-center justify-center rounded">
+                    <div className="bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium">
+                      Pro Only
+                    </div>
+                  </div>
+                </Card>
+              </>
+            )}
           </div>
         </div>
 
         {/* Pro Features Teaser */}
         {!isPro && (
-          <Card className="p-8 text-center border-2 border-blue-500">
-            <h3
-              className="text-xl font-medium mb-4"
-              style={{ color: 'var(--color-lighthouse-beam)' }}
-            >
-              Unlock Advanced Diagnostics
-            </h3>
-            <p
-              className="text-base mb-6"
-              style={{ color: 'var(--color-maritime-fog)' }}
-            >
-              Get page-level analysis, automated fixes, and continuous monitoring 
-              with a Pro subscription.
-            </p>
-            <Button
-              size="lg"
-              className="px-8 py-3"
-              style={{
-                backgroundColor: 'var(--color-navigation-blue)',
-                color: 'white',
-              }}
-            >
-              Upgrade to Pro
-            </Button>
+          <Card className="p-8 border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50">
+            <div className="text-center mb-6">
+              <div className="text-4xl mb-4">🚀</div>
+              <h3
+                className="text-2xl font-medium mb-4"
+                style={{ color: 'var(--color-lighthouse-beam)' }}
+              >
+                Unlock Advanced AI Readiness Analysis
+              </h3>
+              <p
+                className="text-base mb-6 max-w-2xl mx-auto"
+                style={{ color: 'var(--color-maritime-fog)' }}
+              >
+                This free scan shows you the basics. Get the complete picture with Pro features designed 
+                for serious AI optimization.
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <div className="text-left">
+                <h4 className="font-medium text-gray-900 mb-3">🔍 Deep Analysis</h4>
+                <ul className="text-sm text-gray-700 space-y-2">
+                  <li>• Scan up to 20 pages (vs 5 free)</li>
+                  <li>• Detailed category breakdowns</li>
+                  <li>• Page-level indicator details</li>
+                  <li>• Raw HTML & screenshot storage</li>
+                </ul>
+              </div>
+              <div className="text-left">
+                <h4 className="font-medium text-gray-900 mb-3">⚡ Advanced Features</h4>
+                <ul className="text-sm text-gray-700 space-y-2">
+                  <li>• Unlimited daily scans</li>
+                  <li>• Priority support</li>
+                  <li>• On-demand rescoring</li>
+                  <li>• Scheduled audits (coming soon)</li>
+                </ul>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-4">
+                <div className="text-sm text-gray-600">
+                  <s>$29/month</s>
+                </div>
+                <div className="text-2xl font-bold text-green-600">
+                  $19/month
+                </div>
+                <div className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                  Launch Special
+                </div>
+              </div>
+              <Button
+                size="lg"
+                className="px-8 py-3 mt-4"
+                style={{
+                  backgroundColor: 'var(--color-navigation-blue)',
+                  color: 'white',
+                }}
+              >
+                Start Pro Trial - 7 Days Free
+              </Button>
+              <p className="text-xs text-gray-500 mt-2">
+                Cancel anytime • No credit card required for trial
+              </p>
+            </div>
           </Card>
         )}
 

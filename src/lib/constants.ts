@@ -25,9 +25,11 @@ export const ENDPOINTS = {
     SITES: '/api/users/sites',
   },
   DIAGNOSTICS: {
-    SITE_SCORE: (id: string) => `/v1/sites/${id}/score`,
-    PAGE_SCORES: '/v1/pages',
-    TRIGGER_RESCORE: (id: string) => `/v1/sites/${id}/trigger-rescore`,
+    SCAN: '/api/v1/diagnostics/scan-url',
+    SITE_SCORE: (id: string) => `/api/v1/diagnostics/sites/${id}/score`,
+    PAGE_INDICATORS: (pageId: string) => `/api/v1/diagnostics/pages/${pageId}/indicators`,
+    TRIGGER_RESCORE: '/api/v1/diagnostics/trigger-rescore',
+    AUDIT_DETAILS: (auditId: string) => `/api/v1/diagnostics/audits/${auditId}`,
   },
 } as const;
 

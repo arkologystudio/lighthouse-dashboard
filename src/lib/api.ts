@@ -13,6 +13,11 @@ import type {
   DiagnosticPageScore,
   TriggerRescoreRequest,
   TriggerRescoreResponse,
+  DiagnosticScanRequest,
+  DiagnosticScanResponse,
+  DiagnosticIndicator,
+  DiagnosticAuditDetails,
+  DiagnosticStatus,
 } from '../types';
 import Cookies from 'js-cookie';
 
@@ -87,13 +92,36 @@ const apiRequest = async <T>(
     const apiResponse: ApiResponse<T> = await response.json();
 
     if (!response.ok || !apiResponse.success) {
+      // Map HTTP status codes to user-friendly error codes
+      let errorCode = response.status.toString();
+      const errorMessage = apiResponse.error || `HTTP ${response.status}: ${response.statusText}`;
+      
+      switch (response.status) {
+        case 400:
+          errorCode = 'INVALID_REQUEST';
+          break;
+        case 404:
+          errorCode = 'SITE_NOT_ACCESSIBLE';
+          break;
+        case 429:
+          errorCode = 'RATE_LIMIT_EXCEEDED';
+          break;
+        case 500:
+          errorCode = 'SERVER_ERROR';
+          break;
+        case 503:
+          errorCode = 'SERVICE_UNAVAILABLE';
+          break;
+        case 504:
+          errorCode = 'SCAN_TIMEOUT';
+          break;
+      }
+      
       return {
         success: false,
         error: {
-          message:
-            apiResponse.error ||
-            `HTTP ${response.status}: ${response.statusText}`,
-          code: response.status.toString(),
+          message: errorMessage,
+          code: errorCode,
           details: apiResponse,
         },
       };
@@ -307,6 +335,29 @@ export const matchResult = <T, U>(
 
 // Diagnostics API functions
 export const diagnosticsApi = {
+  // Free scan endpoint (no authentication required for anonymous scans)
+  scan: async (request: DiagnosticScanRequest): Promise<Result<DiagnosticScanResponse>> => {
+    // For free scans, we need to make an unauthenticated request
+    const isFreeScan = !request.siteId && request.url;
+    
+    if (isFreeScan) {
+      // Free scan - no authentication (apiRequest handles the case where no token is provided)
+      return apiRequest<DiagnosticScanResponse>(ENDPOINTS.DIAGNOSTICS.SCAN, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      });
+    } else {
+      // Authenticated scan for existing site
+      return authenticatedRequest<DiagnosticScanResponse>(ENDPOINTS.DIAGNOSTICS.SCAN, {
+        method: 'POST',
+        body: JSON.stringify(request),
+      });
+    }
+  },
+
   getSiteScore: async (siteId: string): Promise<Result<DiagnosticReport>> => {
     const result = await authenticatedRequest<DiagnosticReport>(
       ENDPOINTS.DIAGNOSTICS.SITE_SCORE(siteId)
@@ -317,8 +368,10 @@ export const diagnosticsApi = {
   },
 
   getPageScores: async (siteId: string): Promise<Result<DiagnosticPageScore[]>> => {
+    // This is now handled by getPageIndicators for the new API structure
+    // Keeping this for backward compatibility but it may need to be updated
     const result = await authenticatedRequest<DiagnosticPageScore[]>(
-      `${ENDPOINTS.DIAGNOSTICS.PAGE_SCORES}?site_id=${siteId}`
+      `${ENDPOINTS.DIAGNOSTICS.SITE_SCORE(siteId)}/pages`
     );
 
     return result;
@@ -334,7 +387,7 @@ export const diagnosticsApi = {
     };
 
     const result = await authenticatedRequest<TriggerRescoreResponse>(
-      ENDPOINTS.DIAGNOSTICS.TRIGGER_RESCORE(siteId),
+      ENDPOINTS.DIAGNOSTICS.TRIGGER_RESCORE,
       {
         method: 'POST',
         body: JSON.stringify(requestData),
@@ -343,4 +396,28 @@ export const diagnosticsApi = {
 
     return result;
   },
+
+  getPageIndicators: async (
+    pageId: string,
+    params?: { 
+      category?: string; 
+      status?: DiagnosticStatus; 
+      limit?: number; 
+      offset?: number;
+    }
+  ): Promise<Result<{ indicators: DiagnosticIndicator[]; pagination: { total: number; limit: number; offset: number; hasMore: boolean } }>> => {
+    const queryParams = new URLSearchParams();
+    if (params?.category) queryParams.append('category', params.category);
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.offset) queryParams.append('offset', params.offset.toString());
+    
+    const url = `${ENDPOINTS.DIAGNOSTICS.PAGE_INDICATORS(pageId)}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return authenticatedRequest(url);
+  },
+
+  getAuditDetails: async (auditId: string): Promise<Result<DiagnosticAuditDetails>> => 
+    authenticatedRequest<DiagnosticAuditDetails>(
+      ENDPOINTS.DIAGNOSTICS.AUDIT_DETAILS(auditId)
+    ),
 };
