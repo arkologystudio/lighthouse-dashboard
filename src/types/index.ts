@@ -489,10 +489,11 @@ export type LicenseType =
 export type BillingPeriod = 'monthly' | 'annual';
 export type LicenseStatus = 'active' | 'expired' | 'revoked' | 'suspended';
 
-// Diagnostics Types
-export type DiagnosticStatus = 'pass' | 'warn' | 'fail' | 'not_applicable';
+// Diagnostics Types - aligned with server
+export type IndicatorStatus = 'pass' | 'warn' | 'fail' | 'not_applicable';
+export type DiagnosticStatus = IndicatorStatus; // Keep for backward compatibility
 export type AccessIntent = 'allow' | 'partial' | 'block';
-export type IndicatorCategory = 'standards' | 'seo' | 'structured_data' | 'accessibility';
+export type IndicatorCategory = 'standards' | 'seo' | 'structured_data' | 'accessibility' | 'performance' | 'security';
 
 // V2 API Enhanced Indicator Structure
 export interface IndicatorResult {
@@ -503,7 +504,7 @@ export interface IndicatorResult {
   category: IndicatorCategory;     // 'standards' | 'seo' | 'structured_data' | etc.
   
   // Status and scoring
-  status: DiagnosticStatus;
+  status: IndicatorStatus;
   score: number;                   // 0-10
   weight: number;                  // Importance multiplier
   maxScore: number;                // Always 10 for normalization
@@ -556,7 +557,7 @@ export interface IndicatorDetails {
 export interface DiagnosticIndicator {
   id: string;
   name: string;
-  status: DiagnosticStatus;
+  status: IndicatorStatus;
   score: number;
   max_score: number;
   why_it_matters: string; // ≤ 120 chars per spec

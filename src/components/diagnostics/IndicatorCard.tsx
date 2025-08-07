@@ -63,7 +63,7 @@ export const IndicatorCard: React.FC<IndicatorCardProps> = ({ indicator, classNa
   const statusConfig = getStatusConfig(indicator.status);
   
   return (
-    <Card className={`p-4 ${className || ''}`}>
+    <Card className={`p-4 relative ${className || ''}`}>
       <div className="space-y-3">
         {/* Header */}
         <div className="flex items-start justify-between">
@@ -78,13 +78,13 @@ export const IndicatorCard: React.FC<IndicatorCardProps> = ({ indicator, classNa
               </span>
               
               {/* Score */}
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-gray-600">
                 {indicator.score}/{indicator.max_score}
               </span>
             </div>
             
             {/* Enhanced metadata */}
-            <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 mb-2">
+            <div className="flex flex-wrap items-center gap-4 text-xs text-gray-600 mb-2">
               {enhancedDetails?.category && (
                 <span className="inline-flex items-center gap-1">
                   <span>📂</span>
@@ -103,7 +103,10 @@ export const IndicatorCard: React.FC<IndicatorCardProps> = ({ indicator, classNa
               {enhancedDetails?.scannedAt && (
                 <span className="inline-flex items-center gap-1">
                   <span>🕐</span>
-                  {enhancedDetails.scannedAt.toLocaleTimeString()}
+                  {typeof enhancedDetails.scannedAt === 'string' ? 
+                    enhancedDetails.scannedAt : 
+                    new Date(enhancedDetails.scannedAt).toLocaleTimeString()
+                  }
                 </span>
               )}
             </div>
@@ -142,7 +145,7 @@ export const IndicatorCard: React.FC<IndicatorCardProps> = ({ indicator, classNa
           <div className="relative group" title={whyItMatters}>
             <svg
               data-testid="info-icon"
-              className="w-5 h-5 text-gray-400 hover:text-gray-600 cursor-help"
+              className="w-5 h-5 text-gray-500 hover:text-gray-700 cursor-help"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -220,9 +223,11 @@ export const IndicatorCard: React.FC<IndicatorCardProps> = ({ indicator, classNa
         
         {/* Expandable sections */}
         {isExpanded && (
-          <div className="mt-2 text-sm text-gray-600 bg-gray-50 rounded-md p-3">
+          <div className="absolute top-full left-0 right-0 mt-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-md p-4 shadow-lg z-10">
             <div className="font-medium text-gray-900 mb-2">Recommendation:</div>
-            {indicator.fix_recommendation}
+            <div className="text-gray-700">
+              {indicator.fix_recommendation}
+            </div>
           </div>
         )}
         
@@ -232,16 +237,16 @@ export const IndicatorCard: React.FC<IndicatorCardProps> = ({ indicator, classNa
             <div className="space-y-2">
               {enhancedDetails.found !== undefined && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Resource Found:</span>
-                  <span className={enhancedDetails.found ? 'text-green-600' : 'text-red-600'}>
+                  <span className="text-gray-700">Resource Found:</span>
+                  <span className={enhancedDetails.found ? 'text-green-700' : 'text-red-700'}>
                     {enhancedDetails.found ? 'Yes' : 'No'}
                   </span>
                 </div>
               )}
               {enhancedDetails.isValid !== undefined && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Valid:</span>
-                  <span className={enhancedDetails.isValid ? 'text-green-600' : 'text-red-600'}>
+                  <span className="text-gray-700">Valid:</span>
+                  <span className={enhancedDetails.isValid ? 'text-green-700' : 'text-red-700'}>
                     {enhancedDetails.isValid ? 'Yes' : 'No'}
                   </span>
                 </div>
@@ -254,7 +259,7 @@ export const IndicatorCard: React.FC<IndicatorCardProps> = ({ indicator, classNa
                 if (value && typeof value !== 'object') {
                   return (
                     <div key={key} className="flex justify-between">
-                      <span className="text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
+                      <span className="text-gray-700 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
                       <span className="text-gray-900 max-w-xs truncate" title={String(value)}>
                         {String(value)}
                       </span>

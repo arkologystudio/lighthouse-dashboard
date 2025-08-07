@@ -12,7 +12,7 @@ import { Button } from '../../../components/ui/Button';
 import { useAuth } from '../../../lib/hooks/useAuth';
 import { diagnosticsApi, matchResult } from '../../../lib/api';
 import toast from 'react-hot-toast';
-import type { DiagnosticReport, DiagnosticScanResponse, DiagnosticScanRequest, DiagnosticIndicator, IndicatorResult } from '../../../types';
+import type { DiagnosticReport, DiagnosticScanResponse, DiagnosticScanRequest, DiagnosticIndicator, IndicatorResult, IndicatorStatus } from '../../../types';
 
 // Helper function to create legacy DiagnosticIndicator from IndicatorResult for backward compatibility
 const convertIndicatorResultToLegacy = (indicator: IndicatorResult): DiagnosticIndicator => ({
@@ -371,46 +371,46 @@ const DiagnosticsClient: React.FC = () => {
             {/* Pro Locked Indicators Preview */}
             {!isPro && (
               <>
-                <Card className="p-4 border-2 border-dashed border-gray-300 bg-gray-50 relative">
-                  <div className="text-center opacity-60">
-                    <div className="text-2xl mb-2">🔒</div>
-                    <h4 className="font-medium text-gray-700 mb-2">llms.txt Analysis</h4>
-                    <p className="text-sm text-gray-600">
+                <Card className="p-4 border-2 border-dashed border-gray-300 bg-gradient-to-br from-gray-50/80 to-gray-100/80 backdrop-blur-sm relative overflow-hidden">
+                  <div className="text-center opacity-70">
+                    {/* <div className="text-2xl mb-2">🔒</div> */}
+                    <h4 className="font-medium text-gray-800 mb-2">llms.txt Analysis</h4>
+                    <p className="text-sm text-gray-700">
                       Detailed analysis of your AI agent configuration file
                     </p>
                   </div>
-                  <div className="absolute inset-0 bg-white/75 flex items-center justify-center rounded">
-                    <div className="bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium">
+                  <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center rounded">
+                    <div className="bg-blue-600/90 backdrop-blur-sm text-white px-3 py-1 rounded text-sm font-medium shadow-lg">
                       Pro Only
                     </div>
                   </div>
                 </Card>
                 
-                <Card className="p-4 border-2 border-dashed border-gray-300 bg-gray-50 relative">
-                  <div className="text-center opacity-60">
-                    <div className="text-2xl mb-2">🔒</div>
-                    <h4 className="font-medium text-gray-700 mb-2">Structured Data</h4>
-                    <p className="text-sm text-gray-600">
+                <Card className="p-4 border-2 border-dashed border-gray-300 bg-gradient-to-br from-gray-50/80 to-gray-100/80 backdrop-blur-sm relative overflow-hidden">
+                  <div className="text-center opacity-70">
+                    {/* <div className="text-2xl mb-2">🔒</div> */}
+                    <h4 className="font-medium text-gray-800 mb-2">Structured Data</h4>
+                    <p className="text-sm text-gray-700">
                       JSON-LD and schema.org markup analysis
                     </p>
                   </div>
-                  <div className="absolute inset-0 bg-white/75 flex items-center justify-center rounded">
-                    <div className="bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium">
+                  <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center rounded">
+                    <div className="bg-blue-600/90 backdrop-blur-sm text-white px-3 py-1 rounded text-sm font-medium shadow-lg">
                       Pro Only
                     </div>
                   </div>
                 </Card>
                 
-                <Card className="p-4 border-2 border-dashed border-gray-300 bg-gray-50 relative">
-                  <div className="text-center opacity-60">
-                    <div className="text-2xl mb-2">🔒</div>
-                    <h4 className="font-medium text-gray-700 mb-2">SEO Analysis</h4>
-                    <p className="text-sm text-gray-600">
+                <Card className="p-4 border-2 border-dashed border-gray-300 bg-gradient-to-br from-gray-50/80 to-gray-100/80 backdrop-blur-sm relative overflow-hidden">
+                  <div className="text-center opacity-70">
+                    {/* <div className="text-2xl mb-2">🔒</div> */}
+                    <h4 className="font-medium text-gray-800 mb-2">SEO Analysis</h4>
+                    <p className="text-sm text-gray-700">
                       Title tags, meta descriptions, and semantic markup
                     </p>
                   </div>
-                  <div className="absolute inset-0 bg-white/75 flex items-center justify-center rounded">
-                    <div className="bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium">
+                  <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center rounded">
+                    <div className="bg-blue-600/90 backdrop-blur-sm text-white px-3 py-1 rounded text-sm font-medium shadow-lg">
                       Pro Only
                     </div>
                   </div>
