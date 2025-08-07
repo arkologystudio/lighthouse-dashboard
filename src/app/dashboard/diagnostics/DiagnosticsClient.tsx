@@ -16,50 +16,107 @@ import type { DiagnosticReport, DiagnosticScanResponse, DiagnosticScanRequest, D
 
 // Convert backend scan response to frontend DiagnosticReport format
 const convertScanResponseToReport = (scanResponse: DiagnosticScanResponse): DiagnosticReport => {
-  // Create indicators from the backend summary
+  // Create indicators from the backend data
   const indicators: DiagnosticIndicator[] = [];
   
-  // Add basic indicators based on the summary
-  if (scanResponse.result.summary.passedIndicators > 0) {
-    indicators.push({
-      id: 'passed-indicators',
-      name: 'Passed Standards',
-      status: 'pass',
-      score: 10,
-      max_score: 10,
-      why_it_matters: 'These standards help AI agents understand and access your content properly',
-      fix_recommendation: 'Great! These standards are properly implemented.'
-    });
-  }
+  // Use audit ID from the result
+  const auditId = scanResponse.result.auditId;
   
-  if (scanResponse.result.summary.failedIndicators > 0) {
-    indicators.push({
-      id: 'failed-indicators',
-      name: 'Failed Standards',
-      status: 'fail',
-      score: 0,
-      max_score: 10,
-      why_it_matters: 'Missing standards prevent AI agents from understanding your content',
-      fix_recommendation: scanResponse.result.summary.topRecommendations?.[0] || 'Review and implement missing AI-readiness standards'
-    });
-  }
+  // Get overall score from siteScore
+  const overallScore = scanResponse.result.siteScore.overall;
   
-  if (scanResponse.result.summary.warnedIndicators && scanResponse.result.summary.warnedIndicators > 0) {
-    indicators.push({
-      id: 'warned-indicators',
-      name: 'Partial Standards',
-      status: 'warn',
-      score: 5,
-      max_score: 10,
-      why_it_matters: 'These standards are partially implemented and could be improved',
-      fix_recommendation: scanResponse.result.summary.topRecommendations?.[1] || 'Improve existing implementation for better AI compatibility'
-    });
+  // Get category scores
+  const categoryScores = scanResponse.result.categoryScores;
+  
+  // Create indicators from category scores
+  categoryScores.forEach((category) => {
+    const categoryName = category.category.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+    
+    // Add passed indicators
+    if (category.passedCount > 0) {
+      indicators.push({
+        id: `${category.category}-passed`,
+        name: `${categoryName} - Passed`,
+        status: 'pass',
+        score: Math.round((category.passedCount / category.indicatorCount) * 10),
+        max_score: 10,
+        why_it_matters: `These ${categoryName.toLowerCase()} standards help AI agents understand and access your content properly`,
+        fix_recommendation: `Great! These ${categoryName.toLowerCase()} standards are properly implemented.`
+      });
+    }
+    
+    // Add warning indicators
+    if (category.warningCount > 0) {
+      indicators.push({
+        id: `${category.category}-warned`,
+        name: `${categoryName} - Warnings`,
+        status: 'warn',
+        score: Math.round((category.warningCount / category.indicatorCount) * 5),
+        max_score: 10,
+        why_it_matters: `These ${categoryName.toLowerCase()} standards are partially implemented and could be improved`,
+        fix_recommendation: `Improve existing ${categoryName.toLowerCase()} implementation for better AI compatibility`
+      });
+    }
+    
+    // Add failed indicators
+    if (category.failedCount > 0) {
+      indicators.push({
+        id: `${category.category}-failed`,
+        name: `${categoryName} - Failed`,
+        status: 'fail',
+        score: 0,
+        max_score: 10,
+        why_it_matters: `Missing ${categoryName.toLowerCase()} standards prevent AI agents from understanding your content`,
+        fix_recommendation: `Review and implement missing ${categoryName.toLowerCase()} standards for AI-readiness`
+      });
+    }
+  });
+  
+  // Fallback indicators if no category scores provided
+  if (indicators.length === 0) {
+    const summary = scanResponse.result.summary;
+    
+    if (summary.passedIndicators > 0) {
+      indicators.push({
+        id: 'passed-indicators',
+        name: 'Passed Standards',
+        status: 'pass',
+        score: 10,
+        max_score: 10,
+        why_it_matters: 'These standards help AI agents understand and access your content properly',
+        fix_recommendation: 'Great! These standards are properly implemented.'
+      });
+    }
+    
+    if (summary.failedIndicators > 0) {
+      indicators.push({
+        id: 'failed-indicators',
+        name: 'Failed Standards',
+        status: 'fail',
+        score: 0,
+        max_score: 10,
+        why_it_matters: 'Missing standards prevent AI agents from understanding your content',
+        fix_recommendation: summary.topRecommendations?.[0] || 'Review and implement missing AI-readiness standards'
+      });
+    }
+    
+    if (summary.warnedIndicators > 0) {
+      indicators.push({
+        id: 'warned-indicators',
+        name: 'Partial Standards',
+        status: 'warn',
+        score: 5,
+        max_score: 10,
+        why_it_matters: 'These standards are partially implemented and could be improved',
+        fix_recommendation: summary.topRecommendations?.[1] || 'Improve existing implementation for better AI compatibility'
+      });
+    }
   }
 
   return {
-    id: scanResponse.auditId,
+    id: auditId,
     site_id: 'free-scan', // No site ID for free scans
-    overall_score: scanResponse.result.siteScore.overall,
+    overall_score: overallScore,
     max_possible_score: 100,
     access_intent: scanResponse.result.accessIntent,
     indicators,
@@ -102,7 +159,7 @@ const DiagnosticsClient: React.FC = () => {
       console.log('🔗 Full URL will be:', `${process.env.NEXT_PUBLIC_API_URL}/api/v1/diagnostics/scan-url`);
 
       const result = await diagnosticsApi.scan(scanRequest);
-      console.log('📥 API response result:', result);
+      console.log('📥 API response RESULT:', result);
       
       matchResult(result, {
         success: (scanResponse) => {

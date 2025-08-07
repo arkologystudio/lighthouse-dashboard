@@ -557,32 +557,69 @@ export interface DiagnosticScanRequest {
 
 export type AIReadinessLevel = 'excellent' | 'good' | 'needs_improvement' | 'poor';
 
+// Server diagnostic types - matching backend exactly
+export interface DiagnosticResult {
+  auditId: string;
+  status: 'completed' | 'failed' | 'partial';
+  result?: AggregatedResult;
+  error?: string;
+  duration: number;
+}
+
+export interface AggregatedResult {
+  auditId: string;
+  siteUrl: string;
+  pages: PageAggregation[];
+  siteScore: SiteScore;
+  categoryScores: CategoryScore[];
+  summary: AuditSummary;
+  aiReadiness: 'excellent' | 'good' | 'needs_improvement' | 'poor';
+  accessIntent: 'allow' | 'partial' | 'block';
+}
+
+export interface PageAggregation {
+  id: string;
+  url: string;
+  title: string;
+  pageScore: number;
+  indicatorCount: number;
+}
+
+export interface SiteScore {
+  overall: number;
+  breakdown?: {
+    standards: number;
+    structured_data: number;
+    seo: number;
+    accessibility: number;
+  };
+}
+
+export interface CategoryScore {
+  category: 'standards' | 'structured_data' | 'seo' | 'accessibility';
+  score: number;
+  weight: number;
+  indicatorCount: number;
+  passedCount: number;
+  warningCount: number;
+  failedCount: number;
+}
+
+export interface AuditSummary {
+  totalIndicators: number;
+  passedIndicators: number;
+  warnedIndicators: number;
+  failedIndicators: number;
+  topIssues?: string[];
+  topRecommendations?: string[];
+}
+
+// Response from the diagnostics scan endpoint
 export interface DiagnosticScanResponse {
   message: string;
-  auditId: string;
-  status: 'completed' | 'failed';
+  status: 'completed' | 'failed' | 'partial';
   duration: number; // seconds
-  result: {
-    siteScore: {
-      overall: number;
-      breakdown?: { // Pro only
-        standards: number;
-        structured_data: number;
-        seo: number;
-        accessibility: number;
-      };
-    };
-    aiReadiness: AIReadinessLevel;
-    accessIntent: AccessIntent;
-    summary: {
-      totalIndicators: number;
-      passedIndicators: number;
-      warnedIndicators?: number; // Pro only
-      failedIndicators: number;
-      topIssues?: string[]; // Pro only
-      topRecommendations?: string[]; // Pro only
-    };
-  };
+  result: AggregatedResult;
 }
 
 export interface DiagnosticCategoryScore {

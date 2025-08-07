@@ -341,14 +341,103 @@ export const diagnosticsApi = {
     const isFreeScan = !request.siteId && request.url;
     
     if (isFreeScan) {
-      // Free scan - no authentication (apiRequest handles the case where no token is provided)
-      return apiRequest<DiagnosticScanResponse>(ENDPOINTS.DIAGNOSTICS.SCAN, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-      });
+      // Free scan - no authentication, handle direct response format
+      try {
+        const url = `${API_BASE_URL}${ENDPOINTS.DIAGNOSTICS.SCAN}`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(request),
+        });
+
+        // Parse response body first
+        const responseBody = await response.json();
+
+        if (!response.ok) {
+          // Map HTTP status codes to user-friendly error codes
+          let errorCode = response.status.toString();
+          let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+          
+          switch (response.status) {
+            case 400:
+              errorCode = 'INVALID_REQUEST';
+              break;
+            case 404:
+              errorCode = 'SITE_NOT_ACCESSIBLE';
+              break;
+            case 429:
+              errorCode = 'RATE_LIMIT_EXCEEDED';
+              break;
+            case 500:
+              errorCode = 'SERVER_ERROR';
+              break;
+            case 503:
+              errorCode = 'SERVICE_UNAVAILABLE';
+              break;
+            case 504:
+              errorCode = 'SCAN_TIMEOUT';
+              break;
+          }
+
+          // Try to get error message from response body
+          if (responseBody.message) {
+            errorMessage = responseBody.message;
+          } else if (responseBody.error) {
+            errorMessage = responseBody.error;
+          }
+          
+          return {
+            success: false,
+            error: {
+              message: errorMessage,
+              code: errorCode,
+            },
+          };
+        }
+
+        // Check if this is a successful diagnostic scan wrapped in an "error" structure
+        // This happens when the server returns HTTP 200 but with success: false wrapper
+        if (responseBody.success === false && 
+            responseBody.error?.code === "200" && 
+            responseBody.error?.details?.status === "completed" &&
+            responseBody.error?.details?.result) {
+          
+          // Extract the actual diagnostic response from error.details
+          const scanResponse: DiagnosticScanResponse = {
+            message: responseBody.error.details.message,
+            status: responseBody.error.details.status,
+            duration: responseBody.error.details.duration,
+            result: responseBody.error.details.result
+          };
+          
+          return { success: true, data: scanResponse };
+        }
+
+        // Handle direct DiagnosticScanResponse format
+        if (responseBody.message && responseBody.status && responseBody.result) {
+          const scanResponse: DiagnosticScanResponse = responseBody;
+          return { success: true, data: scanResponse };
+        }
+
+        // If we get here, it's an unexpected response format
+        return {
+          success: false,
+          error: {
+            message: 'Unexpected response format from server',
+            code: 'INVALID_RESPONSE',
+          },
+        };
+      } catch (error) {
+        return {
+          success: false,
+          error: {
+            message: error instanceof Error ? error.message : 'Network error occurred',
+            code: 'NETWORK_ERROR',
+          },
+        };
+      }
     } else {
       // Authenticated scan for existing site
       return authenticatedRequest<DiagnosticScanResponse>(ENDPOINTS.DIAGNOSTICS.SCAN, {
