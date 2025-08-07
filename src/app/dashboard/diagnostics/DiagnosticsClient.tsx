@@ -12,116 +12,67 @@ import { Button } from '../../../components/ui/Button';
 import { useAuth } from '../../../lib/hooks/useAuth';
 import { diagnosticsApi, matchResult } from '../../../lib/api';
 import toast from 'react-hot-toast';
-import type { DiagnosticReport, DiagnosticScanResponse, DiagnosticScanRequest, DiagnosticIndicator } from '../../../types';
+import type { DiagnosticReport, DiagnosticScanResponse, DiagnosticScanRequest, DiagnosticIndicator, IndicatorResult } from '../../../types';
 
-// Convert backend scan response to frontend DiagnosticReport format
-const convertScanResponseToReport = (scanResponse: DiagnosticScanResponse): DiagnosticReport => {
-  // Create indicators from the backend data
-  const indicators: DiagnosticIndicator[] = [];
+// Helper function to create legacy DiagnosticIndicator from IndicatorResult for backward compatibility
+const convertIndicatorResultToLegacy = (indicator: IndicatorResult): DiagnosticIndicator => ({
+  id: `${indicator.name}_${indicator.category}`,
+  name: indicator.displayName,
+  status: indicator.status,
+  score: indicator.score,
+  max_score: indicator.maxScore,
+  why_it_matters: indicator.description.length > 120 ? 
+    `${indicator.description.substring(0, 117)}...` : 
+    indicator.description,
+  fix_recommendation: indicator.recommendation || indicator.message,
+  details: {
+    ...indicator.details,
+    checkedUrl: indicator.checkedUrl,
+    found: indicator.found,
+    isValid: indicator.isValid,
+    scannedAt: indicator.scannedAt,
+    category: indicator.category,
+  }
+});
+
+// Helper function to safely convert a date to ISO string
+const safeToISOString = (date: Date | string | undefined): string => {
+  if (!date) {
+    return new Date().toISOString();
+  }
   
-  // Use audit ID from the result
-  const auditId = scanResponse.result.auditId;
+  const dateObj = date instanceof Date ? date : new Date(date);
   
-  // Get overall score from siteScore
-  const overallScore = scanResponse.result.siteScore.overall;
+  // Check if the date is valid
+  if (isNaN(dateObj.getTime())) {
+    console.warn('Invalid date encountered, using current time:', date);
+    return new Date().toISOString();
+  }
   
-  // Get category scores
-  const categoryScores = scanResponse.result.categoryScores;
+  return dateObj.toISOString();
+};
+
+// Convert v2 scan response to legacy DiagnosticReport format for compatibility
+const convertV2ScanResponseToReport = (scanResponse: DiagnosticScanResponse): DiagnosticReport => {
+  const result = scanResponse.result;
   
-  // Create indicators from category scores
-  categoryScores.forEach((category) => {
-    const categoryName = category.category.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
-    
-    // Add passed indicators
-    if (category.passedCount > 0) {
-      indicators.push({
-        id: `${category.category}-passed`,
-        name: `${categoryName} - Passed`,
-        status: 'pass',
-        score: Math.round((category.passedCount / category.indicatorCount) * 10),
-        max_score: 10,
-        why_it_matters: `These ${categoryName.toLowerCase()} standards help AI agents understand and access your content properly`,
-        fix_recommendation: `Great! These ${categoryName.toLowerCase()} standards are properly implemented.`
-      });
-    }
-    
-    // Add warning indicators
-    if (category.warningCount > 0) {
-      indicators.push({
-        id: `${category.category}-warned`,
-        name: `${categoryName} - Warnings`,
-        status: 'warn',
-        score: Math.round((category.warningCount / category.indicatorCount) * 5),
-        max_score: 10,
-        why_it_matters: `These ${categoryName.toLowerCase()} standards are partially implemented and could be improved`,
-        fix_recommendation: `Improve existing ${categoryName.toLowerCase()} implementation for better AI compatibility`
-      });
-    }
-    
-    // Add failed indicators
-    if (category.failedCount > 0) {
-      indicators.push({
-        id: `${category.category}-failed`,
-        name: `${categoryName} - Failed`,
-        status: 'fail',
-        score: 0,
-        max_score: 10,
-        why_it_matters: `Missing ${categoryName.toLowerCase()} standards prevent AI agents from understanding your content`,
-        fix_recommendation: `Review and implement missing ${categoryName.toLowerCase()} standards for AI-readiness`
-      });
-    }
+  // Gather all indicators from all pages
+  const allIndicators: DiagnosticIndicator[] = [];
+  result.pages.forEach(page => {
+    page.indicators.forEach(indicator => {
+      allIndicators.push(convertIndicatorResultToLegacy(indicator));
+    });
   });
   
-  // Fallback indicators if no category scores provided
-  if (indicators.length === 0) {
-    const summary = scanResponse.result.summary;
-    
-    if (summary.passedIndicators > 0) {
-      indicators.push({
-        id: 'passed-indicators',
-        name: 'Passed Standards',
-        status: 'pass',
-        score: 10,
-        max_score: 10,
-        why_it_matters: 'These standards help AI agents understand and access your content properly',
-        fix_recommendation: 'Great! These standards are properly implemented.'
-      });
-    }
-    
-    if (summary.failedIndicators > 0) {
-      indicators.push({
-        id: 'failed-indicators',
-        name: 'Failed Standards',
-        status: 'fail',
-        score: 0,
-        max_score: 10,
-        why_it_matters: 'Missing standards prevent AI agents from understanding your content',
-        fix_recommendation: summary.topRecommendations?.[0] || 'Review and implement missing AI-readiness standards'
-      });
-    }
-    
-    if (summary.warnedIndicators > 0) {
-      indicators.push({
-        id: 'warned-indicators',
-        name: 'Partial Standards',
-        status: 'warn',
-        score: 5,
-        max_score: 10,
-        why_it_matters: 'These standards are partially implemented and could be improved',
-        fix_recommendation: summary.topRecommendations?.[1] || 'Improve existing implementation for better AI compatibility'
-      });
-    }
-  }
-
   return {
-    id: auditId,
-    site_id: 'free-scan', // No site ID for free scans
-    overall_score: overallScore,
+    id: result.auditId,
+    site_id: 'free-scan',
+    overall_score: result.siteScore.overall,
     max_possible_score: 100,
-    access_intent: scanResponse.result.accessIntent,
-    indicators,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    access_intent: result.accessIntent,
+    indicators: allIndicators,
+    created_at: safeToISOString(result.scanMetadata?.scanStartTime),
+    updated_at: safeToISOString(result.scanMetadata?.scanEndTime),
   };
 };
 
@@ -145,7 +96,6 @@ const DiagnosticsClient: React.FC = () => {
 
   const runDiagnostics = async (url: string) => {
     try {
-      console.log('🔍 Starting diagnostics scan for:', url);
       setIsRunningDiagnostics(true);
       setError(null);
       
@@ -153,22 +103,16 @@ const DiagnosticsClient: React.FC = () => {
         url,
       };
 
-      console.log('📡 Scan request payload:', scanRequest);
-      console.log('🌐 API Base URL:', process.env.NEXT_PUBLIC_API_URL);
-      console.log('📍 Endpoint:', '/api/v1/diagnostics/scan-url');
-      console.log('🔗 Full URL will be:', `${process.env.NEXT_PUBLIC_API_URL}/api/v1/diagnostics/scan-url`);
-
       const result = await diagnosticsApi.scan(scanRequest);
-      console.log('📥 API response RESULT:', result);
       
       matchResult(result, {
         success: (scanResponse) => {
           try {
-            const diagnosticReport = convertScanResponseToReport(scanResponse);
+            const diagnosticReport = convertV2ScanResponseToReport(scanResponse);
             setReport(diagnosticReport);
             setIsRunningDiagnostics(false);
           } catch (conversionError) {
-            console.error('Error converting scan response:', conversionError);
+            console.error('Error converting v2 scan response:', conversionError);
             setError('Failed to process scan results. Please try again.');
             setIsRunningDiagnostics(false);
             toast.error('Failed to process results');
@@ -415,7 +359,7 @@ const DiagnosticsClient: React.FC = () => {
             </h2>
             {!isPro && (
               <div className="text-sm text-gray-500">
-                Free scan • {report.indicators.length} of 24+ indicators shown
+                Free scan • {report.indicators.length} indicators analyzed
               </div>
             )}
           </div>
@@ -498,19 +442,17 @@ const DiagnosticsClient: React.FC = () => {
             
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               <div className="text-left">
-                <h4 className="font-medium text-gray-900 mb-3">🔍 Deep Analysis</h4>
+                <h4 className="font-medium text-gray-900 mb-3">🔍 Deeper Analysis</h4>
                 <ul className="text-sm text-gray-700 space-y-2">
                   <li>• Scan up to 20 pages (vs 5 free)</li>
                   <li>• Detailed category breakdowns</li>
                   <li>• Page-level indicator details</li>
-                  <li>• Raw HTML & screenshot storage</li>
                 </ul>
               </div>
               <div className="text-left">
                 <h4 className="font-medium text-gray-900 mb-3">⚡ Advanced Features</h4>
                 <ul className="text-sm text-gray-700 space-y-2">
                   <li>• Unlimited daily scans</li>
-                  <li>• Priority support</li>
                   <li>• On-demand rescoring</li>
                   <li>• Scheduled audits (coming soon)</li>
                 </ul>

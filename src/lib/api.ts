@@ -18,6 +18,8 @@ import type {
   DiagnosticIndicator,
   DiagnosticAuditDetails,
   DiagnosticStatus,
+  IndicatorResult,
+  PageAggregation,
 } from '../types';
 import Cookies from 'js-cookie';
 
@@ -335,115 +337,157 @@ export const matchResult = <T, U>(
 
 // Diagnostics API functions
 export const diagnosticsApi = {
-  // Free scan endpoint (no authentication required for anonymous scans)
+  // V2 API scan endpoint - handles both free and authenticated scans
   scan: async (request: DiagnosticScanRequest): Promise<Result<DiagnosticScanResponse>> => {
-    // For free scans, we need to make an unauthenticated request
     const isFreeScan = !request.siteId && request.url;
     
-    if (isFreeScan) {
-      // Free scan - no authentication, handle direct response format
-      try {
+    try {
+      let response: Response;
+      
+      if (isFreeScan) {
+        // Free scan - no authentication required
         const url = `${API_BASE_URL}${ENDPOINTS.DIAGNOSTICS.SCAN}`;
-        const response = await fetch(url, {
+        response = await fetch(url, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(request),
         });
-
-        // Parse response body first
-        const responseBody = await response.json();
-
-        if (!response.ok) {
-          // Map HTTP status codes to user-friendly error codes
-          let errorCode = response.status.toString();
-          let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-          
-          switch (response.status) {
-            case 400:
-              errorCode = 'INVALID_REQUEST';
-              break;
-            case 404:
-              errorCode = 'SITE_NOT_ACCESSIBLE';
-              break;
-            case 429:
-              errorCode = 'RATE_LIMIT_EXCEEDED';
-              break;
-            case 500:
-              errorCode = 'SERVER_ERROR';
-              break;
-            case 503:
-              errorCode = 'SERVICE_UNAVAILABLE';
-              break;
-            case 504:
-              errorCode = 'SCAN_TIMEOUT';
-              break;
+      } else {
+        // Authenticated scan for registered users
+        const result = await authenticatedRequest<DiagnosticScanResponse>(
+          ENDPOINTS.DIAGNOSTICS.SCAN, 
+          {
+            method: 'POST',
+            body: JSON.stringify(request),
           }
+        );
+        return result;
+      }
 
-          // Try to get error message from response body
-          if (responseBody.message) {
-            errorMessage = responseBody.message;
-          } else if (responseBody.error) {
-            errorMessage = responseBody.error;
-          }
-          
-          return {
-            success: false,
-            error: {
-              message: errorMessage,
-              code: errorCode,
-            },
-          };
+      // Handle free scan response
+      const responseBody = await response.json();
+
+      if (!response.ok) {
+        // Map HTTP status codes to user-friendly error codes
+        let errorCode = response.status.toString();
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        
+        switch (response.status) {
+          case 400:
+            errorCode = 'INVALID_REQUEST';
+            break;
+          case 404:
+            errorCode = 'SITE_NOT_ACCESSIBLE';
+            break;
+          case 429:
+            errorCode = 'RATE_LIMIT_EXCEEDED';
+            break;
+          case 500:
+            errorCode = 'SERVER_ERROR';
+            break;
+          case 503:
+            errorCode = 'SERVICE_UNAVAILABLE';
+            break;
+          case 504:
+            errorCode = 'SCAN_TIMEOUT';
+            break;
         }
 
-        // Check if this is a successful diagnostic scan wrapped in an "error" structure
-        // This happens when the server returns HTTP 200 but with success: false wrapper
-        if (responseBody.success === false && 
-            responseBody.error?.code === "200" && 
-            responseBody.error?.details?.status === "completed" &&
-            responseBody.error?.details?.result) {
-          
-          // Extract the actual diagnostic response from error.details
-          const scanResponse: DiagnosticScanResponse = {
-            message: responseBody.error.details.message,
-            status: responseBody.error.details.status,
-            duration: responseBody.error.details.duration,
-            result: responseBody.error.details.result
-          };
-          
-          return { success: true, data: scanResponse };
+        // Try to get error message from response body
+        if (responseBody.message) {
+          errorMessage = responseBody.message;
+        } else if (responseBody.error) {
+          errorMessage = responseBody.error;
         }
-
-        // Handle direct DiagnosticScanResponse format
-        if (responseBody.message && responseBody.status && responseBody.result) {
-          const scanResponse: DiagnosticScanResponse = responseBody;
-          return { success: true, data: scanResponse };
-        }
-
-        // If we get here, it's an unexpected response format
+        
         return {
           success: false,
           error: {
-            message: 'Unexpected response format from server',
-            code: 'INVALID_RESPONSE',
-          },
-        };
-      } catch (error) {
-        return {
-          success: false,
-          error: {
-            message: error instanceof Error ? error.message : 'Network error occurred',
-            code: 'NETWORK_ERROR',
+            message: errorMessage,
+            code: errorCode,
           },
         };
       }
-    } else {
-      // Authenticated scan for existing site
-      return authenticatedRequest<DiagnosticScanResponse>(ENDPOINTS.DIAGNOSTICS.SCAN, {
-        method: 'POST',
-        body: JSON.stringify(request),
-      });
+      
+             // V2 API Response validation - expect direct DiagnosticScanResponse format
+       if (responseBody.message && 
+           responseBody.status && 
+           responseBody.result && 
+           responseBody.duration !== undefined) {
+         
+         // Safely convert date strings to Date objects for metadata if present
+         if (responseBody.result.scanMetadata) {
+           // Only convert if the date string is valid
+           if (responseBody.result.scanMetadata.scanStartTime) {
+             const startDate = new Date(responseBody.result.scanMetadata.scanStartTime);
+             if (!isNaN(startDate.getTime())) {
+               responseBody.result.scanMetadata.scanStartTime = startDate;
+             } else {
+               console.warn('Invalid scanStartTime, keeping as string:', responseBody.result.scanMetadata.scanStartTime);
+             }
+           }
+           
+           if (responseBody.result.scanMetadata.scanEndTime) {
+             const endDate = new Date(responseBody.result.scanMetadata.scanEndTime);
+             if (!isNaN(endDate.getTime())) {
+               responseBody.result.scanMetadata.scanEndTime = endDate;
+             } else {
+               console.warn('Invalid scanEndTime, keeping as string:', responseBody.result.scanMetadata.scanEndTime);
+             }
+           }
+         }
+         
+         // Safely convert scannedAt strings to Date objects for all indicators
+         responseBody.result.pages?.forEach((page: PageAggregation) => {
+           page.indicators?.forEach((indicator: IndicatorResult) => {
+             if (indicator.scannedAt) {
+               const scannedDate = new Date(indicator.scannedAt);
+               if (!isNaN(scannedDate.getTime())) {
+                 indicator.scannedAt = scannedDate;
+               } else {
+                 console.warn('Invalid scannedAt date, keeping as string:', indicator.scannedAt);
+               }
+             }
+           });
+         });
+         
+         return { success: true, data: responseBody as DiagnosticScanResponse };
+       }
+      
+      // Handle legacy error wrapper format (backward compatibility)
+      if (responseBody.success === false && 
+          responseBody.error?.details?.status === "completed") {
+        
+        const scanResponse: DiagnosticScanResponse = {
+          message: responseBody.error.details.message,
+          status: responseBody.error.details.status,
+          duration: responseBody.error.details.duration,
+          result: responseBody.error.details.result
+        };
+        
+        return { success: true, data: scanResponse };
+      }
+      
+      // If response doesn't match expected format
+      return {
+        success: false,
+        error: {
+          message: responseBody.error || 'Unexpected response format from server',
+          code: responseBody.code || 'INVALID_RESPONSE',
+        },
+      };
+      
+    } catch (error) {
+      console.error('Network error in diagnostics scan:', error);
+      return {
+        success: false,
+        error: {
+          message: error instanceof Error ? error.message : 'Network error occurred',
+          code: 'NETWORK_ERROR',
+        },
+      };
     }
   },
 

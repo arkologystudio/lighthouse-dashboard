@@ -490,9 +490,69 @@ export type BillingPeriod = 'monthly' | 'annual';
 export type LicenseStatus = 'active' | 'expired' | 'revoked' | 'suspended';
 
 // Diagnostics Types
-export type DiagnosticStatus = 'pass' | 'warn' | 'fail';
+export type DiagnosticStatus = 'pass' | 'warn' | 'fail' | 'not_applicable';
 export type AccessIntent = 'allow' | 'partial' | 'block';
+export type IndicatorCategory = 'standards' | 'seo' | 'structured_data' | 'accessibility';
 
+// V2 API Enhanced Indicator Structure
+export interface IndicatorResult {
+  // Core identifier
+  name: string;                    // e.g., "llms_txt"
+  displayName: string;             // e.g., "LLMS.txt File"
+  description: string;             // Human-readable description
+  category: IndicatorCategory;     // 'standards' | 'seo' | 'structured_data' | etc.
+  
+  // Status and scoring
+  status: DiagnosticStatus;
+  score: number;                   // 0-10
+  weight: number;                  // Importance multiplier
+  maxScore: number;                // Always 10 for normalization
+  
+  // User-facing messaging
+  message: string;                 // Status message
+  recommendation?: string;         // Actionable advice
+  
+  // Technical details
+  checkedUrl?: string;             // URL that was analyzed
+  found: boolean;                  // Whether the resource was found
+  isValid: boolean;                // Whether it passed validation
+  
+  // Rich details for UI
+  details: IndicatorDetails;       // Structured data specific to indicator
+  
+  // Performance context
+  scannedAt: Date;                 // When this indicator was checked
+}
+
+// Structured details for different indicator types
+export interface IndicatorDetails {
+  // Technical validation results
+  validationErrors?: string[];
+  validationWarnings?: string[];
+  
+  // File/resource specific data
+  fileSize?: number;
+  contentType?: string;
+  lastModified?: string;
+  
+  // Content analysis
+  contentSample?: string;
+  parsedStructure?: Record<string, unknown>;
+  
+  // URLs and references
+  relatedUrls?: string[];
+  externalReferences?: string[];
+  
+  // Recommendations with context
+  impactLevel?: 'high' | 'medium' | 'low';
+  difficultyLevel?: 'easy' | 'medium' | 'hard';
+  estimatedTimeToFix?: string;
+  
+  // Custom data per indicator type
+  [key: string]: unknown;
+}
+
+// Legacy interface for backward compatibility
 export interface DiagnosticIndicator {
   id: string;
   name: string;
@@ -569,25 +629,97 @@ export interface DiagnosticResult {
 export interface AggregatedResult {
   auditId: string;
   siteUrl: string;
+  auditType: 'full' | 'quick' | 'scheduled' | 'on_demand';
   pages: PageAggregation[];
   siteScore: SiteScore;
   categoryScores: CategoryScore[];
   summary: AuditSummary;
+  
+  // V2 Enhancement: AI-specific insights
   aiReadiness: 'excellent' | 'good' | 'needs_improvement' | 'poor';
+  aiReadinessDetails: AiReadinessDetails;
   accessIntent: 'allow' | 'partial' | 'block';
+  accessIntentDetails: AccessIntentDetails;
+  
+  // V2 Enhancement: Metadata
+  scanMetadata: ScanMetadata;
 }
 
+// V2 AI Readiness Details
+export interface AiReadinessDetails {
+  overallReadinessScore: number;
+  categoryBreakdown: {
+    standards: {
+      score: number;
+      completedIndicators: string[];
+      missingIndicators: string[];
+    };
+    seo: {
+      score: number;
+      completedIndicators: string[];
+      missingIndicators: string[];
+    };
+    structuredData: {
+      score: number;
+      completedIndicators: string[];
+      missingIndicators: string[];
+    };
+  };
+  keyStrengths: string[];
+  criticalGaps: string[];
+  nextSteps: string[];
+}
+
+// V2 Access Intent Details
+export interface AccessIntentDetails {
+  reasoning: string;
+  detectedSignals: {
+    robotsTxt: {
+      found: boolean;
+      allowsAI: boolean;
+      specificDirectives?: string[];
+    };
+    metaRobots: {
+      found: boolean;
+      allowsAI: boolean;
+      specificDirectives?: string[];
+    };
+    noaiTags: {
+      found: boolean;
+      locations?: string[];
+    };
+  };
+  recommendations: string[];
+}
+
+// V2 Scan Metadata
+export interface ScanMetadata {
+  scanStartTime: Date;
+  scanEndTime: Date;
+  totalDuration: number; // milliseconds
+  pagesAnalyzed: number;
+  indicatorsChecked: number;
+  errors: string[];
+  warnings: string[];
+  userAgent: string;
+  version: string;
+}
+
+// V2 API Enhanced Page Structure
 export interface PageAggregation {
   id: string;
   url: string;
   title: string;
   pageScore: number;
   indicatorCount: number;
+  // V2 Enhancement: Individual indicators for each page
+  indicators: IndicatorResult[];
 }
 
 export interface SiteScore {
   overall: number;
-  breakdown?: {
+  // V2 Enhancement: Detailed breakdown by category
+  breakdown: {
     standards: number;
     structured_data: number;
     seo: number;
@@ -610,8 +742,27 @@ export interface AuditSummary {
   passedIndicators: number;
   warnedIndicators: number;
   failedIndicators: number;
+  completionPercentage: number;
+  
+  // V2 Enhancement: Prioritized recommendations
+  quickWins: RecommendationItem[];
+  strategicImprovements: RecommendationItem[];
+  
+  // Legacy fields for backward compatibility
   topIssues?: string[];
   topRecommendations?: string[];
+}
+
+// V2 Recommendation structure
+export interface RecommendationItem {
+  id: string;
+  title: string;
+  description: string;
+  impactLevel: 'high' | 'medium' | 'low';
+  difficultyLevel: 'easy' | 'medium' | 'hard';
+  estimatedTimeToFix?: string;
+  category: IndicatorCategory;
+  relatedIndicators: string[];
 }
 
 // Response from the diagnostics scan endpoint
