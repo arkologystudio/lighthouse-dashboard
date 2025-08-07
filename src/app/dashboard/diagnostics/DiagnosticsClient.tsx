@@ -83,60 +83,75 @@ const DiagnosticsClient: React.FC = () => {
     if (targetUrl && !report) {
       runDiagnostics(targetUrl);
     }
-  }, [targetUrl, report]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetUrl]);
 
   const runDiagnostics = async (url: string) => {
-    console.log('🔍 Starting diagnostics scan for:', url);
-    setIsRunningDiagnostics(true);
-    setError(null);
-    
-    const scanRequest: DiagnosticScanRequest = {
-      url,
-    };
+    try {
+      console.log('🔍 Starting diagnostics scan for:', url);
+      setIsRunningDiagnostics(true);
+      setError(null);
+      
+      const scanRequest: DiagnosticScanRequest = {
+        url,
+      };
 
-    console.log('📡 Scan request payload:', scanRequest);
-    console.log('🌐 API Base URL:', process.env.NEXT_PUBLIC_API_URL);
-    console.log('📍 Endpoint:', '/api/v1/diagnostics/scan-url');
-    console.log('🔗 Full URL will be:', `${process.env.NEXT_PUBLIC_API_URL}/api/v1/diagnostics/scan-url`);
+      console.log('📡 Scan request payload:', scanRequest);
+      console.log('🌐 API Base URL:', process.env.NEXT_PUBLIC_API_URL);
+      console.log('📍 Endpoint:', '/api/v1/diagnostics/scan-url');
+      console.log('🔗 Full URL will be:', `${process.env.NEXT_PUBLIC_API_URL}/api/v1/diagnostics/scan-url`);
 
-    const result = await diagnosticsApi.scan(scanRequest);
-    console.log('📥 API response result:', result);
-    
-    matchResult(result, {
-      success: (scanResponse) => {
-        const diagnosticReport = convertScanResponseToReport(scanResponse);
-        setReport(diagnosticReport);
-        setIsRunningDiagnostics(false);
-      },
-      error: (apiError) => {
-        let userFriendlyMessage = apiError.message;
-        
-        // Handle specific error codes and messages
-        if (apiError.code === 'RATE_LIMIT_EXCEEDED' || apiError.message.toLowerCase().includes('rate limit')) {
-          userFriendlyMessage = 'You have reached the daily limit of 10 free scans. Please try again tomorrow or upgrade to Pro for unlimited scans.';
-          toast.error('Rate limit exceeded');
-        } else if (apiError.code === 'SITE_NOT_ACCESSIBLE' || apiError.message.includes('404')) {
-          userFriendlyMessage = 'Unable to access this website. Please ensure the URL is correct and publicly accessible.';
-          toast.error('Website not accessible');
-        } else if (apiError.code === 'INVALID_URL') {
-          userFriendlyMessage = 'Please enter a valid website URL (e.g., https://example.com)';
-          toast.error('Invalid URL format');
-        } else if (apiError.code === 'SCAN_TIMEOUT') {
-          userFriendlyMessage = 'The scan took too long to complete. This may happen with very large websites. Please try again.';
-          toast.error('Scan timeout');
-        } else if (apiError.code === 'NETWORK_ERROR') {
-          userFriendlyMessage = 'Network connection error. Please check your internet connection and try again.';
-          toast.error('Network error');
-        } else {
-          // Generic error handling
-          userFriendlyMessage = apiError.message || 'An unexpected error occurred while running diagnostics.';
-          toast.error('Diagnostics failed');
-        }
-        
-        setError(userFriendlyMessage);
-        setIsRunningDiagnostics(false);
-      },
-    });
+      const result = await diagnosticsApi.scan(scanRequest);
+      console.log('📥 API response result:', result);
+      
+      matchResult(result, {
+        success: (scanResponse) => {
+          try {
+            const diagnosticReport = convertScanResponseToReport(scanResponse);
+            setReport(diagnosticReport);
+            setIsRunningDiagnostics(false);
+          } catch (conversionError) {
+            console.error('Error converting scan response:', conversionError);
+            setError('Failed to process scan results. Please try again.');
+            setIsRunningDiagnostics(false);
+            toast.error('Failed to process results');
+          }
+        },
+        error: (apiError) => {
+          let userFriendlyMessage = apiError.message;
+          
+          // Handle specific error codes and messages
+          if (apiError.code === 'RATE_LIMIT_EXCEEDED' || apiError.message.toLowerCase().includes('rate limit')) {
+            userFriendlyMessage = 'You have reached the daily limit of 10 free scans. Please try again tomorrow or upgrade to Pro for unlimited scans.';
+            toast.error('Rate limit exceeded');
+          } else if (apiError.code === 'SITE_NOT_ACCESSIBLE' || apiError.message.includes('404')) {
+            userFriendlyMessage = 'Unable to access this website. Please ensure the URL is correct and publicly accessible.';
+            toast.error('Website not accessible');
+          } else if (apiError.code === 'INVALID_URL') {
+            userFriendlyMessage = 'Please enter a valid website URL (e.g., https://example.com)';
+            toast.error('Invalid URL format');
+          } else if (apiError.code === 'SCAN_TIMEOUT') {
+            userFriendlyMessage = 'The scan took too long to complete. This may happen with very large websites. Please try again.';
+            toast.error('Scan timeout');
+          } else if (apiError.code === 'NETWORK_ERROR') {
+            userFriendlyMessage = 'Network connection error. Please check your internet connection and try again.';
+            toast.error('Network error');
+          } else {
+            // Generic error handling
+            userFriendlyMessage = apiError.message || 'An unexpected error occurred while running diagnostics.';
+            toast.error('Diagnostics failed');
+          }
+          
+          setError(userFriendlyMessage);
+          setIsRunningDiagnostics(false);
+        },
+      });
+    } catch (unexpectedError) {
+      console.error('Unexpected error in runDiagnostics:', unexpectedError);
+      setError('An unexpected error occurred. Please try again.');
+      setIsRunningDiagnostics(false);
+      toast.error('Unexpected error');
+    }
   };
 
   const handleNewDiagnostic = (url: string) => {

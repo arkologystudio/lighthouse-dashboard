@@ -19,7 +19,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
-  if (!user) {
+  // Allow diagnostics page to work without authentication
+  const isDiagnosticsPage = pathname?.includes('/diagnostics');
+  
+  if (!user && !isDiagnosticsPage) {
     return (
       <div className="lh-loading-container min-h-screen">
         <div className="lh-spinner lh-spinner-lg" />
@@ -291,16 +294,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             <div className="lh-flex-icon-text">
               <div className="lh-icon-circle-primary w-8 h-8">
                 <span className="text-sm font-medium">
-                  {user.name
+                  {user?.name
                     ? user.name.charAt(0).toUpperCase()
-                    : user.email.charAt(0).toUpperCase()}
+                    : user?.email?.charAt(0).toUpperCase() || 'G'}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="lh-table-cell-content truncate">
-                  {user.name || 'User'}
+                  {user?.name || 'Guest'}
                 </p>
-                <p className="lh-text-small truncate">{user.email}</p>
+                <p className="lh-text-small truncate">{user?.email || 'Anonymous'}</p>
               </div>
               <div className="relative">
                 <button
@@ -325,25 +328,39 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
                 {userMenuOpen && (
                   <div className="absolute bottom-full right-0 mb-2 w-48 lh-dropdown">
-                    <button
-                      onClick={() => {
-                        setUserMenuOpen(false);
-                        router.push('/dashboard/settings');
-                      }}
-                      className="lh-dropdown-item"
-                    >
-                      Account Settings
-                    </button>
-                    <button
-                      onClick={() => {
-                        setUserMenuOpen(false);
-                        handleLogout();
-                      }}
-                      className="lh-dropdown-item"
-                      style={{ color: 'var(--color-text-error)' }}
-                    >
-                      Sign out
-                    </button>
+                    {user ? (
+                      <>
+                        <button
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            router.push('/dashboard/settings');
+                          }}
+                          className="lh-dropdown-item"
+                        >
+                          Account Settings
+                        </button>
+                        <button
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            handleLogout();
+                          }}
+                          className="lh-dropdown-item"
+                          style={{ color: 'var(--color-text-error)' }}
+                        >
+                          Sign out
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          window.location.href = '/login';
+                        }}
+                        className="lh-dropdown-item"
+                      >
+                        Sign in
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -355,12 +372,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                     className="lh-icon-circle-primary w-8 h-8 lh-transition-colors"
-                    title={user.name || user.email}
+                    title={user?.name || user?.email || 'Guest'}
                   >
                     <span className="text-sm font-medium">
-                      {user.name
+                      {user?.name
                         ? user.name.charAt(0).toUpperCase()
-                        : user.email.charAt(0).toUpperCase()}
+                        : user?.email?.charAt(0).toUpperCase() || 'G'}
                     </span>
                   </button>
 
@@ -377,29 +394,43 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                         style={{ borderColor: 'var(--color-border)' }}
                       >
                         <p className="lh-table-cell-content truncate">
-                          {user.name || 'User'}
+                          {user?.name || 'Guest'}
                         </p>
-                        <p className="lh-text-small truncate">{user.email}</p>
+                        <p className="lh-text-small truncate">{user?.email || 'Anonymous'}</p>
                       </div>
-                      <button
-                        onClick={() => {
-                          setUserMenuOpen(false);
-                          router.push('/dashboard/settings');
-                        }}
-                        className="lh-dropdown-item"
-                      >
-                        Account Settings
-                      </button>
-                      <button
-                        onClick={() => {
-                          setUserMenuOpen(false);
-                          handleLogout();
-                        }}
-                        className="lh-dropdown-item"
-                        style={{ color: 'var(--color-text-error)' }}
-                      >
-                        Sign out
-                      </button>
+                      {user ? (
+                        <>
+                          <button
+                            onClick={() => {
+                              setUserMenuOpen(false);
+                              router.push('/dashboard/settings');
+                            }}
+                            className="lh-dropdown-item"
+                          >
+                            Account Settings
+                          </button>
+                          <button
+                            onClick={() => {
+                              setUserMenuOpen(false);
+                              handleLogout();
+                            }}
+                            className="lh-dropdown-item"
+                            style={{ color: 'var(--color-text-error)' }}
+                          >
+                            Sign out
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            window.location.href = '/login';
+                          }}
+                          className="lh-dropdown-item"
+                        >
+                          Sign in
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
