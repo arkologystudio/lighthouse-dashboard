@@ -5,6 +5,8 @@ import { useSites } from '../../../lib/hooks/useSites';
 import { useLicenses } from '../../../lib/hooks/useLicenses';
 import { Modal } from '../../../components/ui/Modal';
 import { Site } from '../../../types';
+import { API_BASE_URL } from '../../../lib/constants';
+import Cookies from 'js-cookie';
 
 interface SiteCredentialsModalProps {
   site: Site;
@@ -44,44 +46,69 @@ const SiteCredentialsModal: React.FC<SiteCredentialsModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { getSiteCredentials } = useSites();
+  const { getSiteCredentials, generateApiKey, deleteApiKey } = useSites();
   const { assignLicense, licenses } = useLicenses();
   const [credentialsData, setCredentialsData] =
     useState<CredentialsData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [newApiKey, setNewApiKey] = useState<string | null>(null);
 
-  const loadCredentials = useCallback(async () => {
+  const loadCredentials = useCallback(async (preserveNewKey = false) => {
     setIsLoading(true);
     setError(null);
+    
+    // Only clear the new key if not preserving it
+    if (!preserveNewKey) {
+      setNewApiKey(null);
+    }
 
     try {
       const result = await getSiteCredentials(site.id);
 
       if (result.success && result.data) {
-        // Enhance the backend data with client-side license assignment data
-        const assignedLicense = licenses.find(
-          license =>
-            license.status === 'active' &&
-            license.metadata?.assigned_site_id === site.id
-        );
+        // First check if backend returned a license
+        let assignedLicense = result.data.credentials.license;
+        
+        // If backend doesn't have license info, try to find it from client-side licenses
+        if (!assignedLicense) {
+          // Check for site-specific license assignment by ID
+          let clientLicense = licenses.find(
+            license =>
+              license.status === 'active' &&
+              license.metadata?.assigned_site_id === site.id
+          );
+          
+          // If no site-specific license, check for any active product license
+          // (Product licenses like Neural Search can be used across all sites)
+          if (!clientLicense) {
+            clientLicense = licenses.find(
+              license =>
+                license.status === 'active' &&
+                license.product?.slug && // Has a product association
+                !license.metadata?.assigned_site_id // Not assigned to a specific site
+            );
+          }
+          
+          if (clientLicense) {
+            assignedLicense = {
+              id: clientLicense.id,
+              license_key: clientLicense.license_key,
+              license_type: clientLicense.license_type,
+              max_queries: clientLicense.max_queries ?? null,
+              query_count: clientLicense.query_count,
+              assigned_at: (clientLicense.metadata?.assigned_at ||
+                clientLicense.updated_at) as string,
+            };
+          }
+        }
 
         const enhancedData = {
           ...result.data,
           credentials: {
             ...result.data.credentials,
-            license: assignedLicense
-              ? {
-                  id: assignedLicense.id,
-                  license_key: assignedLicense.license_key,
-                  license_type: assignedLicense.license_type,
-                  max_queries: assignedLicense.max_queries ?? null,
-                  query_count: assignedLicense.query_count,
-                  assigned_at: (assignedLicense.metadata?.assigned_at ||
-                    assignedLicense.updated_at) as string,
-                }
-              : result.data.credentials.license,
+            license: assignedLicense,
           },
         };
 
@@ -112,9 +139,10 @@ const SiteCredentialsModal: React.FC<SiteCredentialsModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      loadCredentials();
+      loadCredentials(false); // Don't preserve key when opening modal fresh
     }
   }, [isOpen, loadCredentials]);
+
 
   const copyToClipboard = async (text: string, fieldName: string) => {
     try {
@@ -129,7 +157,9 @@ const SiteCredentialsModal: React.FC<SiteCredentialsModalProps> = ({
   const getAvailableLicenses = () =>
     licenses.filter(
       license =>
-        license.status === 'active' && !license.metadata?.assigned_site_id
+        license.status === 'active' && 
+        !license.metadata?.assigned_site_id &&
+        !license.product?.slug // Exclude product-specific licenses as they don't need assignment
     );
 
   const handleAssignLicense = async (licenseId: string) => {
@@ -138,9 +168,56 @@ const SiteCredentialsModal: React.FC<SiteCredentialsModalProps> = ({
       const result = await assignLicense(licenseId, site.id);
 
       if (result.success) {
-        await loadCredentials(); // Refresh data
+        // Refresh credentials immediately to get the updated license from backend
+        await loadCredentials();
       } else {
         setError(result.error || 'Failed to assign license');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGenerateApiKey = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // If regenerating, delete the old key first
+      if (credentialsData?.credentials.api_key?.id) {
+        const deleteResult = await deleteApiKey(credentialsData.credentials.api_key.id);
+        if (!deleteResult.success) {
+          setError(deleteResult.error || 'Failed to delete old API key');
+          return;
+        }
+      }
+
+      // Make the API call directly to get the raw response
+      const response = await fetch(`${API_BASE_URL}/api/api-keys`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${Cookies.get('lighthouse_auth_token') || localStorage.getItem('lighthouse_auth_token')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: `${site.name} API Key`,
+          site_id: site.id,
+          scopes: ['search', 'embed'],
+        }),
+      });
+
+      const rawResult = await response.json();
+
+      // Extract the full key from the response
+      const fullKey = rawResult.data?.key;
+
+      if (response.ok && rawResult.success && fullKey) {
+        // Store the full key directly from the raw response
+        setNewApiKey(fullKey);
+        // Refresh credentials data while preserving the new key
+        await loadCredentials(true);
+      } else {
+        setError(rawResult.error || 'Failed to generate API key');
       }
     } finally {
       setIsLoading(false);
@@ -155,10 +232,12 @@ const SiteCredentialsModal: React.FC<SiteCredentialsModalProps> = ({
       return '';
     }
 
+    const apiKey = newApiKey || `${credentialsData.credentials.api_key.key_prefix}...`;
+
     return `// Add these configuration values to your WordPress wp-config.php file:
 
 // Lighthouse API Configuration
-define('LIGHTHOUSE_API_KEY', '${credentialsData.credentials.api_key.key_prefix}...');
+define('LIGHTHOUSE_API_KEY', '${apiKey}');
 define('LIGHTHOUSE_LICENSE_KEY', '${credentialsData.credentials.license.license_key}');
 define('LIGHTHOUSE_SITE_ID', '${site.id}');
 define('LIGHTHOUSE_API_URL', 'https://api.lighthousestudios.xyz');
@@ -295,18 +374,17 @@ define('LIGHTHOUSE_DEBUG', false);`;
 
                     <div className="lh-credential-field">
                       <label className="lh-credential-label">
-                        API Key (Prefix)
+                        {newApiKey ? 'API Key (Full - Save Now!)' : 'API Key (Prefix)'}
                       </label>
                       <div className="lh-credential-value-with-copy">
                         <div className="lh-credential-value lh-credential-monospace">
-                          {credentialsData.credentials.api_key.key_prefix}...
+                          {newApiKey || `${credentialsData.credentials.api_key.key_prefix}...`}
                         </div>
                         <button
                           className="lh-copy-button"
                           onClick={() =>
                             copyToClipboard(
-                              credentialsData.credentials.api_key?.key_prefix ||
-                                '',
+                              newApiKey || credentialsData.credentials.api_key?.key_prefix || '',
                               'api_key'
                             )
                           }
@@ -314,9 +392,15 @@ define('LIGHTHOUSE_DEBUG', false);`;
                           {copiedField === 'api_key' ? 'Copied!' : 'Copy'}
                         </button>
                       </div>
-                      <p className="lh-credential-help">
-                        Full API key is only shown once during creation
-                      </p>
+                      {newApiKey ? (
+                        <div className="lh-credential-help" style={{ color: '#f59e0b', fontWeight: 'bold' }}>
+                          ⚠️ Copy this key now! It won&apos;t be shown again after closing this modal.
+                        </div>
+                      ) : (
+                        <p className="lh-credential-help">
+                          Full API key is only shown once during creation
+                        </p>
+                      )}
                     </div>
 
                     <div className="lh-credential-field">
@@ -333,6 +417,21 @@ define('LIGHTHOUSE_DEBUG', false);`;
                         )}
                       </div>
                     </div>
+
+                    {!newApiKey && (
+                      <div className="lh-credential-field">
+                        <button 
+                          className="lh-credentials-regenerate-button"
+                          onClick={handleGenerateApiKey}
+                          disabled={isLoading}
+                        >
+                          {isLoading ? 'Regenerating...' : 'Regenerate API Key'}
+                        </button>
+                        <p className="lh-credential-help">
+                          Regenerating will invalidate the current key
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="lh-credentials-empty-state">
@@ -340,8 +439,12 @@ define('LIGHTHOUSE_DEBUG', false);`;
                     <div className="lh-credentials-empty-description">
                       Generate an API key to connect your site
                     </div>
-                    <button className="lh-credentials-empty-action">
-                      Generate API Key
+                    <button 
+                      className="lh-credentials-empty-action"
+                      onClick={handleGenerateApiKey}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? 'Generating...' : 'Generate API Key'}
                     </button>
                   </div>
                 )}
@@ -534,7 +637,7 @@ define('LIGHTHOUSE_DEBUG', false);`;
         <div className="lh-credentials-actions">
           <button
             className="lh-credentials-refresh-button"
-            onClick={loadCredentials}
+            onClick={() => loadCredentials(false)}
             disabled={isLoading}
           >
             <svg className={`lh-icon-sm ${isLoading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">

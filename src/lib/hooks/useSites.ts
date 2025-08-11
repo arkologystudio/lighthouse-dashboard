@@ -56,6 +56,22 @@ interface UseSitesReturn {
     success: boolean;
     error?: string;
   }>;
+  generateApiKey: (siteId: string, keyName?: string) => Promise<{
+    success: boolean;
+    data?: {
+      id: string;
+      name: string;
+      key: string;
+      key_prefix: string;
+      scopes: string[];
+      note: string;
+    };
+    error?: string;
+  }>;
+  deleteApiKey: (keyId: string) => Promise<{
+    success: boolean;
+    error?: string;
+  }>;
 }
 
 export const useSites = (initialSites?: Site[]): UseSitesReturn => {
@@ -317,6 +333,91 @@ export const useSites = (initialSites?: Site[]): UseSitesReturn => {
     }
   }, []);
 
+  const generateApiKey = useCallback(async (siteId: string, keyName = 'WordPress Plugin Key'): Promise<{
+    success: boolean;
+    data?: {
+      id: string;
+      name: string;
+      key: string;
+      key_prefix: string;
+      scopes: string[];
+      note: string;
+    };
+    error?: string;
+  }> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/api-keys`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${getAuthToken()}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: keyName,
+          site_id: siteId,
+          scopes: ['search', 'embed'],
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        return {
+          success: false,
+          error: result.error || `HTTP ${response.status}: ${response.statusText}`,
+        };
+      }
+
+      return { 
+        success: true, 
+        data: {
+          id: result.data.api_key.id,
+          name: keyName,
+          key: result.data.api_key.key,
+          key_prefix: result.data.api_key.key_prefix || result.data.api_key.key?.substring(0, 8),
+          scopes: result.data.api_key.scopes || ['search', 'embed'],
+          note: 'Generated from dashboard',
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Network error occurred',
+      };
+    }
+  }, []);
+
+  const deleteApiKey = useCallback(async (keyId: string): Promise<{
+    success: boolean;
+    error?: string;
+  }> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/api-keys/${keyId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${getAuthToken()}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        return {
+          success: false,
+          error: result.error || `HTTP ${response.status}: ${response.statusText}`,
+        };
+      }
+
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Network error occurred',
+      };
+    }
+  }, []);
+
   return {
     sites,
     isLoading,
@@ -329,5 +430,7 @@ export const useSites = (initialSites?: Site[]): UseSitesReturn => {
     installProduct,
     uninstallProduct,
     updateSiteProduct,
+    generateApiKey,
+    deleteApiKey,
   };
 };
