@@ -61,11 +61,24 @@ const nextConfig = {
         ]
       },
       {
-        source: '/((?!api).*)',
+        // Only cache static assets aggressively
+        source: '/_next/static/(.*)',
         headers: [
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable'
+          }
+        ]
+      },
+      {
+        // For development, disable caching on pages
+        source: '/((?!api|_next/static).*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: process.env.NODE_ENV === 'development' 
+              ? 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0'
+              : 'public, s-maxage=10, stale-while-revalidate=59'
           }
         ]
       }
@@ -88,19 +101,32 @@ const nextConfig = {
     ];
   },
 
-  // Bundle analyzer (optional, enable when needed)
-  // webpack: (config, { isServer }) => {
-  //   if (process.env.ANALYZE === 'true') {
-  //     const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-  //     config.plugins.push(
-  //       new BundleAnalyzerPlugin({
-  //         analyzerMode: 'server',
-  //         openAnalyzer: true,
-  //       })
-  //     );
-  //   }
-  //   return config;
-  // },
+  // Webpack configuration
+  webpack: (config, { dev, isServer }) => {
+    // Better hot reload in development
+    if (dev && !isServer) {
+      config.watchOptions = {
+        poll: 1000,
+        aggregateTimeout: 300,
+      };
+      
+      // Disable build caching in development for faster rebuilds
+      config.cache = false;
+    }
+    
+    // Bundle analyzer (optional, enable when needed)
+    if (process.env.ANALYZE === 'true') {
+      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+      config.plugins.push(
+        new BundleAnalyzerPlugin({
+          analyzerMode: 'server',
+          openAnalyzer: true,
+        })
+      );
+    }
+    
+    return config;
+  },
 };
 
 module.exports = nextConfig;

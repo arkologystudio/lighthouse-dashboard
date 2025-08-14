@@ -92,7 +92,8 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
     try {
       const success = await createSite(formData);
       if (success) {
-        setFormData({ name: '', url: '' });
+        setFormData({ name: '', url: '', description: '' });
+        setErrors({});
         setIsAddModalOpen(false);
       }
     } finally {
@@ -288,9 +289,12 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
           <Modal
             isOpen={isAddModalOpen}
             onClose={() => {
-              setIsAddModalOpen(false);
-              setFormData({ name: '', url: '', description: '' });
-              setErrors({});
+              if (!isSubmitting) {
+                setIsAddModalOpen(false);
+                setFormData({ name: '', url: '', description: '' });
+                setErrors({});
+                setIsSubmitting(false);
+              }
             }}
             title="Add New Site"
           >
@@ -303,6 +307,7 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
                   onChange={handleInputChange('name')}
                   error={errors.name}
                   placeholder="My WordPress Site"
+                  disabled={isSubmitting}
                   required
                 />
 
@@ -314,6 +319,7 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
                   error={errors.url}
                   placeholder="https://example.com"
                   helperText="Include the full URL with https://"
+                  disabled={isSubmitting}
                   required
                 />
 
@@ -323,6 +329,7 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
                   value={formData.description || ''}
                   onChange={handleInputChange('description')}
                   placeholder="Brief description of your site"
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -330,7 +337,13 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
                 <button
                   type="button"
                   className="lh-btn lh-btn-ghost"
-                  onClick={() => setIsAddModalOpen(false)}
+                  onClick={() => {
+                    setIsAddModalOpen(false);
+                    setFormData({ name: '', url: '', description: '' });
+                    setErrors({});
+                    setIsSubmitting(false);
+                  }}
+                  disabled={isSubmitting}
                 >
                   Cancel
                 </button>

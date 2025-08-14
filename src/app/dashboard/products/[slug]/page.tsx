@@ -125,7 +125,7 @@ const ProductDetailPage: React.FC = () => {
     if (!product) return;
 
     setIsProcessing(true);
-    toast.loading('Processing purchase...');
+    toast.loading(isUpgrade ? 'Processing upgrade...' : 'Processing purchase...');
 
     try {
       const result = await simulatePurchase({
@@ -138,16 +138,24 @@ const ProductDetailPage: React.FC = () => {
 
       toast.dismiss();
       if (result.success) {
-        toast.success(`Successfully purchased ${product.name} license!`);
+        toast.success(isUpgrade 
+          ? `Successfully upgraded to ${formatLicenseType(selectedLicenseType)} license!`
+          : `Successfully purchased ${product.name} license!`);
         await refreshLicenses();
         setShowPurchaseForm(false);
+        setIsUpgrade(false);
       } else {
-        toast.error(result.error || 'Purchase failed');
+        // Don't show "already have a license" error for upgrades
+        if (isUpgrade && result.error?.includes('already have a license')) {
+          toast.error('Upgrade failed. Please try again.');
+        } else {
+          toast.error(result.error || (isUpgrade ? 'Upgrade failed' : 'Purchase failed'));
+        }
       }
     } catch (error) {
       console.error(error);
       toast.dismiss();
-      toast.error('Purchase failed');
+      toast.error(isUpgrade ? 'Upgrade failed' : 'Purchase failed');
     } finally {
       setIsProcessing(false);
     }
@@ -529,63 +537,77 @@ const ProductDetailPage: React.FC = () => {
 
       {/* Purchase Form Modal */}
       {showPurchaseForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">
-                {isUpgrade ? 'Upgrade License' : 'Purchase License'}
-              </h3>
-              <Button
-                onClick={() => setShowPurchaseForm(false)}
-                variant="outline"
-                size="sm"
-              >
-                ×
-              </Button>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="lh-card w-full max-w-md mx-4">
+            <div className="lh-card-header">
+              <div className="flex items-center justify-between">
+                <h3 className="lh-title-card">
+                  {isUpgrade ? 'Upgrade License' : 'Purchase License'}
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowPurchaseForm(false);
+                    setIsUpgrade(false);
+                  }}
+                  className="lh-field-icon-button"
+                  aria-label="Close"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              {isUpgrade && (
+                <p className="lh-text-muted mt-2">
+                  Upgrade your existing license to unlock more features
+                </p>
+              )}
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  License Type:
-                </label>
-                <select
-                  value={selectedLicenseType}
-                  onChange={e => setSelectedLicenseType(e.target.value as 'trial' | 'standard' | 'standard_plus' | 'premium' | 'premium_plus' | 'enterprise')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="trial">Trial ({getLicenseTypePrice('trial')})</option>
-                  <option value="standard">Standard ({getLicenseTypePrice('standard', selectedBillingPeriod)})</option>
-                  <option value="standard_plus">Standard+ ({getLicenseTypePrice('standard_plus', selectedBillingPeriod)})</option>
-                  <option value="premium">Premium ({getLicenseTypePrice('premium', selectedBillingPeriod)})</option>
-                  <option value="premium_plus">Premium+ ({getLicenseTypePrice('premium_plus', selectedBillingPeriod)})</option>
-                  <option value="enterprise">Enterprise ({getLicenseTypePrice('enterprise', selectedBillingPeriod)})</option>
-                </select>
-              </div>
-
-              {selectedLicenseType !== 'trial' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Billing Period:
+            <div className="lh-card-content">
+              <div className="lh-form">
+                <div className="lh-field-container">
+                  <label className="lh-field-label">
+                    License Type:
                   </label>
                   <select
-                    value={selectedBillingPeriod}
-                    onChange={e => setSelectedBillingPeriod(e.target.value as 'monthly' | 'annual')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    value={selectedLicenseType}
+                    onChange={e => setSelectedLicenseType(e.target.value as 'trial' | 'standard' | 'standard_plus' | 'premium' | 'premium_plus' | 'enterprise')}
+                    className="lh-field-input"
                   >
-                    <option value="monthly">Monthly</option>
-                    <option value="annual">Annual (Save 10%)</option>
+                    {!isUpgrade && <option value="trial">Trial ({getLicenseTypePrice('trial')})</option>}
+                    <option value="standard">Standard ({getLicenseTypePrice('standard', selectedBillingPeriod)})</option>
+                    <option value="standard_plus">Standard+ ({getLicenseTypePrice('standard_plus', selectedBillingPeriod)})</option>
+                    <option value="premium">Premium ({getLicenseTypePrice('premium', selectedBillingPeriod)})</option>
+                    <option value="premium_plus">Premium+ ({getLicenseTypePrice('premium_plus', selectedBillingPeriod)})</option>
+                    <option value="enterprise">Enterprise ({getLicenseTypePrice('enterprise', selectedBillingPeriod)})</option>
                   </select>
                 </div>
-              )}
 
-              <Button
-                onClick={handlePurchaseLicense}
-                disabled={isProcessing}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                {isProcessing ? 'Processing...' : `${isUpgrade ? 'Upgrade to' : 'Purchase'} ${formatLicenseType(selectedLicenseType)} License`}
-              </Button>
+                {selectedLicenseType !== 'trial' && (
+                  <div className="lh-field-container">
+                    <label className="lh-field-label">
+                      Billing Period:
+                    </label>
+                    <select
+                      value={selectedBillingPeriod}
+                      onChange={e => setSelectedBillingPeriod(e.target.value as 'monthly' | 'annual')}
+                      className="lh-field-input"
+                    >
+                      <option value="monthly">Monthly</option>
+                      <option value="annual">Annual (Save 10%)</option>
+                    </select>
+                  </div>
+                )}
+
+                <Button
+                  onClick={handlePurchaseLicense}
+                  disabled={isProcessing}
+                  className="w-full"
+                >
+                  {isProcessing ? 'Processing...' : `${isUpgrade ? 'Upgrade to' : 'Purchase'} ${formatLicenseType(selectedLicenseType)} License`}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
