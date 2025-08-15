@@ -348,6 +348,261 @@ const ProductDetailPage: React.FC = () => {
             </Card>
           )}
 
+          {/* License Tiers & Benefits */}
+          <Card>
+            <CardHeader className="pb-4">
+              <h2 className="lh-title-card">License Tiers & Benefits</h2>
+              <p className="lh-text-muted mt-1">Compare features and choose the right plan for your needs</p>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="grid gap-4">
+                {/* Trial */}
+                <div className="lh-card-hover p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h3 className="lh-title-small">Trial</h3>
+                      <p className="lh-text-stat mt-1">Free</p>
+                      <p className="lh-text-muted">14 days</p>
+                    </div>
+                    <span className="lh-badge lh-badge-gray">Try it out</span>
+                  </div>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">Full feature access for testing</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">Up to 1,000 queries</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">Community support</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Standard */}
+                <div className="lh-card-hover p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h3 className="lh-title-small">Standard</h3>
+                      <p className="lh-text-stat mt-1">${getTierByName('standard')?.monthly_price || 29}/mo</p>
+                      <p className="lh-text-muted">or ${getTierByName('standard')?.annual_price || 290}/year</p>
+                    </div>
+                    <span className="lh-badge lh-badge-blue">Popular</span>
+                  </div>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">Everything in Trial</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">10,000 queries/month</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">Email support</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">Basic analytics</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Standard Plus */}
+                <div className="lh-card-hover p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h3 className="lh-title-small">Standard+</h3>
+                      <p className="lh-text-stat mt-1">${getTierByName('standard_plus')?.monthly_price || 49}/mo</p>
+                      <p className="lh-text-muted">or ${getTierByName('standard_plus')?.annual_price || 490}/year</p>
+                    </div>
+                  </div>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">Everything in Standard</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">25,000 queries/month</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">Priority email support</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">Advanced analytics</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Premium */}
+                <div className="lh-card-hover p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h3 className="lh-title-small">Premium</h3>
+                      <p className="lh-text-stat mt-1">${getTierByName('premium')?.monthly_price || 99}/mo</p>
+                      <p className="lh-text-muted">or ${getTierByName('premium')?.annual_price || 990}/year</p>
+                    </div>
+                    <span className="lh-badge lh-badge-purple">Best Value</span>
+                  </div>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">Everything in Standard+</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">100,000 queries/month</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">24/7 phone & email support</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">Custom integrations</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">API access</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Premium Plus */}
+                <div className="lh-card-hover p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h3 className="lh-title-small">Premium+</h3>
+                      <p className="lh-text-stat mt-1">${getTierByName('premium_plus')?.monthly_price || 199}/mo</p>
+                      <p className="lh-text-muted">or ${getTierByName('premium_plus')?.annual_price || 1990}/year</p>
+                    </div>
+                  </div>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">Everything in Premium</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">500,000 queries/month</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">Dedicated account manager</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">Custom training</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">White-label options</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Enterprise */}
+                <div className="lh-card-hover p-4 border-amber-700 bg-amber-950/20">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h3 className="lh-title-small">Enterprise</h3>
+                      <p className="lh-text-stat mt-1">Custom</p>
+                      <p className="lh-text-muted">Contact sales</p>
+                    </div>
+                    <span className="lh-badge lh-badge-warning">Ultimate</span>
+                  </div>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">Everything in Premium+</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">Unlimited queries</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">On-premise deployment option</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">SLA guarantees</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">Custom contracts & billing</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="lh-text-muted">Priority feature development</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Active Assignments */}
           {assignedLicenses.length > 0 && (
             <Card>
@@ -463,7 +718,7 @@ const ProductDetailPage: React.FC = () => {
                 <h2 className="lh-title-card">Purchase License</h2>
               </CardHeader>
               <CardContent className="pt-0">
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="lh-text-muted mb-4">
                   Purchase a license to use this product on your sites.
                 </p>
                 <Button 
@@ -486,15 +741,15 @@ const ProductDetailPage: React.FC = () => {
                 <h2 className="lh-title-card">Assign License to Site</h2>
               </CardHeader>
               <CardContent className="pt-0">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="lh-form">
+                  <div className="lh-field-container">
+                    <label className="lh-field-label">
                       Select Site:
                     </label>
                     <select
                       value={selectedSite}
                       onChange={e => setSelectedSite(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="lh-field-input"
                     >
                       <option value="">Choose a site...</option>
                       {Array.isArray(sites) && sites.map(site => 
@@ -523,7 +778,7 @@ const ProductDetailPage: React.FC = () => {
           {availableLicense && sites.length === 0 && (
             <Card>
               <CardContent className="p-6 text-center">
-                <p className="text-gray-600 mb-4">
+                <p className="lh-text-muted mb-4">
                   You need to add a site before you can assign a license.
                 </p>
                 <Link href="/dashboard/sites">
