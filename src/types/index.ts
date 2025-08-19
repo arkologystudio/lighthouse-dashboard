@@ -489,11 +489,64 @@ export type LicenseType =
 export type BillingPeriod = 'monthly' | 'annual';
 export type LicenseStatus = 'active' | 'expired' | 'revoked' | 'suspended';
 
-// Diagnostics Types - aligned with server
+// AI Readiness Index Types - v1.0 specification
 export type IndicatorStatus = 'pass' | 'warn' | 'fail' | 'not_applicable';
 export type DiagnosticStatus = IndicatorStatus; // Keep for backward compatibility
 export type AccessIntent = 'allow' | 'partial' | 'block';
 export type IndicatorCategory = 'standards' | 'seo' | 'structured_data' | 'accessibility' | 'performance' | 'security';
+
+// Site Profile Types - matching specification
+export type SiteProfile = 
+  | 'blog_content'
+  | 'ecommerce' 
+  | 'saas_app'
+  | 'kb_support'
+  | 'gov_nontransacting'
+  | 'custom';
+
+// AI Readiness Index specification types
+export interface SpecIndicator {
+  name: string;
+  score: number; // 0.0 to 1.0 range
+  status: 'pass' | 'warn' | 'fail' | 'not_applicable';
+  message: string;
+  applicability: {
+    status: 'required' | 'optional' | 'not_applicable';
+    included_in_category_math: boolean;
+  };
+  evidence?: Record<string, unknown>; // Detailed scanner results
+}
+
+export interface Category {
+  score: number; // 0.0 to 1.0 range
+  indicators: SpecIndicator[];
+}
+
+export interface Weights {
+  discovery: 0.30;    // Fixed weight
+  understanding: 0.30; // Fixed weight  
+  actions: 0.25;      // Fixed weight
+  trust: 0.15;        // Fixed weight
+}
+
+export interface LighthouseAIReport {
+  site: {
+    url: string;
+    scan_date: string; // YYYY-MM-DD format
+    category: SiteProfile;
+  };
+  categories: {
+    discovery: Category;
+    understanding: Category; 
+    actions: Category;
+    trust: Category;
+  };
+  weights: Weights;
+  overall: {
+    raw_0_1: number;    // 0.0 to 1.0 range
+    score_0_100: number; // 0 to 100 for display
+  };
+}
 
 // V2 API Enhanced Indicator Structure
 export interface IndicatorResult {

@@ -43,6 +43,16 @@ const categoryConfig: Record<IndicatorCategory | 'all', {
     label: 'Accessibility',
     icon: '♿',
     description: 'Web accessibility standards'
+  },
+  performance: {
+    label: 'Performance',
+    icon: '⚡',
+    description: 'Site performance indicators'
+  },
+  security: {
+    label: 'Security',
+    icon: '🔒',
+    description: 'Security and privacy indicators'
   }
 };
 

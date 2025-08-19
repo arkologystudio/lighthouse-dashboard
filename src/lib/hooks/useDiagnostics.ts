@@ -60,11 +60,11 @@ export const useDiagnostics = (
           maxScore: indicator.max_score,
           message: indicator.fix_recommendation,
           recommendation: indicator.fix_recommendation,
-          checkedUrl: details?.checkedUrl,
-          found: details?.found ?? true,
-          isValid: details?.isValid ?? (indicator.status === 'pass'),
+          checkedUrl: typeof details?.checkedUrl === 'string' ? details.checkedUrl : undefined,
+          found: typeof details?.found === 'boolean' ? details.found : true,
+          isValid: typeof details?.isValid === 'boolean' ? details.isValid : (indicator.status === 'pass'),
           details: details || {},
-          scannedAt: details?.scannedAt ? new Date(details.scannedAt) : new Date(),
+          scannedAt: details?.scannedAt ? new Date(details.scannedAt as string | number | Date) : new Date(),
         };
       });
       setAllIndicators(indicators);

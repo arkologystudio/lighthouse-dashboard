@@ -4,71 +4,133 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { DiagnosticsLoading } from '../../../components/diagnostics/DiagnosticsLoading';
 import { DiagnosticsUrlInput } from '../../../components/diagnostics/DiagnosticsUrlInput';
-import { Gauge } from '../../../components/diagnostics/Gauge';
 import { DiagnosticsReport } from '../../../components/diagnostics/DiagnosticsReport';
-import { AccessIntentBanner } from '../../../components/diagnostics/AccessIntentBanner';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { useAuth } from '../../../lib/hooks/useAuth';
-import { diagnosticsApi, matchResult } from '../../../lib/api';
 import toast from 'react-hot-toast';
-import type { DiagnosticScanResponse, DiagnosticScanRequest, DiagnosticIndicator, IndicatorResult } from '../../../types';
+import type { LighthouseAIReport } from '../../../types';
 
-// Convert IndicatorResult to DiagnosticIndicator format
-const convertIndicator = (indicator: IndicatorResult): DiagnosticIndicator => {
-  // If score is perfect, ensure status is 'pass'
-  let status = indicator.status;
-  if (indicator.score === indicator.maxScore && indicator.score > 0) {
-    status = 'pass';
-  }
-  
-  return {
-    id: `${indicator.name}_${indicator.category}`,
-    name: indicator.displayName,
-    status,
-    score: indicator.score,
-    max_score: indicator.maxScore,
-    why_it_matters: indicator.description.length > 120 ? 
-      `${indicator.description.substring(0, 117)}...` : 
-      indicator.description,
-    fix_recommendation: indicator.recommendation || indicator.message,
-    details: {
-      ...indicator.details,
-      checkedUrl: indicator.checkedUrl,
-      found: indicator.found,
-      isValid: indicator.isValid,
-      scannedAt: indicator.scannedAt,
-      category: indicator.category,
-    }
-  };
-};
-
-// Process scan response and filter out unwanted indicators
-const processScanResponse = (scanResponse: DiagnosticScanResponse) => {
-  const result = scanResponse.result;
-  
-  // Gather all indicators from all pages, filtering out unwanted ones
-  const allIndicators: DiagnosticIndicator[] = [];
-  result.pages.forEach(page => {
-    page.indicators.forEach(indicator => {
-      // Filter out Robots.txt agent access and ai-agent.json indicators
-      const indicatorName = indicator.displayName.toLowerCase();
-      if (indicatorName.includes('robots.txt agent access') || 
-          indicatorName.includes('ai-agent.json')) {
-        return; // Skip these indicators
+// Mock function to simulate server response - in real implementation, this would come from the API
+const createMockLighthouseReport = (url: string): LighthouseAIReport => ({
+    site: {
+      url,
+      scan_date: new Date().toISOString().split('T')[0],
+      category: 'custom' // This would be detected by the server
+    },
+    categories: {
+      discovery: {
+        score: 0.75,
+        indicators: [
+          {
+            name: 'seo_basic',
+            score: 0.8,
+            status: 'pass',
+            message: 'Basic SEO elements are present and properly configured.',
+            applicability: {
+              status: 'required',
+              included_in_category_math: true
+            },
+            evidence: {
+              title_found: true,
+              meta_description_found: true,
+              headings_structured: true
+            }
+          },
+          {
+            name: 'sitemap_xml',
+            score: 0.7,
+            status: 'warn',
+            message: 'XML sitemap found but has some validation issues.',
+            applicability: {
+              status: 'required',
+              included_in_category_math: true
+            },
+            evidence: {
+              sitemap_found: true,
+              url_count: 42,
+              last_modified: '2024-08-15'
+            }
+          }
+        ]
+      },
+      understanding: {
+        score: 0.6,
+        indicators: [
+          {
+            name: 'json_ld',
+            score: 0.5,
+            status: 'warn',
+            message: 'JSON-LD structured data present but incomplete.',
+            applicability: {
+              status: 'required',
+              included_in_category_math: true
+            },
+            evidence: {
+              schemas_found: ['WebSite', 'Organization'],
+              schemas_valid: true,
+              coverage_percentage: 50
+            }
+          },
+          {
+            name: 'llms_txt',
+            score: 0.0,
+            status: 'fail',
+            message: 'llms.txt file not found.',
+            applicability: {
+              status: 'optional',
+              included_in_category_math: true
+            }
+          }
+        ]
+      },
+      actions: {
+        score: 0.3,
+        indicators: [
+          {
+            name: 'mcp',
+            score: 0.0,
+            status: 'not_applicable',
+            message: 'Model Context Protocol not applicable for this site type.',
+            applicability: {
+              status: 'not_applicable',
+              included_in_category_math: false
+            }
+          }
+        ]
+      },
+      trust: {
+        score: 0.9,
+        indicators: [
+          {
+            name: 'robots_txt',
+            score: 1.0,
+            status: 'pass',
+            message: 'Robots.txt file properly configured for AI agents.',
+            applicability: {
+              status: 'required',
+              included_in_category_math: true
+            },
+            evidence: {
+              robots_found: true,
+              allows_crawling: true,
+              ai_agent_directives: ['Allow: /']
+            }
+          }
+        ]
       }
-      allIndicators.push(convertIndicator(indicator));
-    });
+    },
+    weights: {
+      discovery: 0.30,
+      understanding: 0.30,
+      actions: 0.25,
+      trust: 0.15
+    },
+    overall: {
+      raw_0_1: 0.6525,
+      score_0_100: 65
+    }
   });
-  
-  return {
-    auditId: result.auditId,
-    overallScore: result.siteScore.overall,
-    accessIntent: result.accessIntent,
-    indicators: allIndicators,
-    scanTime: result.scanMetadata?.scanEndTime || new Date().toISOString(),
-  };
-};
 
 const DiagnosticsClient: React.FC = () => {
   const searchParams = useSearchParams();
@@ -77,13 +139,13 @@ const DiagnosticsClient: React.FC = () => {
   
   const [targetUrl, setTargetUrl] = useState<string | null>(urlParam);
   const [isRunningDiagnostics, setIsRunningDiagnostics] = useState(false);
-  const [scanData, setScanData] = useState<ReturnType<typeof processScanResponse> | null>(null);
+  const [reportData, setReportData] = useState<LighthouseAIReport | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [shouldCompleteSteps, setShouldCompleteSteps] = useState(false);
 
   // Run diagnostics when URL is set
   useEffect(() => {
-    if (targetUrl && !scanData) {
+    if (targetUrl && !reportData) {
       runDiagnostics(targetUrl);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -95,61 +157,48 @@ const DiagnosticsClient: React.FC = () => {
       setError(null);
       setShouldCompleteSteps(false);
       
-      const scanRequest: DiagnosticScanRequest = {
-        url,
-      };
-
-      const result = await diagnosticsApi.scan(scanRequest);
+      // TODO: Replace with actual API call to the new diagnostics endpoint
+      // For now, using mock data to demonstrate the new structure
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      // Trigger completion of remaining steps
+      setShouldCompleteSteps(true);
+      
+      // Create mock report data
+      const mockReport = createMockLighthouseReport(url);
+      
+      // Set the data after a brief delay to allow steps to complete
+      setTimeout(() => {
+        setReportData(mockReport);
+        setIsRunningDiagnostics(false);
+        toast.success('AI Readiness analysis complete!');
+      }, 2000);
+      
+      /* 
+      // When real API is ready, replace the above with:
+      const scanRequest = { url };
+      const result = await diagnosticsApi.scanForAIReadiness(scanRequest);
       
       matchResult(result, {
-        success: (scanResponse) => {
-          try {
-            const processedData = processScanResponse(scanResponse);
-            
-            // Trigger completion of remaining steps
-            setShouldCompleteSteps(true);
-            
-            // Set the data after a brief delay to allow steps to complete
-            setTimeout(() => {
-              setScanData(processedData);
-              setIsRunningDiagnostics(false);
-            }, 2000); // Give time for remaining steps to complete
-          } catch (processingError) {
-            console.error('Error processing scan response:', processingError);
-            setError('Failed to process scan results. Please try again.');
+        success: (aiReport: LighthouseAIReport) => {
+          setShouldCompleteSteps(true);
+          setTimeout(() => {
+            setReportData(aiReport);
             setIsRunningDiagnostics(false);
-            toast.error('Failed to process results');
-          }
+            toast.success('AI Readiness analysis complete!');
+          }, 2000);
         },
         error: (apiError) => {
-          let userFriendlyMessage = apiError.message;
-          
-          // Handle specific error codes and messages
-          if (apiError.code === 'RATE_LIMIT_EXCEEDED' || apiError.message.toLowerCase().includes('rate limit')) {
-            userFriendlyMessage = 'You have reached the daily limit of 10 free scans. Please try again tomorrow or upgrade to Pro for unlimited scans.';
-            toast.error('Rate limit exceeded');
-          } else if (apiError.code === 'SITE_NOT_ACCESSIBLE' || apiError.message.includes('404')) {
-            userFriendlyMessage = 'Unable to access this website. Please ensure the URL is correct and publicly accessible.';
-            toast.error('Website not accessible');
-          } else if (apiError.code === 'INVALID_URL') {
-            userFriendlyMessage = 'Please enter a valid website URL (e.g., https://example.com)';
-            toast.error('Invalid URL format');
-          } else if (apiError.code === 'SCAN_TIMEOUT') {
-            userFriendlyMessage = 'The scan took too long to complete. This may happen with very large websites. Please try again.';
-            toast.error('Scan timeout');
-          } else if (apiError.code === 'NETWORK_ERROR') {
-            userFriendlyMessage = 'Network connection error. Please check your internet connection and try again.';
-            toast.error('Network error');
-          } else {
-            // Generic error handling
-            userFriendlyMessage = apiError.message || 'An unexpected error occurred while running diagnostics.';
-            toast.error('Diagnostics failed');
-          }
-          
-          setError(userFriendlyMessage);
+          // Handle API errors...
+          setError(apiError.message);
           setIsRunningDiagnostics(false);
-        },
+          toast.error('Analysis failed');
+        }
       });
+      */
+      
     } catch (unexpectedError) {
       console.error('Unexpected error in runDiagnostics:', unexpectedError);
       setError('An unexpected error occurred. Please try again.');
@@ -160,14 +209,14 @@ const DiagnosticsClient: React.FC = () => {
 
   const handleNewDiagnostic = (url: string) => {
     setTargetUrl(url);
-    setScanData(null);
+    setReportData(null);
     setError(null);
     setShouldCompleteSteps(false);
   };
 
   const handleRetryDiagnostic = () => {
     if (targetUrl) {
-      setScanData(null);
+      setReportData(null);
       setError(null);
       setShouldCompleteSteps(false);
       runDiagnostics(targetUrl);
@@ -280,231 +329,56 @@ const DiagnosticsClient: React.FC = () => {
     );
   }
 
-  // Show results if we have scan data
-  if (scanData && targetUrl) {
-    const percentage = Math.round(scanData.overallScore);
+  // Show results if we have report data
+  if (reportData && targetUrl) {
     const isPro = user?.subscription_tier === 'pro';
     
     return (
       <div className="max-w-6xl mx-auto p-6 space-y-8">
-        {/* Header */}
-        <div className="text-center">
-          <h1
-            className="text-3xl md:text-4xl font-light mb-4"
-            style={{ color: 'var(--color-lighthouse-beam)' }}
-          >
-            AI Readiness Report
-          </h1>
-          <p
-            className="text-lg mb-2"
-            style={{ color: 'var(--color-maritime-fog)' }}
-          >
-            Analysis for{' '}
-            <span style={{ color: 'var(--color-beacon-light)' }}>
-              {targetUrl}
-            </span>
-          </p>
-          <p
-            className="text-sm"
-            style={{ color: 'var(--color-maritime-fog)' }}
-          >
-            Last analyzed {new Date().toLocaleString()}
-          </p>
-        </div>
+        {/* Diagnostic Report - New Structure with Radar Chart */}
+        <DiagnosticsReport report={reportData} />
 
-        {/* Overall Score */}
-        <Card className="p-8 text-center">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8">
+        {/* Action Buttons */}
+        <Card className="p-6">
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
             <div>
-              <Gauge score={scanData.overallScore} maxScore={100} size={200} />
-            </div>
-            <div className="text-left">
-              <h2
-                className="text-2xl font-medium mb-4"
+              <h3 
+                className="text-lg font-medium mb-2"
                 style={{ color: 'var(--color-lighthouse-beam)' }}
               >
-                Overall AI Readiness Score
-              </h2>
-              <p
-                className="text-lg mb-4"
+                Next Steps
+              </h3>
+              <p 
+                className="text-sm"
                 style={{ color: 'var(--color-maritime-fog)' }}
               >
-                Your website scores <strong>{percentage}%</strong> on the Lighthouse AI Readiness Index. 
-                {percentage >= 80 && ' Excellent! Your site is well-optimized for AI discovery.'}
-                {percentage >= 60 && percentage < 80 && ' Good foundation with room for improvement.'}
-                {percentage < 60 && ' Significant improvements needed for optimal AI compatibility.'}
-              </p>
-              <div className="flex gap-3">
-                <Button
-                  onClick={handleRetryDiagnostic}
-                  variant="outline"
-                  className="px-6 py-2"
-                  style={{
-                    borderColor: 'var(--color-maritime-border)',
-                    color: 'var(--color-lighthouse-beam)',
-                  }}
-                >
-                  Re-scan Website
-                </Button>
-                <Button
-                  className="px-6 py-2"
-                  style={{
-                    backgroundColor: 'var(--color-navigation-blue)',
-                    color: 'white',
-                  }}
-                >
-                  {isPro ? 'Improve AI-Readiness' : 'Upgrade for Fixes'}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Access Intent Banner */}
-        <AccessIntentBanner accessIntent={scanData.accessIntent} />
-
-        {/* Diagnostic Report - New Linear Layout */}
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2
-              className="text-2xl font-medium"
-              style={{ color: 'var(--color-lighthouse-beam)' }}
-            >
-              Diagnostic Details
-            </h2>
-            {!isPro && (
-              <div className="text-sm text-gray-500">
-                Free scan • {scanData.indicators.length} indicators analyzed
-              </div>
-            )}
-          </div>
-          
-          {/* Use the DiagnosticsReport component */}
-          <DiagnosticsReport indicators={scanData.indicators} />
-          
-          {/* Pro Features Preview */}
-          {!isPro && (
-            <div className="mt-8 space-y-4">
-              <h3 
-                className="text-lg font-medium"
-                style={{ color: 'var(--color-lighthouse-beam)' }}
-              >
-                Pro Features Preview
-              </h3>
-              <div className="grid md:grid-cols-3 gap-4">
-                <Card className="p-4 border-2 border-dashed border-gray-300 bg-gradient-to-br from-gray-50/80 to-gray-100/80 backdrop-blur-sm relative overflow-hidden">
-                  <div className="text-center opacity-70">
-                    <h4 className="font-medium text-gray-800 mb-2">Advanced llms.txt Analysis</h4>
-                    <p className="text-sm text-gray-700">
-                      Detailed analysis of your AI agent configuration file
-                    </p>
-                  </div>
-                  <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center rounded">
-                    <div className="bg-blue-600/90 backdrop-blur-sm text-white px-3 py-1 rounded text-sm font-medium shadow-lg">
-                      Pro Only
-                    </div>
-                  </div>
-                </Card>
-                
-                <Card className="p-4 border-2 border-dashed border-gray-300 bg-gradient-to-br from-gray-50/80 to-gray-100/80 backdrop-blur-sm relative overflow-hidden">
-                  <div className="text-center opacity-70">
-                    <h4 className="font-medium text-gray-800 mb-2">Deep Structured Data</h4>
-                    <p className="text-sm text-gray-700">
-                      JSON-LD and schema.org markup validation
-                    </p>
-                  </div>
-                  <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center rounded">
-                    <div className="bg-blue-600/90 backdrop-blur-sm text-white px-3 py-1 rounded text-sm font-medium shadow-lg">
-                      Pro Only
-                    </div>
-                  </div>
-                </Card>
-                
-                <Card className="p-4 border-2 border-dashed border-gray-300 bg-gradient-to-br from-gray-50/80 to-gray-100/80 backdrop-blur-sm relative overflow-hidden">
-                  <div className="text-center opacity-70">
-                    <h4 className="font-medium text-gray-800 mb-2">Page-Level Analysis</h4>
-                    <p className="text-sm text-gray-700">
-                      Scan up to 20 pages for comprehensive insights
-                    </p>
-                  </div>
-                  <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center rounded">
-                    <div className="bg-blue-600/90 backdrop-blur-sm text-white px-3 py-1 rounded text-sm font-medium shadow-lg">
-                      Pro Only
-                    </div>
-                  </div>
-                </Card>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Pro Features Teaser */}
-        {!isPro && (
-          <Card className="p-8 border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50">
-            <div className="text-center mb-6">
-              <div className="text-4xl mb-4">🚀</div>
-              <h3
-                className="text-2xl font-medium mb-4"
-                style={{ color: 'var(--color-navigation-blue)' }}
-              >
-                Unlock Advanced AI Readiness Analysis
-              </h3>
-              <p
-                className="text-base mb-6 max-w-2xl mx-auto"
-                style={{ color: 'var(--color-navigation-blue)' }}
-              >
-                This free scan shows you the basics. Get the complete picture with Pro features designed 
-                for serious AI optimization.
+                Review the recommendations above and take action to improve your AI readiness score.
               </p>
             </div>
-            
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
-              <div className="text-left">
-                <h4 className="font-medium text-gray-900 mb-3">🔍 Deeper Analysis</h4>
-                <ul className="text-sm text-gray-700 space-y-2">
-                  <li>• Scan up to 20 pages (vs 5 free)</li>
-                  <li>• Detailed category breakdowns</li>
-                  <li>• Page-level indicator details</li>
-                </ul>
-              </div>
-              <div className="text-left">
-                <h4 className="font-medium text-gray-900 mb-3">⚡ Advanced Features</h4>
-                <ul className="text-sm text-gray-700 space-y-2">
-                  <li>• Unlimited daily scans</li>
-                  <li>• On-demand rescoring</li>
-                  <li>• Scheduled audits (coming soon)</li>
-                </ul>
-              </div>
-            </div>
-            
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-4">
-                <div className="text-sm text-gray-600">
-                  <s>$29/month</s>
-                </div>
-                <div className="text-2xl font-bold text-green-600">
-                  $19/month
-                </div>
-                <div className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
-                  Launch Special
-                </div>
-              </div>
+            <div className="flex gap-3">
               <Button
-                size="lg"
-                className="px-8 py-3 mt-4"
+                onClick={handleRetryDiagnostic}
+                variant="outline"
+                className="px-6 py-2"
+                style={{
+                  borderColor: 'var(--color-maritime-border)',
+                  color: 'var(--color-lighthouse-beam)',
+                }}
+              >
+                Re-scan Website
+              </Button>
+              <Button
+                className="px-6 py-2"
                 style={{
                   backgroundColor: 'var(--color-navigation-blue)',
                   color: 'white',
                 }}
               >
-                Start Pro Trial - 7 Days Free
+                {isPro ? 'Get Implementation Guide' : 'Upgrade for Detailed Fixes'}
               </Button>
-              <p className="text-xs text-gray-500 mt-2">
-                Cancel anytime • No credit card required for trial
-              </p>
             </div>
-          </Card>
-        )}
+          </div>
+        </Card>
 
         {/* New Diagnostic */}
         <Card className="p-8">
