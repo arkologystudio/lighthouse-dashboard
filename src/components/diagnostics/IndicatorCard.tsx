@@ -9,7 +9,6 @@ interface IndicatorCardProps {
 
 export const IndicatorCard: React.FC<IndicatorCardProps> = ({ indicator, className }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
   
   // Truncate why_it_matters to 120 chars if needed
   const whyItMatters = indicator.why_it_matters.length > 120 
@@ -231,46 +230,6 @@ export const IndicatorCard: React.FC<IndicatorCardProps> = ({ indicator, classNa
           </div>
         )}
         
-        {showTechnicalDetails && enhancedDetails && (
-          <div className="mt-2 text-sm bg-gray-50 rounded-md p-3">
-            <div className="font-medium text-gray-900 mb-3">Technical Details:</div>
-            <div className="space-y-2">
-              {enhancedDetails.found !== undefined && (
-                <div className="flex justify-between">
-                  <span className="text-gray-700">Resource Found:</span>
-                  <span className={enhancedDetails.found ? 'text-green-700' : 'text-red-700'}>
-                    {enhancedDetails.found ? 'Yes' : 'No'}
-                  </span>
-                </div>
-              )}
-              {enhancedDetails.isValid !== undefined && (
-                <div className="flex justify-between">
-                  <span className="text-gray-700">Valid:</span>
-                  <span className={enhancedDetails.isValid ? 'text-green-700' : 'text-red-700'}>
-                    {enhancedDetails.isValid ? 'Yes' : 'No'}
-                  </span>
-                </div>
-              )}
-              {Object.entries(enhancedDetails).map(([key, value]) => {
-                // Skip already displayed fields
-                if (['checkedUrl', 'found', 'isValid', 'scannedAt', 'category', 'validationErrors', 'validationWarnings', 'impactLevel', 'difficultyLevel', 'estimatedTimeToFix'].includes(key)) {
-                  return null;
-                }
-                if (value && typeof value !== 'object') {
-                  return (
-                    <div key={key} className="flex justify-between">
-                      <span className="text-gray-700 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
-                      <span className="text-gray-900 max-w-xs truncate" title={String(value)}>
-                        {String(value)}
-                      </span>
-                    </div>
-                  );
-                }
-                return null;
-              })}
-            </div>
-          </div>
-        )}
       </div>
     </Card>
   );

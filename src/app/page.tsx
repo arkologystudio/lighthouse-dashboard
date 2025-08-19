@@ -173,7 +173,7 @@ const HomePage: React.FC = () => {
         {/* Technical lighthouse sketch - positioned behind content */}
         <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-[700px] h-[700px] opacity-15 pointer-events-none hidden lg:block">
           <Image
-            src="/lighthouse_sketch.png"
+            src="/lighthouse_sketch_med.png"
             alt="Lighthouse Technical Sketch - Navigation Infrastructure Diagram"
             width={700}
             height={700}

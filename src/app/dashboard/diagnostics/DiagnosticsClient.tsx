@@ -5,74 +5,68 @@ import { useSearchParams } from 'next/navigation';
 import { DiagnosticsLoading } from '../../../components/diagnostics/DiagnosticsLoading';
 import { DiagnosticsUrlInput } from '../../../components/diagnostics/DiagnosticsUrlInput';
 import { Gauge } from '../../../components/diagnostics/Gauge';
-import { IndicatorCard } from '../../../components/diagnostics/IndicatorCard';
+import { DiagnosticsReport } from '../../../components/diagnostics/DiagnosticsReport';
 import { AccessIntentBanner } from '../../../components/diagnostics/AccessIntentBanner';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { useAuth } from '../../../lib/hooks/useAuth';
 import { diagnosticsApi, matchResult } from '../../../lib/api';
 import toast from 'react-hot-toast';
-import type { DiagnosticReport, DiagnosticScanResponse, DiagnosticScanRequest, DiagnosticIndicator, IndicatorResult, IndicatorStatus } from '../../../types';
+import type { DiagnosticScanResponse, DiagnosticScanRequest, DiagnosticIndicator, IndicatorResult } from '../../../types';
 
-// Helper function to create legacy DiagnosticIndicator from IndicatorResult for backward compatibility
-const convertIndicatorResultToLegacy = (indicator: IndicatorResult): DiagnosticIndicator => ({
-  id: `${indicator.name}_${indicator.category}`,
-  name: indicator.displayName,
-  status: indicator.status,
-  score: indicator.score,
-  max_score: indicator.maxScore,
-  why_it_matters: indicator.description.length > 120 ? 
-    `${indicator.description.substring(0, 117)}...` : 
-    indicator.description,
-  fix_recommendation: indicator.recommendation || indicator.message,
-  details: {
-    ...indicator.details,
-    checkedUrl: indicator.checkedUrl,
-    found: indicator.found,
-    isValid: indicator.isValid,
-    scannedAt: indicator.scannedAt,
-    category: indicator.category,
-  }
-});
-
-// Helper function to safely convert a date to ISO string
-const safeToISOString = (date: Date | string | undefined): string => {
-  if (!date) {
-    return new Date().toISOString();
+// Convert IndicatorResult to DiagnosticIndicator format
+const convertIndicator = (indicator: IndicatorResult): DiagnosticIndicator => {
+  // If score is perfect, ensure status is 'pass'
+  let status = indicator.status;
+  if (indicator.score === indicator.maxScore && indicator.score > 0) {
+    status = 'pass';
   }
   
-  const dateObj = date instanceof Date ? date : new Date(date);
-  
-  // Check if the date is valid
-  if (isNaN(dateObj.getTime())) {
-    console.warn('Invalid date encountered, using current time:', date);
-    return new Date().toISOString();
-  }
-  
-  return dateObj.toISOString();
+  return {
+    id: `${indicator.name}_${indicator.category}`,
+    name: indicator.displayName,
+    status,
+    score: indicator.score,
+    max_score: indicator.maxScore,
+    why_it_matters: indicator.description.length > 120 ? 
+      `${indicator.description.substring(0, 117)}...` : 
+      indicator.description,
+    fix_recommendation: indicator.recommendation || indicator.message,
+    details: {
+      ...indicator.details,
+      checkedUrl: indicator.checkedUrl,
+      found: indicator.found,
+      isValid: indicator.isValid,
+      scannedAt: indicator.scannedAt,
+      category: indicator.category,
+    }
+  };
 };
 
-// Convert v2 scan response to legacy DiagnosticReport format for compatibility
-const convertV2ScanResponseToReport = (scanResponse: DiagnosticScanResponse): DiagnosticReport => {
+// Process scan response and filter out unwanted indicators
+const processScanResponse = (scanResponse: DiagnosticScanResponse) => {
   const result = scanResponse.result;
   
-  // Gather all indicators from all pages
+  // Gather all indicators from all pages, filtering out unwanted ones
   const allIndicators: DiagnosticIndicator[] = [];
   result.pages.forEach(page => {
     page.indicators.forEach(indicator => {
-      allIndicators.push(convertIndicatorResultToLegacy(indicator));
+      // Filter out Robots.txt agent access and ai-agent.json indicators
+      const indicatorName = indicator.displayName.toLowerCase();
+      if (indicatorName.includes('robots.txt agent access') || 
+          indicatorName.includes('ai-agent.json')) {
+        return; // Skip these indicators
+      }
+      allIndicators.push(convertIndicator(indicator));
     });
   });
   
   return {
-    id: result.auditId,
-    site_id: 'free-scan',
-    overall_score: result.siteScore.overall,
-    max_possible_score: 100,
-    access_intent: result.accessIntent,
+    auditId: result.auditId,
+    overallScore: result.siteScore.overall,
+    accessIntent: result.accessIntent,
     indicators: allIndicators,
-    created_at: safeToISOString(result.scanMetadata?.scanStartTime),
-    updated_at: safeToISOString(result.scanMetadata?.scanEndTime),
+    scanTime: result.scanMetadata?.scanEndTime || new Date().toISOString(),
   };
 };
 
@@ -83,12 +77,13 @@ const DiagnosticsClient: React.FC = () => {
   
   const [targetUrl, setTargetUrl] = useState<string | null>(urlParam);
   const [isRunningDiagnostics, setIsRunningDiagnostics] = useState(false);
-  const [report, setReport] = useState<DiagnosticReport | null>(null);
+  const [scanData, setScanData] = useState<ReturnType<typeof processScanResponse> | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [shouldCompleteSteps, setShouldCompleteSteps] = useState(false);
 
-  // Real diagnostics API integration
+  // Run diagnostics when URL is set
   useEffect(() => {
-    if (targetUrl && !report) {
+    if (targetUrl && !scanData) {
       runDiagnostics(targetUrl);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -98,6 +93,7 @@ const DiagnosticsClient: React.FC = () => {
     try {
       setIsRunningDiagnostics(true);
       setError(null);
+      setShouldCompleteSteps(false);
       
       const scanRequest: DiagnosticScanRequest = {
         url,
@@ -108,11 +104,18 @@ const DiagnosticsClient: React.FC = () => {
       matchResult(result, {
         success: (scanResponse) => {
           try {
-            const diagnosticReport = convertV2ScanResponseToReport(scanResponse);
-            setReport(diagnosticReport);
-            setIsRunningDiagnostics(false);
-          } catch (conversionError) {
-            console.error('Error converting v2 scan response:', conversionError);
+            const processedData = processScanResponse(scanResponse);
+            
+            // Trigger completion of remaining steps
+            setShouldCompleteSteps(true);
+            
+            // Set the data after a brief delay to allow steps to complete
+            setTimeout(() => {
+              setScanData(processedData);
+              setIsRunningDiagnostics(false);
+            }, 2000); // Give time for remaining steps to complete
+          } catch (processingError) {
+            console.error('Error processing scan response:', processingError);
             setError('Failed to process scan results. Please try again.');
             setIsRunningDiagnostics(false);
             toast.error('Failed to process results');
@@ -157,21 +160,32 @@ const DiagnosticsClient: React.FC = () => {
 
   const handleNewDiagnostic = (url: string) => {
     setTargetUrl(url);
-    setReport(null);
+    setScanData(null);
     setError(null);
+    setShouldCompleteSteps(false);
   };
 
   const handleRetryDiagnostic = () => {
     if (targetUrl) {
-      setReport(null);
+      setScanData(null);
       setError(null);
+      setShouldCompleteSteps(false);
       runDiagnostics(targetUrl);
     }
   };
 
   // Show loading state while running diagnostics
   if (isRunningDiagnostics) {
-    return <DiagnosticsLoading url={targetUrl || undefined} />;
+    return (
+      <DiagnosticsLoading 
+        url={targetUrl || undefined} 
+        shouldComplete={shouldCompleteSteps}
+        onComplete={() => {
+          // Optional: Handle completion if needed
+          // Steps completed
+        }}
+      />
+    );
   }
 
   // Show error state if there's an error
@@ -205,9 +219,10 @@ const DiagnosticsClient: React.FC = () => {
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                   <h3 className="font-medium text-blue-900 mb-2">Upgrade to Pro for:</h3>
                   <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• AI-Ready enhancements</li>
+                    <li>• Advanced recommendations</li>
                     <li>• Unlimited daily scans</li>
                     <li>• Detailed page-level analysis</li>
-                    <li>• Advanced recommendations</li>
                     <li>• Automated monitoring</li>
                   </ul>
                 </div>
@@ -265,9 +280,9 @@ const DiagnosticsClient: React.FC = () => {
     );
   }
 
-  // Show results if we have a report
-  if (report && targetUrl) {
-    const percentage = Math.round((report.overall_score / report.max_possible_score) * 100);
+  // Show results if we have scan data
+  if (scanData && targetUrl) {
+    const percentage = Math.round(scanData.overallScore);
     const isPro = user?.subscription_tier === 'pro';
     
     return (
@@ -301,7 +316,7 @@ const DiagnosticsClient: React.FC = () => {
         <Card className="p-8 text-center">
           <div className="flex flex-col md:flex-row items-center justify-center gap-8">
             <div>
-              <Gauge score={report.overall_score} maxScore={report.max_possible_score} size={200} />
+              <Gauge score={scanData.overallScore} maxScore={100} size={200} />
             </div>
             <div className="text-left">
               <h2
@@ -314,7 +329,7 @@ const DiagnosticsClient: React.FC = () => {
                 className="text-lg mb-4"
                 style={{ color: 'var(--color-maritime-fog)' }}
               >
-                Your website scores <strong>{percentage}%</strong> for AI agent readiness. 
+                Your website scores <strong>{percentage}%</strong> on the Lighthouse AI Readiness Index. 
                 {percentage >= 80 && ' Excellent! Your site is well-optimized for AI discovery.'}
                 {percentage >= 60 && percentage < 80 && ' Good foundation with room for improvement.'}
                 {percentage < 60 && ' Significant improvements needed for optimal AI compatibility.'}
@@ -346,9 +361,9 @@ const DiagnosticsClient: React.FC = () => {
         </Card>
 
         {/* Access Intent Banner */}
-        <AccessIntentBanner accessIntent={report.access_intent} />
+        <AccessIntentBanner accessIntent={scanData.accessIntent} />
 
-        {/* Indicators Grid */}
+        {/* Diagnostic Report - New Linear Layout */}
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2
@@ -359,22 +374,27 @@ const DiagnosticsClient: React.FC = () => {
             </h2>
             {!isPro && (
               <div className="text-sm text-gray-500">
-                Free scan • {report.indicators.length} indicators analyzed
+                Free scan • {scanData.indicators.length} indicators analyzed
               </div>
             )}
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {report.indicators.map((indicator) => (
-              <IndicatorCard key={indicator.id} indicator={indicator} />
-            ))}
-            
-            {/* Pro Locked Indicators Preview */}
-            {!isPro && (
-              <>
+          
+          {/* Use the DiagnosticsReport component */}
+          <DiagnosticsReport indicators={scanData.indicators} />
+          
+          {/* Pro Features Preview */}
+          {!isPro && (
+            <div className="mt-8 space-y-4">
+              <h3 
+                className="text-lg font-medium"
+                style={{ color: 'var(--color-lighthouse-beam)' }}
+              >
+                Pro Features Preview
+              </h3>
+              <div className="grid md:grid-cols-3 gap-4">
                 <Card className="p-4 border-2 border-dashed border-gray-300 bg-gradient-to-br from-gray-50/80 to-gray-100/80 backdrop-blur-sm relative overflow-hidden">
                   <div className="text-center opacity-70">
-                    {/* <div className="text-2xl mb-2">🔒</div> */}
-                    <h4 className="font-medium text-gray-800 mb-2">llms.txt Analysis</h4>
+                    <h4 className="font-medium text-gray-800 mb-2">Advanced llms.txt Analysis</h4>
                     <p className="text-sm text-gray-700">
                       Detailed analysis of your AI agent configuration file
                     </p>
@@ -388,10 +408,9 @@ const DiagnosticsClient: React.FC = () => {
                 
                 <Card className="p-4 border-2 border-dashed border-gray-300 bg-gradient-to-br from-gray-50/80 to-gray-100/80 backdrop-blur-sm relative overflow-hidden">
                   <div className="text-center opacity-70">
-                    {/* <div className="text-2xl mb-2">🔒</div> */}
-                    <h4 className="font-medium text-gray-800 mb-2">Structured Data</h4>
+                    <h4 className="font-medium text-gray-800 mb-2">Deep Structured Data</h4>
                     <p className="text-sm text-gray-700">
-                      JSON-LD and schema.org markup analysis
+                      JSON-LD and schema.org markup validation
                     </p>
                   </div>
                   <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center rounded">
@@ -403,10 +422,9 @@ const DiagnosticsClient: React.FC = () => {
                 
                 <Card className="p-4 border-2 border-dashed border-gray-300 bg-gradient-to-br from-gray-50/80 to-gray-100/80 backdrop-blur-sm relative overflow-hidden">
                   <div className="text-center opacity-70">
-                    {/* <div className="text-2xl mb-2">🔒</div> */}
-                    <h4 className="font-medium text-gray-800 mb-2">SEO Analysis</h4>
+                    <h4 className="font-medium text-gray-800 mb-2">Page-Level Analysis</h4>
                     <p className="text-sm text-gray-700">
-                      Title tags, meta descriptions, and semantic markup
+                      Scan up to 20 pages for comprehensive insights
                     </p>
                   </div>
                   <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center rounded">
@@ -415,9 +433,9 @@ const DiagnosticsClient: React.FC = () => {
                     </div>
                   </div>
                 </Card>
-              </>
-            )}
-          </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Pro Features Teaser */}
@@ -427,13 +445,13 @@ const DiagnosticsClient: React.FC = () => {
               <div className="text-4xl mb-4">🚀</div>
               <h3
                 className="text-2xl font-medium mb-4"
-                style={{ color: 'var(--color-lighthouse-beam)' }}
+                style={{ color: 'var(--color-navigation-blue)' }}
               >
                 Unlock Advanced AI Readiness Analysis
               </h3>
               <p
                 className="text-base mb-6 max-w-2xl mx-auto"
-                style={{ color: 'var(--color-maritime-fog)' }}
+                style={{ color: 'var(--color-navigation-blue)' }}
               >
                 This free scan shows you the basics. Get the complete picture with Pro features designed 
                 for serious AI optimization.

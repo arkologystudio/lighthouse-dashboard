@@ -1093,6 +1093,18 @@ body {
   border-radius: 0.5rem;
 }
 
+/* Disabled nav items for unauthenticated users */
+.lh-sidebar-nav-item-disabled {
+  color: var(--color-text-secondary);
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+.lh-sidebar-nav-item-disabled:hover {
+  background-color: transparent !important;
+  color: var(--color-text-secondary) !important;
+}
+
 /* Table Styles */
 .lh-table {
   min-width: 100%;
