@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { DiagnosticsLoading } from '../../../components/diagnostics/DiagnosticsLoading';
 import { DiagnosticsUrlInput } from '../../../components/diagnostics/DiagnosticsUrlInput';
@@ -8,198 +8,130 @@ import { DiagnosticsReport } from '../../../components/diagnostics/DiagnosticsRe
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { useAuth } from '../../../lib/hooks/useAuth';
+import { diagnosticsApi } from '../../../lib/api';
+import { matchResult } from '../../../lib/api';
 import toast from 'react-hot-toast';
-import type { LighthouseAIReport } from '../../../types';
+import type { LighthouseAIReport, AIReadinessScanRequest, SiteCategory } from '../../../types';
 
-// Mock function to simulate server response - in real implementation, this would come from the API
-const createMockLighthouseReport = (url: string): LighthouseAIReport => ({
-    site: {
-      url,
-      scan_date: new Date().toISOString().split('T')[0],
-      category: 'custom' // This would be detected by the server
-    },
-    categories: {
-      discovery: {
-        score: 0.75,
-        indicators: [
-          {
-            name: 'seo_basic',
-            score: 0.8,
-            status: 'pass',
-            message: 'Basic SEO elements are present and properly configured.',
-            applicability: {
-              status: 'required',
-              included_in_category_math: true
-            },
-            evidence: {
-              title_found: true,
-              meta_description_found: true,
-              headings_structured: true
-            }
-          },
-          {
-            name: 'sitemap_xml',
-            score: 0.7,
-            status: 'warn',
-            message: 'XML sitemap found but has some validation issues.',
-            applicability: {
-              status: 'required',
-              included_in_category_math: true
-            },
-            evidence: {
-              sitemap_found: true,
-              url_count: 42,
-              last_modified: '2024-08-15'
-            }
-          }
-        ]
-      },
-      understanding: {
-        score: 0.6,
-        indicators: [
-          {
-            name: 'json_ld',
-            score: 0.5,
-            status: 'warn',
-            message: 'JSON-LD structured data present but incomplete.',
-            applicability: {
-              status: 'required',
-              included_in_category_math: true
-            },
-            evidence: {
-              schemas_found: ['WebSite', 'Organization'],
-              schemas_valid: true,
-              coverage_percentage: 50
-            }
-          },
-          {
-            name: 'llms_txt',
-            score: 0.0,
-            status: 'fail',
-            message: 'llms.txt file not found.',
-            applicability: {
-              status: 'optional',
-              included_in_category_math: true
-            }
-          }
-        ]
-      },
-      actions: {
-        score: 0.3,
-        indicators: [
-          {
-            name: 'mcp',
-            score: 0.0,
-            status: 'not_applicable',
-            message: 'Model Context Protocol not applicable for this site type.',
-            applicability: {
-              status: 'not_applicable',
-              included_in_category_math: false
-            }
-          }
-        ]
-      },
-      trust: {
-        score: 0.9,
-        indicators: [
-          {
-            name: 'robots_txt',
-            score: 1.0,
-            status: 'pass',
-            message: 'Robots.txt file properly configured for AI agents.',
-            applicability: {
-              status: 'required',
-              included_in_category_math: true
-            },
-            evidence: {
-              robots_found: true,
-              allows_crawling: true,
-              ai_agent_directives: ['Allow: /']
-            }
-          }
-        ]
-      }
-    },
-    weights: {
-      discovery: 0.30,
-      understanding: 0.30,
-      actions: 0.25,
-      trust: 0.15
-    },
-    overall: {
-      raw_0_1: 0.6525,
-      score_0_100: 65
-    }
-  });
 
 const DiagnosticsClient: React.FC = () => {
   const searchParams = useSearchParams();
   const urlParam = searchParams.get('url');
+  const siteCategoryParam = searchParams.get('site_category');
   const { user } = useAuth();
   
   const [targetUrl, setTargetUrl] = useState<string | null>(urlParam);
+  const [siteCategory] = useState<string | null>(siteCategoryParam);
   const [isRunningDiagnostics, setIsRunningDiagnostics] = useState(false);
   const [reportData, setReportData] = useState<LighthouseAIReport | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [shouldCompleteSteps, setShouldCompleteSteps] = useState(false);
+  
+  // Use ref to track if we've already initiated a scan for the current URL
+  const scanInitiatedRef = useRef<string | null>(null);
 
   // Run diagnostics when URL is set
   useEffect(() => {
-    if (targetUrl && !reportData) {
-      runDiagnostics(targetUrl);
+    // Only run if we have a URL, no report data, and haven't initiated a scan for this URL
+    if (targetUrl && !reportData && scanInitiatedRef.current !== targetUrl) {
+      scanInitiatedRef.current = targetUrl;
+      runDiagnostics(targetUrl, siteCategory);
     }
+    
+    // Cleanup function
+    return () => {
+      // No cleanup needed since we rely on scanInitiatedRef for race condition handling
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [targetUrl]);
+  }, [targetUrl, siteCategory]);
 
-  const runDiagnostics = async (url: string) => {
+  const runDiagnostics = async (url: string, siteCategoryParam?: string | null) => {
     try {
+      console.log('Starting diagnostics scan for:', url);
       setIsRunningDiagnostics(true);
       setError(null);
       setShouldCompleteSteps(false);
       
-      // TODO: Replace with actual API call to the new diagnostics endpoint
-      // For now, using mock data to demonstrate the new structure
+      // Use actual API call to the diagnostics endpoint
+      const scanRequest: AIReadinessScanRequest = { url };
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      // Add site_category to options if provided
+      if (siteCategoryParam) {
+        scanRequest.options = {
+          site_category: siteCategoryParam as unknown as SiteCategory
+        };
+      }
       
-      // Trigger completion of remaining steps
-      setShouldCompleteSteps(true);
-      
-      // Create mock report data
-      const mockReport = createMockLighthouseReport(url);
-      
-      // Set the data after a brief delay to allow steps to complete
-      setTimeout(() => {
-        setReportData(mockReport);
-        setIsRunningDiagnostics(false);
-        toast.success('AI Readiness analysis complete!');
-      }, 2000);
-      
-      /* 
-      // When real API is ready, replace the above with:
-      const scanRequest = { url };
       const result = await diagnosticsApi.scanForAIReadiness(scanRequest);
+      
+
       
       matchResult(result, {
         success: (aiReport: LighthouseAIReport) => {
-          setShouldCompleteSteps(true);
-          setTimeout(() => {
-            setReportData(aiReport);
+          // Only process if this is still the current URL
+          if (scanInitiatedRef.current !== url) {
+            console.log('Ignoring result for outdated scan:', url);
+            return;
+          }
+          
+          console.log('Scan successful, received report:', aiReport);
+          
+          // Validate the report structure
+          if (!aiReport.site || !aiReport.categories || !aiReport.overall) {
+            console.error('Invalid report structure:', aiReport);
+            setError('Received invalid report structure from server');
             setIsRunningDiagnostics(false);
-            toast.success('AI Readiness analysis complete!');
+            toast.error('Invalid response format');
+            return;
+          }
+          
+          // Trigger completion of remaining steps
+          setShouldCompleteSteps(true);
+          
+          // Set the data after a brief delay to allow steps to complete
+          setTimeout(() => {
+            // Double-check we're still processing the correct URL
+            if (scanInitiatedRef.current === url) {
+              setReportData(aiReport);
+              setIsRunningDiagnostics(false);
+              toast.success('AI Readiness analysis complete!');
+            }
           }, 2000);
         },
         error: (apiError) => {
-          // Handle API errors...
+          // Only process errors if this is still the current URL
+          if (scanInitiatedRef.current !== url) {
+            console.log('Ignoring error for outdated scan:', url);
+            return;
+          }
+          
+          // Handle specific API errors
+          console.error('API error in runDiagnostics:', apiError);
           setError(apiError.message);
           setIsRunningDiagnostics(false);
-          toast.error('Analysis failed');
+          
+          // Show appropriate toast message based on error type
+          if (apiError.code === 'RATE_LIMIT_EXCEEDED') {
+            toast.error('Daily scan limit reached');
+          } else if (apiError.code === 'SITE_NOT_ACCESSIBLE') {
+            toast.error('Unable to access the website');
+          } else if (apiError.code === 'SCAN_TIMEOUT') {
+            toast.error('Scan timed out - please try again');
+          } else if (apiError.code === 'INVALID_RESPONSE') {
+            toast.error('Server returned invalid data format');
+          } else {
+            toast.error('Analysis failed');
+          }
         }
       });
-      */
       
     } catch (unexpectedError) {
+      // Only process errors if this is still the current URL
+      if (scanInitiatedRef.current !== url) {
+        console.log('Ignoring unexpected error for outdated scan:', url);
+        return;
+      }
+      
       console.error('Unexpected error in runDiagnostics:', unexpectedError);
       setError('An unexpected error occurred. Please try again.');
       setIsRunningDiagnostics(false);
@@ -207,19 +139,15 @@ const DiagnosticsClient: React.FC = () => {
     }
   };
 
-  const handleNewDiagnostic = (url: string) => {
-    setTargetUrl(url);
-    setReportData(null);
-    setError(null);
-    setShouldCompleteSteps(false);
-  };
-
   const handleRetryDiagnostic = () => {
     if (targetUrl) {
+      // Reset the scan initiated ref to allow retry
+      scanInitiatedRef.current = null;
       setReportData(null);
       setError(null);
       setShouldCompleteSteps(false);
-      runDiagnostics(targetUrl);
+      // Set the URL again to trigger the effect
+      setTargetUrl(targetUrl);
     }
   };
 
@@ -273,7 +201,7 @@ const DiagnosticsClient: React.FC = () => {
                     <li>• Unlimited daily scans</li>
                     <li>• Detailed page-level analysis</li>
                     <li>• Automated monitoring</li>
-                  </ul>
+                  </ul>  
                 </div>
               </div>
             ) : (
@@ -388,13 +316,13 @@ const DiagnosticsClient: React.FC = () => {
           >
             Analyze Another Website
           </h3>
-          <DiagnosticsUrlInput onSubmit={handleNewDiagnostic} />
+          <DiagnosticsUrlInput />
         </Card>
       </div>
     );
   }
 
-  // Default state - show URL input
+  // Default state - show URL input (will navigate to add ?url= param)
   return (
     <div className="max-w-4xl mx-auto p-6 text-center">
       <h1
@@ -412,7 +340,7 @@ const DiagnosticsClient: React.FC = () => {
       </p>
       
       <Card className="p-8">
-        <DiagnosticsUrlInput onSubmit={handleNewDiagnostic} />
+        <DiagnosticsUrlInput />
       </Card>
     </div>
   );

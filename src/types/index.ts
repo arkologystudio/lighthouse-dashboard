@@ -1,3 +1,5 @@
+import { int } from "zod/v4";
+
 // User types - matching backend exactly
 export interface User {
   id: string;
@@ -504,19 +506,79 @@ export type SiteProfile =
   | 'gov_nontransacting'
   | 'custom';
 
-// AI Readiness Index specification types
-export interface SpecIndicator {
-  name: string;
-  score: number; // 0.0 to 1.0 range
-  status: 'pass' | 'warn' | 'fail' | 'not_applicable';
-  message: string;
-  applicability: {
-    status: 'required' | 'optional' | 'not_applicable';
-    included_in_category_math: boolean;
-  };
-  evidence?: Record<string, unknown>; // Detailed scanner results
+// AI Readiness Index specification types - Updated structure from server
+export interface StandardEvidence {
+  // Basic evidence fields
+  statusCode?: number;
+  contentFound?: boolean;
+  contentPreview?: string;
+  validationScore?: number; // 0-100
+
+  // Validation results
+  validationIssues?: string[];
+  warnings?: string[];
+  missingFields?: string[];
+
+  // Scanner-specific data
+  specificData?: Record<string, any>;
+
+  // AI readiness information
+  aiReadinessFactors?: string[];
+  aiOptimizationOpportunities?: string[];
+
+  // Technical details
+  checkedUrl?: string;
+  responseTime?: number;
+  error?: string;
+
+  // Legacy compatibility - allow additional fields for gradual migration
+  [key: string]: any;
 }
 
+export interface SpecIndicator {
+  name: string;
+  score: number; // 0..1
+  applicability: {
+    status: 'required' | 'optional' | 'not_applicable';
+    reason: string;
+    included_in_category_math: boolean;
+  };
+  evidence?: StandardEvidence;
+}
+
+export interface SpecCategory {
+  score: number; // computed 0..1
+  indicator_scores: Record<string, number>; // indicator name -> score
+}
+
+export interface SpecWeights {
+  discovery: number;
+  understanding: number;
+  actions: number;
+  trust: number;
+}
+
+export interface LighthouseAIReport {
+  site: {
+    url: string;
+    scan_date: string;
+    category: string; // site profile
+  };
+  categories: {
+    discovery: SpecCategory;
+    understanding: SpecCategory;
+    actions: SpecCategory;
+    trust: SpecCategory;
+  };
+  indicators: Record<string, SpecIndicator>; // All indicators with full data
+  weights: SpecWeights;
+  overall: {
+    raw_0_1: number;
+    score_0_100: number;
+  };
+}
+
+// Legacy types for backward compatibility - DEPRECATED, use new structure above
 export interface Category {
   score: number; // 0.0 to 1.0 range
   indicators: SpecIndicator[];
@@ -527,25 +589,6 @@ export interface Weights {
   understanding: 0.30; // Fixed weight  
   actions: 0.25;      // Fixed weight
   trust: 0.15;        // Fixed weight
-}
-
-export interface LighthouseAIReport {
-  site: {
-    url: string;
-    scan_date: string; // YYYY-MM-DD format
-    category: SiteProfile;
-  };
-  categories: {
-    discovery: Category;
-    understanding: Category; 
-    actions: Category;
-    trust: Category;
-  };
-  weights: Weights;
-  overall: {
-    raw_0_1: number;    // 0.0 to 1.0 range
-    score_0_100: number; // 0 to 100 for display
-  };
 }
 
 // V2 API Enhanced Indicator Structure
@@ -855,4 +898,27 @@ export interface DiagnosticAuditDetails {
     indicatorCount: number;
   }>;
   categoryScores?: DiagnosticCategoryScore[];
+}
+
+// AI Readiness scan request for the new API
+export interface AIReadinessScanRequest {
+  siteId?: string; // For authenticated users
+  url?: string;    // For anonymous scans
+  options?: {
+    auditType?: 'full' | 'quick' | 'scheduled' | 'on_demand';
+    includeSitemap?: boolean;
+    maxPages?: number;
+    storeRawData?: boolean;
+    skipCache?: boolean;
+    site_category?: SiteCategory
+  };
+}
+
+export interface SiteCategory {
+  blog_content: string;
+  ecommerce: string;
+  saas_app: string;
+  kb_support: string;
+  gov_nontransacting: string;
+  custom: string;
 }

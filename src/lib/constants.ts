@@ -25,7 +25,8 @@ export const ENDPOINTS = {
     SITES: '/api/users/sites',
   },
   DIAGNOSTICS: {
-    SCAN: '/api/v1/diagnostics/scan-url',
+    SCAN_URL: '/api/v1/diagnostics/scan-url',  // Anonymous scan
+    SCAN: '/api/v1/diagnostics/scan',          // Authenticated scan
     SITE_SCORE: (id: string) => `/api/v1/diagnostics/sites/${id}/score`,
     PAGE_INDICATORS: (pageId: string) => `/api/v1/diagnostics/pages/${pageId}/indicators`,
     TRIGGER_RESCORE: '/api/v1/diagnostics/trigger-rescore',

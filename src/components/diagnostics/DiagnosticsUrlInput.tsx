@@ -3,13 +3,24 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '../ui/Button';
+import { Select } from '../ui/Select';
 import { VALIDATION_PATTERNS } from '../../lib/constants';
 
 // Fallback URL validation pattern in case import fails
 const URL_PATTERN = /^https?:\/\/.+\..+/;
 
+// Site profile options
+const SITE_PROFILE_OPTIONS = [
+  { value: 'custom', label: 'Default' },
+  { value: 'blog_content', label: 'Blog' },
+  { value: 'ecommerce', label: 'E-Commerce' },
+  { value: 'saas_app', label: 'SAAS App' },
+  { value: 'kb_support', label: 'Knowledge Base/Wiki' },
+  { value: 'gov_nontransacting', label: 'Government' }
+];
+
 interface DiagnosticsUrlInputProps {
-  onSubmit?: (url: string) => void;
+  onSubmit?: (url: string, siteCategory?: string) => void;
   className?: string;
 }
 
@@ -18,6 +29,7 @@ export const DiagnosticsUrlInput: React.FC<DiagnosticsUrlInputProps> = ({
   className 
 }) => {
   const [url, setUrl] = useState('');
+  const [siteCategory, setSiteCategory] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -81,11 +93,14 @@ export const DiagnosticsUrlInput: React.FC<DiagnosticsUrlInputProps> = ({
 
     try {
       if (onSubmit) {
-        onSubmit(normalizedUrl);
+        onSubmit(normalizedUrl, siteCategory);
       } else {
-        // Navigate to diagnostics page with URL parameter
-        const encodedUrl = encodeURIComponent(normalizedUrl);
-        router.push(`/dashboard/diagnostics?url=${encodedUrl}`);
+        // Navigate to diagnostics page with URL and site category parameters
+        const queryParams = new URLSearchParams({
+          url: normalizedUrl,
+          site_category: siteCategory || 'custom'
+        });
+        router.push(`/dashboard/diagnostics?${queryParams.toString()}`);
       }
     } catch {
       setError('Failed to start diagnostics. Please try again.');
@@ -103,14 +118,15 @@ export const DiagnosticsUrlInput: React.FC<DiagnosticsUrlInputProps> = ({
   return (
     <div className={className}>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="flex-1">
+        {/* All elements on same line with consistent height */}
+        <div className="flex gap-3 items-stretch">
+          <div className="flex-[2]">
             <input
               type="text"
               value={url}
               onChange={handleInputChange}
               placeholder="Enter your website URL (e.g., example.com)"
-              className="w-full px-4 py-3 rounded-lg border text-base"
+              className="w-full h-12 px-4 rounded-lg border text-base"
               style={{
                 backgroundColor: 'var(--color-lighthouse-structure)',
                 borderColor: error ? 'var(--color-signal-red)' : 'var(--color-maritime-border)',
@@ -118,21 +134,24 @@ export const DiagnosticsUrlInput: React.FC<DiagnosticsUrlInputProps> = ({
               }}
               disabled={isLoading}
             />
-            {error && (
-              <p
-                className="text-sm mt-2"
-                style={{ color: 'var(--color-signal-red)' }}
-              >
-                {error}
-              </p>
-            )}
           </div>
           
+          <div className="flex-1">
+            <Select
+              value={siteCategory}
+              onChange={setSiteCategory}
+              options={SITE_PROFILE_OPTIONS}
+              placeholder="Site Type"
+              disabled={isLoading}
+              className="w-full h-12"
+            />
+          </div>
+
           <Button
             type="submit"
             size="lg"
             disabled={isLoading}
-            className="px-8 py-3 text-base font-medium rounded-lg transition-all duration-200 hover:shadow-lg whitespace-nowrap"
+            className="h-12 px-6 text-base font-medium rounded-lg transition-all duration-200 hover:shadow-lg whitespace-nowrap"
             style={{
               backgroundColor: 'var(--color-navigation-blue)',
               color: 'white',
@@ -144,13 +163,23 @@ export const DiagnosticsUrlInput: React.FC<DiagnosticsUrlInputProps> = ({
                 <div
                   className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"
                 />
-                <span>Running...</span>
+                <span>Scanning...</span>
               </div>
             ) : (
-              'Run Diagnostics'
+              'Scan'
             )}
           </Button>
         </div>
+
+        {/* Error message below inputs */}
+        {error && (
+          <p
+            className="text-sm"
+            style={{ color: 'var(--color-signal-red)' }}
+          >
+            {error}
+          </p>
+        )}
       </form>
     </div>
   );

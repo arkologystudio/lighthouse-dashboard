@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Card } from '../ui/Card';
 
 interface DiagnosticsLoadingProps {
@@ -14,7 +14,6 @@ interface LoadingStep {
   completed: boolean;
   inProgress: boolean;
   pending: boolean;
-  duration: number; // seconds this step should take
 }
 
 export const DiagnosticsLoading: React.FC<DiagnosticsLoadingProps> = ({ 
@@ -24,102 +23,134 @@ export const DiagnosticsLoading: React.FC<DiagnosticsLoadingProps> = ({
   shouldComplete = false
 }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [elapsedTime, setElapsedTime] = useState(0);
+  const [progress, setProgress] = useState(0);
   const [isCompleting, setIsCompleting] = useState(false);
+  const [timedOut, setTimedOut] = useState(false);
+  
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const speedMultiplierRef = useRef(5); // Start at 5x speed
+  const lastProgressUpdateRef = useRef(0);
 
-  // Define steps with realistic timing
-  const initialSteps = useMemo<LoadingStep[]>(() => [
-    { id: 1, text: 'Connecting to website...', completed: false, inProgress: false, pending: true, duration: 2 },
-    { id: 2, text: 'Scanning AI readiness indicators...', completed: false, inProgress: false, pending: true, duration: 4 },
-    { id: 3, text: 'Analyzing structured data...', completed: false, inProgress: false, pending: true, duration: 6 },
-    { id: 4, text: 'Checking accessibility for AI agents...', completed: false, inProgress: false, pending: true, duration: 5 },
-    { id: 5, text: 'Evaluating discoverability features...', completed: false, inProgress: false, pending: true, duration: 4 },
-    { id: 6, text: 'Generating comprehensive report...', completed: false, inProgress: false, pending: true, duration: 8 },
+  // Define the new progress events
+  const steps = useMemo<LoadingStep[]>(() => [
+    { id: 1, text: 'Connecting to website', completed: false, inProgress: false, pending: true },
+    { id: 2, text: 'Scanning AI Readiness indicators', completed: false, inProgress: false, pending: true },
+    { id: 3, text: 'Assessing discoverability, understanding & trust', completed: false, inProgress: false, pending: true },
+    { id: 4, text: 'Calculating final scores', completed: false, inProgress: false, pending: true },
+    { id: 5, text: 'Generating report', completed: false, inProgress: false, pending: true },
   ], []);
 
-  const [loadingSteps, setLoadingSteps] = useState(initialSteps);
+  const [loadingSteps, setLoadingSteps] = useState(steps);
 
-  // Progress through steps based on realistic timing
+  // Progress simulation with decreasing speed
   useEffect(() => {
-    if (isCompleting) return; // Don't run normal timing when completing
+    if (isCompleting || timedOut) return;
     
-    const interval = setInterval(() => {
-      setElapsedTime(prev => prev + 1);
-    }, 1000);
+    // Set up 60 second timeout
+    timeoutRef.current = setTimeout(() => {
+      setTimedOut(true);
+      onComplete?.();
+    }, 60000);
+    
+    // Progress simulation
+    intervalRef.current = setInterval(() => {
+      setProgress(prev => {
+        // Don't exceed 90% until server responds
+        if (prev >= 90) return prev;
+        
+        lastProgressUpdateRef.current = Date.now();
+        
+        // Calculate increment based on current speed multiplier
+        // Higher multiplier = faster progress early on
+        const baseIncrement = 0.5; // Base increment per update
+        const increment = baseIncrement * speedMultiplierRef.current;
+        
+        const newProgress = Math.min(90, prev + increment);
+        
+        // Decrease speed multiplier over time (5x -> 4x -> 3x -> 2x -> 1x)
+        if (newProgress > 20 && speedMultiplierRef.current > 4) {
+          speedMultiplierRef.current = 4;
+        } else if (newProgress > 40 && speedMultiplierRef.current > 3) {
+          speedMultiplierRef.current = 3;
+        } else if (newProgress > 60 && speedMultiplierRef.current > 2) {
+          speedMultiplierRef.current = 2;
+        } else if (newProgress > 80 && speedMultiplierRef.current > 1) {
+          speedMultiplierRef.current = 1;
+        }
+        
+        return newProgress;
+      });
+    }, 200); // Update every 200ms for smooth animation
+    
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isCompleting, timedOut, onComplete]);
 
-    return () => clearInterval(interval);
-  }, [isCompleting]);
-
-  // Handle completion trigger from parent
+  // Update steps based on progress
   useEffect(() => {
-    if (shouldComplete && !isCompleting) {
+    if (isCompleting || timedOut) return;
+    
+    const stepThresholds = [15, 35, 55, 75, 90]; // Progress thresholds for each step
+    
+    setLoadingSteps(prev => prev.map((step, index) => {
+      const threshold = stepThresholds[index];
+      
+      if (progress >= threshold) {
+        setCurrentStepIndex(Math.min(index + 1, steps.length - 1));
+        return { ...step, completed: true, inProgress: false, pending: false };
+      } else if (progress >= threshold - 15) {
+        setCurrentStepIndex(index);
+        return { ...step, completed: false, inProgress: true, pending: false };
+      } else {
+        return { ...step, completed: false, inProgress: false, pending: true };
+      }
+    }));
+  }, [progress, steps.length, isCompleting, timedOut]);
+
+  // Handle completion trigger from parent (server responded)
+  useEffect(() => {
+    if (shouldComplete && !isCompleting && !timedOut) {
       setIsCompleting(true);
       
-      // Find remaining steps and complete them quickly
-      const currentSteps = [...loadingSteps];
-      const incompleteSteps = currentSteps.filter(step => !step.completed);
+      // Clear existing timers
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
       
-      if (incompleteSteps.length === 0) {
-        onComplete?.();
-        return;
-      }
-
-      // Complete remaining steps with 1 second intervals
-      incompleteSteps.forEach((step, index) => {
+      // Quickly complete all remaining steps and reach 100%
+      const completionSteps = steps.length - currentStepIndex;
+      const completionInterval = 300; // 300ms between each step completion
+      
+      // Complete remaining steps
+      for (let i = 0; i < completionSteps; i++) {
         setTimeout(() => {
-          setLoadingSteps(prev => prev.map(s => 
-            s.id === step.id 
-              ? { ...s, completed: true, inProgress: false, pending: false }
-              : s
+          const stepIndex = currentStepIndex + i;
+          setLoadingSteps(prev => prev.map((step, index) => 
+            index <= stepIndex 
+              ? { ...step, completed: true, inProgress: false, pending: false }
+              : step
           ));
           
-          // Call onComplete when all steps are done
-          if (index === incompleteSteps.length - 1) {
+          // Update progress to 100% on final step
+          if (i === completionSteps - 1) {
+            setProgress(100);
             setTimeout(() => onComplete?.(), 500);
           }
-        }, (index + 1) * 1000);
-      });
-    }
-  }, [shouldComplete, isCompleting, loadingSteps, onComplete]);
-
-  // Normal step progression when not completing
-  useEffect(() => {
-    if (isCompleting) return;
-    
-    let cumulativeTime = 0;
-    const newSteps = [...initialSteps];
-    let newCurrentStepIndex = 0;
-
-    for (let i = 0; i < newSteps.length; i++) {
-      cumulativeTime += newSteps[i].duration;
-
-      if (elapsedTime < cumulativeTime - newSteps[i].duration) {
-        // This step hasn't started yet
-        newSteps[i] = { ...newSteps[i], completed: false, inProgress: false, pending: true };
-      } else if (elapsedTime >= cumulativeTime) {
-        // This step is completed
-        newSteps[i] = { ...newSteps[i], completed: true, inProgress: false, pending: false };
-      } else {
-        // This step is in progress
-        newSteps[i] = { ...newSteps[i], completed: false, inProgress: true, pending: false };
-        newCurrentStepIndex = i;
+        }, i * completionInterval);
       }
     }
+  }, [shouldComplete, isCompleting, timedOut, currentStepIndex, steps.length, onComplete]);
 
-    setLoadingSteps(newSteps);
-    setCurrentStepIndex(newCurrentStepIndex);
-  }, [elapsedTime, isCompleting, initialSteps]);
-
-  // Calculate estimated time remaining
-  const totalExpectedTime = initialSteps.reduce((sum, step) => sum + step.duration, 0);
-  const timeRemaining = Math.max(0, totalExpectedTime - elapsedTime);
-  
-  // Add some randomness to make it feel more realistic (±10 seconds)
-  const estimatedTimeRange = isCompleting 
-    ? 'Finalizing...'
-    : timeRemaining <= 10 
-    ? 'Almost done...' 
-    : `${Math.max(5, timeRemaining - 10)}-${timeRemaining + 10} seconds remaining`;
+  // Activity label based on current state
+  const getActivityLabel = () => {
+    if (timedOut) return 'Something went wrong';
+    if (isCompleting) return 'Wrapping up';
+    if (progress < 30) return 'Processing';
+    if (progress < 85) return 'Finalising';
+    return 'processing';
+  };
 
   return (
     <div className={`max-w-4xl mx-auto p-6 ${className || ''}`}>
@@ -149,7 +180,7 @@ export const DiagnosticsLoading: React.FC<DiagnosticsLoadingProps> = ({
           }}
         >
           <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
-          Analysis in Progress
+          {getActivityLabel()}
         </div>
       </div>
 
@@ -162,12 +193,6 @@ export const DiagnosticsLoading: React.FC<DiagnosticsLoadingProps> = ({
             >
               Diagnostic Progress
             </h2>
-            <span
-              className="text-sm font-mono"
-              style={{ color: 'var(--color-maritime-fog)' }}
-            >
-              {estimatedTimeRange}
-            </span>
           </div>
           
           <div className="space-y-4">
@@ -232,19 +257,6 @@ export const DiagnosticsLoading: React.FC<DiagnosticsLoadingProps> = ({
                     {step.text}
                   </p>
                 </div>
-                
-                {/* Add progress bar for current step */}
-                {step.inProgress && !isCompleting && (
-                  <div className="w-20 h-1 bg-gray-200 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full transition-all duration-1000 ease-out rounded-full"
-                      style={{ 
-                        backgroundColor: 'var(--color-beacon-light)',
-                        width: `${Math.min(100, (elapsedTime % step.duration / step.duration) * 100)}%`
-                      }}
-                    />
-                  </div>
-                )}
               </div>
             ))}
           </div>
@@ -256,21 +268,21 @@ export const DiagnosticsLoading: React.FC<DiagnosticsLoadingProps> = ({
                 className="text-sm font-medium"
                 style={{ color: 'var(--color-lighthouse-beam)' }}
               >
-                Overall Progress
+                Progress
               </span>
               <span 
                 className="text-sm"
                 style={{ color: 'var(--color-maritime-fog)' }}
               >
-                {Math.round((isCompleting ? 95 : (elapsedTime / totalExpectedTime) * 100))}%
+                {Math.round(progress)}%
               </span>
             </div>
             <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
               <div 
-                className="h-full transition-all duration-1000 ease-out rounded-full"
+                className="h-full transition-all duration-300 ease-out rounded-full"
                 style={{ 
                   backgroundColor: 'var(--color-navigation-green)',
-                  width: `${Math.min(100, isCompleting ? 95 : (elapsedTime / totalExpectedTime) * 100)}%`
+                  width: `${Math.min(100, progress)}%`
                 }}
               />
             </div>
@@ -283,44 +295,8 @@ export const DiagnosticsLoading: React.FC<DiagnosticsLoadingProps> = ({
           className="text-sm mb-4"
           style={{ color: 'var(--color-maritime-fog)' }}
         >
-          This usually takes 15-45 seconds. We&apos;re analyzing your website against 
-          the latest AI readiness standards.
+          We&apos;re analyzing your website against the latest AI readiness standards.
         </p>
-        
-        <div
-          className="flex justify-center items-center space-x-8 text-xs font-mono uppercase tracking-wider opacity-60"
-          style={{ color: 'var(--color-maritime-fog)' }}
-        >
-          <div className="flex items-center space-x-2">
-            <div
-              className="w-1 h-1 rounded-full"
-              style={{ backgroundColor: currentStepIndex >= 2 ? 'var(--color-navigation-green)' : 'var(--color-maritime-border)' }}
-            ></div>
-            <span>llms.txt Check</span>
-          </div>
-          <div
-            className="w-px h-4"
-            style={{ backgroundColor: 'var(--color-maritime-border)' }}
-          ></div>
-          <div className="flex items-center space-x-2">
-            <div
-              className="w-1 h-1 rounded-full"
-              style={{ backgroundColor: currentStepIndex >= 2 ? 'var(--color-navigation-green)' : 'var(--color-maritime-border)' }}
-            ></div>
-            <span>Schema.org Analysis</span>
-          </div>
-          <div
-            className="w-px h-4"
-            style={{ backgroundColor: 'var(--color-maritime-border)' }}
-          ></div>
-          <div className="flex items-center space-x-2">
-            <div
-              className="w-1 h-1 rounded-full"
-              style={{ backgroundColor: currentStepIndex >= 3 ? 'var(--color-navigation-green)' : 'var(--color-maritime-border)' }}
-            ></div>
-            <span>Agent Access</span>
-          </div>
-        </div>
       </div>
     </div>
   );

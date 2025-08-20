@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3333 --turbopack",
-    "dev:standard": "next dev -p 3333",
+    "dev": "next dev -p 3333",
+    "dev:turbopack": "next dev -p 3333 --turbopack",
     "build": "next build && next-sitemap",
     "start": "next start -p 3333",
     "lint": "next lint",

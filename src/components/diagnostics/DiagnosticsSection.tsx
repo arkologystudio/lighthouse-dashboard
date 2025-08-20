@@ -29,16 +29,16 @@ const DiagnosticsSection: React.FC = () => (
           >
             Is your site ready for{' '}
             <span style={{ color: 'var(--color-beacon-light)' }}>
-              the agentic web?
+              the Agentic Web?
             </span>
           </h2>
           
-          <p
+          {/* <p
             className="text-xl mb-2"
             style={{ color: 'var(--color-maritime-fog)' }}
           >
             Audit your Website
-          </p>
+          </p> */}
           
           {/* Free label */}
           <div
@@ -48,18 +48,18 @@ const DiagnosticsSection: React.FC = () => (
               color: 'white',
             }}
           >
-            Free
+            Free Audit
           </div>
           
           <p
             className="text-lg max-w-3xl mx-auto leading-relaxed mb-12"
             style={{ color: 'var(--color-maritime-fog)' }}
           >
-            Get an instant analysis of your website&apos;s readiness for AI agents. 
-            Our comprehensive diagnostic scans check for AI standards compliance, 
-            structured data implementation, and discoverability optimization. 
-            Receive actionable insights to make your site visible to the next 
-            generation of intelligent web crawlers.
+            Dermine your site's AI Readiness by running our free diagnostics scan. 
+            We'll audit your site based on the Lighthouse AI Readiness Index, 
+            identifying key indicators that make discoverable, understandable, and trusted 
+            by AI Agents and services. Receive actionable insights and recommendations to  
+            improve your site's AI Readiness.
           </p>
         </div>
 

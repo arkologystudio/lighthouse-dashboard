@@ -20,6 +20,8 @@ import type {
   DiagnosticStatus,
   IndicatorResult,
   PageAggregation,
+  LighthouseAIReport,
+  AIReadinessScanRequest,
 } from '../types';
 import Cookies from 'js-cookie';
 
@@ -552,5 +554,124 @@ export const diagnosticsApi = {
   getAuditDetails: async (auditId: string): Promise<Result<DiagnosticAuditDetails>> => 
     authenticatedRequest<DiagnosticAuditDetails>(
       ENDPOINTS.DIAGNOSTICS.AUDIT_DETAILS(auditId)
+    ),
+
+  // New AI Readiness scan function that returns LighthouseAIReport
+  scanForAIReadiness: async (request: AIReadinessScanRequest): Promise<Result<LighthouseAIReport>> => {
+    const isAnonymous = !request.siteId;
+    
+    try {
+      let response: Response;
+      
+      if (isAnonymous) {
+        // Anonymous scan using /api/v1/diagnostics/scan-url
+        const url = `${API_BASE_URL}${ENDPOINTS.DIAGNOSTICS.SCAN_URL}`;
+        const requestBody: { url: string; site_category?: string } = { url: request.url };
+        
+        // Add site_category if provided
+        if (request.options?.site_category) {
+          requestBody.site_category = request.options.site_category;
+        }
+        
+        response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+        });
+      } else {
+        // Authenticated scan using /api/v1/diagnostics/scan
+        const requestBody: { siteId: string; options?: object } = { siteId: request.siteId };
+        
+        // Add options if provided (including site_category)
+        if (request.options) {
+          requestBody.options = request.options;
+        }
+        
+        const result = await authenticatedRequest<LighthouseAIReport>(
+          ENDPOINTS.DIAGNOSTICS.SCAN,
+          {
+            method: 'POST',
+            body: JSON.stringify(requestBody),
+          }
+        );
+        return result;
+      }
+
+      // Handle anonymous scan response
+      const responseBody = await response.json();
+
+      if (!response.ok) {
+        let errorCode = response.status.toString();
+        let errorMessage = responseBody.message || responseBody.error || `HTTP ${response.status}: ${response.statusText}`;
+        
+        switch (response.status) {
+          case 400:
+            errorCode = 'INVALID_REQUEST';
+            break;
+          case 404:
+            errorCode = 'SITE_NOT_ACCESSIBLE';
+            break;
+          case 429:
+            errorCode = 'RATE_LIMIT_EXCEEDED';
+            errorMessage = responseBody.message || 'You have reached your daily limit of free scans. Upgrade to Pro for unlimited scanning.';
+            break;
+          case 500:
+            errorCode = 'SERVER_ERROR';
+            break;
+          case 503:
+            errorCode = 'SERVICE_UNAVAILABLE';
+            break;
+          case 504:
+            errorCode = 'SCAN_TIMEOUT';
+            break;
+        }
+
+        return {
+          success: false,
+          error: {
+            message: errorMessage,
+            code: errorCode,
+          },
+        };
+      }
+
+      // Parse the response according to the schema
+      // Response format: { message: string, status: string, duration: number, result: LighthouseAIReport }
+      if (responseBody.result && typeof responseBody.result === 'object') {
+        // Extract the LighthouseAIReport from the wrapped response
+        return { success: true, data: responseBody.result as LighthouseAIReport };
+      } else if (responseBody.site && responseBody.categories && responseBody.overall) {
+        // Direct LighthouseAIReport format (fallback for different API versions)
+        return { success: true, data: responseBody as LighthouseAIReport };
+      } else {
+        // Unexpected response format
+        console.error('Unexpected API response format:', responseBody);
+        return {
+          success: false,
+          error: {
+            message: 'Invalid response format from server',
+            code: 'INVALID_RESPONSE',
+          },
+        };
+      }
+      
+    } catch (error) {
+      console.error('Network error in AI readiness scan:', error);
+      return {
+        success: false,
+        error: {
+          message: error instanceof Error ? error.message : 'Network error occurred',
+          code: 'NETWORK_ERROR',
+        },
+      };
+    }
+  },
+
+  // Get latest results for authenticated users
+  getLatestResults: async (siteId: string): Promise<Result<LighthouseAIReport>> => 
+    authenticatedRequest<LighthouseAIReport>(
+      ENDPOINTS.DIAGNOSTICS.SITE_SCORE(siteId)
     ),
 };
