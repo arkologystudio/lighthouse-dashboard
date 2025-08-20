@@ -80,7 +80,7 @@ export const CategoryRadarChart: React.FC<CategoryRadarChartProps> = ({
         >
           AI Readiness Score
         </h2>
-        <div className="mb-2">
+        <div className="mb-6">
           <a
             href="https://lighthousestudios.xyz/docs/ai-readiness-index"
             target="_blank"
