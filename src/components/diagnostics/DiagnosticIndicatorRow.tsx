@@ -11,28 +11,18 @@ const getIndicatorStatus = (indicator: SpecIndicator): 'pass' | 'warn' | 'fail' 
     return 'not_applicable';
   }
   
-  // Otherwise, use evidence status or fallback to score-based status
-  if (indicator.evidence && typeof indicator.evidence.status === 'string') {
-    return indicator.evidence.status as 'pass' | 'warn' | 'fail' | 'not_applicable';
-  }
-  
   // Fallback logic based on score
   if (indicator.score >= 0.8) return 'pass';
   if (indicator.score >= 0.5) return 'warn';
   return 'fail';
 };
 
-const getIndicatorMessage = (indicator: SpecIndicator): string => {
-  if (indicator.evidence && typeof indicator.evidence.message === 'string') {
-    return indicator.evidence.message;
-  }
-  // Fallback message based on applicability
-  if (indicator.applicability.status === 'not_applicable') {
+const getIndicatorMessage = (indicator: SpecIndicator): string  => {
+  if (indicator.evidence && typeof indicator.evidence.aiOptimizationOpportunities === 'string') {
+    return indicator.evidence.aiOptimizationOpportunities;
+  } else {
     return indicator.applicability.reason;
   }
-  // Generic message based on score
-  const score = Math.round(indicator.score * 100);
-  return `Indicator scored ${score}%`;
 };
 
 // User-friendly descriptions for each indicator
@@ -423,6 +413,257 @@ const getIndicatorRecommendation = (indicator: SpecIndicator): string => {
   }
 };
 
+// Helper function to render evidence details in a compact, modern format
+const renderEvidenceDetails = (evidence: any) => {
+  const relevantFields = [
+    'statusCode',
+    'contentFound', 
+    'contentPreview',
+    'validationScore',
+    'validationIssues',
+    'warnings',
+    'missingFields',
+    'specificData',
+    'aiReadinessFactors',
+    'aiOptimizationOpportunities',
+    'checkedUrl',
+    'responseTime',
+    'error'
+  ];
+
+  const availableFields = relevantFields.filter(field => 
+    evidence[field] !== undefined && evidence[field] !== null && 
+    !(Array.isArray(evidence[field]) && evidence[field].length === 0) &&
+    !(typeof evidence[field] === 'object' && Object.keys(evidence[field]).length === 0)
+  );
+
+  if (availableFields.length === 0) {
+    return (
+      <div className="text-sm text-gray-500 italic">
+        No scan details available
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {availableFields.map(field => {
+        const value = evidence[field];
+        return (
+          <div key={field} className="group">
+            {renderEvidenceField(field, value)}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+// Helper function to render individual evidence fields with appropriate styling
+const renderEvidenceField = (field: string, value: any) => {
+  const getFieldLabel = (field: string): string => {
+    const labels: Record<string, string> = {
+      statusCode: 'Status Code',
+      contentFound: 'Content Found',
+      contentPreview: 'Content Preview',
+      validationScore: 'Validation Score',
+      validationIssues: 'Validation Issues',
+      warnings: 'Warnings', 
+      missingFields: 'Missing Fields',
+      specificData: 'Technical Details',
+      aiReadinessFactors: 'AI Readiness Factors',
+      aiOptimizationOpportunities: 'AI Optimization Opportunities',
+      checkedUrl: 'Checked URL',
+      responseTime: 'Response Time',
+      error: 'Error'
+    };
+    return labels[field] || field;
+  };
+
+  const fieldLabel = getFieldLabel(field);
+
+  // Status Code - show with colored badge
+  if (field === 'statusCode') {
+    const statusColor = value >= 200 && value < 300 ? 'text-green-700 bg-green-100' : 
+                       value >= 300 && value < 400 ? 'text-yellow-700 bg-yellow-100' :
+                       'text-red-700 bg-red-100';
+    return (
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-gray-700">{fieldLabel}</span>
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor}`}>
+          {value}
+        </span>
+      </div>
+    );
+  }
+
+  // Boolean values - show with colored indicators
+  if (field === 'contentFound' && typeof value === 'boolean') {
+    return (
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-gray-700">{fieldLabel}</span>
+        <span className={`inline-flex items-center gap-1 text-sm ${value ? 'text-green-700' : 'text-red-700'}`}>
+          <span className={`w-2 h-2 rounded-full ${value ? 'bg-green-500' : 'bg-red-500'}`}></span>
+          {value ? 'Yes' : 'No'}
+        </span>
+      </div>
+    );
+  }
+
+  // Validation Score - show with progress-like styling
+  if (field === 'validationScore' && typeof value === 'number') {
+    const scoreColor = value >= 80 ? 'text-green-700' : value >= 50 ? 'text-yellow-700' : 'text-red-700';
+    return (
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-gray-700">{fieldLabel}</span>
+        <span className={`text-sm font-semibold ${scoreColor}`}>
+          {value}/100
+        </span>
+      </div>
+    );
+  }
+
+  // Response Time - show formatted duration
+  if (field === 'responseTime' && typeof value === 'number') {
+    const formatTime = (ms: number): string => {
+      if (ms < 1000) return `${ms}ms`;
+      return `${(ms / 1000).toFixed(2)}s`;
+    };
+    return (
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-gray-700">{fieldLabel}</span>
+        <span className="text-sm text-gray-600 font-mono">
+          {formatTime(value)}
+        </span>
+      </div>
+    );
+  }
+
+  // Arrays (issues, warnings, factors, etc.)
+  if (Array.isArray(value) && value.length > 0) {
+    const isErrorType = field === 'validationIssues' || field === 'warnings';
+    const isPositiveType = field === 'aiReadinessFactors';
+    
+    return (
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-sm font-medium text-gray-700">{fieldLabel}</span>
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+            {value.length}
+          </span>
+        </div>
+        <div className="space-y-1">
+          {value.slice(0, 5).map((item: string, index: number) => (
+            <div 
+              key={index}
+              className={`flex items-start gap-2 text-sm p-2 rounded ${
+                isErrorType ? 'bg-red-50 text-red-700' :
+                isPositiveType ? 'bg-green-50 text-green-700' :
+                'bg-blue-50 text-blue-700'
+              }`}
+            >
+              <span className={`mt-0.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                isErrorType ? 'bg-red-400' :
+                isPositiveType ? 'bg-green-400' :
+                'bg-blue-400'
+              }`}></span>
+              <span className="flex-1">{item}</span>
+            </div>
+          ))}
+          {value.length > 5 && (
+            <div className="text-xs text-gray-500 ml-4">
+              +{value.length - 5} more items
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // URLs - show with link styling
+  if (field === 'checkedUrl' && typeof value === 'string') {
+    return (
+      <div>
+        <span className="text-sm font-medium text-gray-700 block mb-1">{fieldLabel}</span>
+        <a 
+          href={value}
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 hover:underline break-all"
+        >
+          <span>{value}</span>
+          <span className="text-xs">↗</span>
+        </a>
+      </div>
+    );
+  }
+
+  // Content Preview - show truncated with expand option
+  if (field === 'contentPreview' && typeof value === 'string') {
+    const truncateLength = 200;
+    const isTruncated = value.length > truncateLength;
+    const [isExpanded, setIsExpanded] = React.useState(false);
+    
+    return (
+      <div>
+        <span className="text-sm font-medium text-gray-700 block mb-2">{fieldLabel}</span>
+        <div className="bg-gray-50 border rounded-lg p-3">
+          <pre className="text-xs text-gray-600 whitespace-pre-wrap font-mono leading-relaxed">
+            {isExpanded || !isTruncated 
+              ? value 
+              : value.substring(0, truncateLength) + '...'
+            }
+          </pre>
+          {isTruncated && (
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium"
+            >
+              {isExpanded ? 'Show less' : 'Show more'}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Error messages - show with error styling
+  if (field === 'error' && typeof value === 'string') {
+    return (
+      <div>
+        <span className="text-sm font-medium text-gray-700 block mb-1">{fieldLabel}</span>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+          <span className="text-sm text-red-700">{value}</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Objects (specificData) - show formatted JSON
+  if (typeof value === 'object' && value !== null) {
+    return (
+      <div>
+        <span className="text-sm font-medium text-gray-700 block mb-2">{fieldLabel}</span>
+        <div className="bg-gray-50 border rounded-lg p-3">
+          <pre className="text-xs text-gray-600 font-mono leading-relaxed overflow-x-auto">
+            {JSON.stringify(value, null, 2)}
+          </pre>
+        </div>
+      </div>
+    );
+  }
+
+  // Default case for strings and other types
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-sm font-medium text-gray-700">{fieldLabel}</span>
+      <span className="text-sm text-gray-600 break-all max-w-xs text-right">
+        {String(value)}
+      </span>
+    </div>
+  );
+};
+
 interface DiagnosticIndicatorRowProps {
   indicator: SpecIndicator;
   siteProfile: SiteProfile;
@@ -503,21 +744,8 @@ export const DiagnosticIndicatorRow: React.FC<DiagnosticIndicatorRowProps> = ({
   const statusConfig = getStatusConfig(indicatorStatus);
   const isNotApplicable = indicator.applicability.status === 'not_applicable';
   const isIncludedInMath = indicator.applicability.included_in_category_math;
-  
-  // const getApplicabilityBadge = () => {
-  //   switch (indicator.applicability.status) {
-  //     case 'required':
-  //       return { text: 'Required', variant: 'error' as const };
-  //     case 'optional':
-  //       return { text: 'Optional', variant: 'warning' as const };
-  //     case 'not_applicable':
-  //       return { text: 'Not Applicable', variant: 'secondary' as const };
-  //     default:
-  //       return null;
-  //   }
-  // };
 
-  // const applicabilityBadge = getApplicabilityBadge();
+
 
   return (
     <Card className={`${statusConfig.cardOpacity} ${className} hover:shadow-md transition-all duration-200 rounded-xl`} padding="none">
@@ -567,12 +795,12 @@ export const DiagnosticIndicatorRow: React.FC<DiagnosticIndicatorRowProps> = ({
           </div>
         </div>
 
-        {/* Message
+        {/* Message */}
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
           <p className="text-sm leading-relaxed text-gray-800 font-medium">
             {indicatorMessage}
           </p>
-        </div> */}
+        </div>
 
         {/* Applicability Notice for not_applicable indicators */}
         {isNotApplicable && (
@@ -603,32 +831,7 @@ export const DiagnosticIndicatorRow: React.FC<DiagnosticIndicatorRowProps> = ({
                 </div>
               </AccordionTrigger>
               <AccordionContent value="evidence" className="px-4 pb-4 bg-white">
-                <div className="space-y-3">
-                  {Object.entries(indicator.evidence).map(([key, value]) => {
-                    // Handle complex objects properly
-                    let displayValue: string;
-                    if (typeof value === 'boolean') {
-                      displayValue = value ? 'Yes' : 'No';
-                    } else if (typeof value === 'object' && value !== null) {
-                      displayValue = JSON.stringify(value, null, 2);
-                    } else {
-                      displayValue = String(value);
-                    }
-                    
-                    return (
-                      <div key={key} className="border-b border-gray-100 pb-2 last:border-b-0">
-                        <div className="flex flex-col space-y-1">
-                          <span className="font-medium text-sm text-gray-700">
-                            {key.replace(/([A-Z])/g, ' $1').trim().replace(/^./, str => str.toUpperCase())}
-                          </span>
-                          <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded font-mono text-xs break-all">
-                            {displayValue}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                {renderEvidenceDetails(indicator.evidence)}
               </AccordionContent>
             </AccordionItem>
           </Accordion>

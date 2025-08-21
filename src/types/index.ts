@@ -506,34 +506,74 @@ export type SiteProfile =
   | 'gov_nontransacting'
   | 'custom';
 
-// AI Readiness Index specification types - Updated structure from server
-export interface StandardEvidence {
-  // Basic evidence fields
-  statusCode?: number;
-  contentFound?: boolean;
-  contentPreview?: string;
-  validationScore?: number; // 0-100
+  export interface StandardEvidence {
+    // Basic evidence fields
+    
+    /** HTTP status code returned when checking the resource (e.g., 200, 404, 500) */
+    statusCode?: number;
+    
+    /** Whether the expected content/file was found during scanning 
+     * @example true for "robots.txt exists", false for "no sitemap found" */
+    contentFound?: boolean;
+    
+    /** Preview of the content found, truncated for display purposes
+     * @example "User-agent: *\nDisallow: /admin\nSitemap: https://..." */
+    contentPreview?: string;
+    
+    /** Numeric score from 0-100 indicating validation quality
+     * @example 85 for "good SEO with minor issues", 0 for "missing required elements" */
+    validationScore?: number;
+    
+    // Validation results
+    
+    /** List of validation problems found during scanning
+     * @example ["Missing meta description", "Title too long (65 characters)"] */
+    validationIssues?: string[];
+    
+    /** Non-critical issues that should be addressed
+     * @example ["Consider adding Open Graph image", "H1 tag could be more descriptive"] */
+    warnings?: string[];
+    
+    /** Required fields that were not found in the scanned content
+     * @example ["name", "description"] for agent.json missing fields */
+    missingFields?: string[];
+    
+    // Scanner-specific data
+    
+    /** Detailed analysis data specific to each scanner type
+     * @example { "schemas": ["Product", "Offer"], "validSchemas": 2 } for JSON-LD
+     * @example { "title": { "length": 45, "optimal": true }, "headings": [...] } for SEO */
+    specificData?: Record<string, any>;
+    
+    // AI readiness information
+    
+    /** Positive factors that enhance AI agent compatibility
+     * @example ["JSON-LD structured data present", "Clear page hierarchy with H1-H3 tags"] */
+    aiReadinessFactors?: string[];
+    
+    /** Suggestions for improving AI agent compatibility
+     * @example ["Add agent.json file for API discovery", "Include more semantic markup"] */
+    aiOptimizationOpportunities?: string[];
+    
+    // Technical details
+    
+    /** The specific URL that was checked during scanning
+     * @example "https://example.com/robots.txt", "https://example.com/.well-known/ai-plugin.json" */
+    checkedUrl?: string;
+    
+    /** Time taken to complete the scan in milliseconds
+     * @example 1250 for a scan that took 1.25 seconds */
+    responseTime?: number;
+    
+    /** Error message if the scan failed or encountered issues
+     * @example "Connection timeout", "Invalid JSON syntax" */
+    error?: string;
 
-  // Validation results
-  validationIssues?: string[];
-  warnings?: string[];
-  missingFields?: string[];
+    
+    
+  }
 
-  // Scanner-specific data
-  specificData?: Record<string, any>;
-
-  // AI readiness information
-  aiReadinessFactors?: string[];
-  aiOptimizationOpportunities?: string[];
-
-  // Technical details
-  checkedUrl?: string;
-  responseTime?: number;
-  error?: string;
-
-  // Legacy compatibility - allow additional fields for gradual migration
-  [key: string]: any;
-}
+  //TODO Add types for specific indicator data:
 
 export interface SpecIndicator {
   name: string;

@@ -93,7 +93,7 @@ export const ReportHeading: React.FC<ReportHeadingProps> = ({
         </div>
         
         {/* Site Score Card */}
-        <Card className="bg-gray-50 dark:bg-gray-800/50 p-6 mb-6 max-w-md mx-auto">
+        <Card className="bg-gray-100 dark:bg-gray-700/60 p-6 mb-6 max-w-md mx-auto">
           <div className="flex items-center justify-center gap-8">
             <div 
               className="text-6xl font-bold"

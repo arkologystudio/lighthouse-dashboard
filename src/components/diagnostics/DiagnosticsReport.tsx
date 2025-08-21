@@ -1,7 +1,7 @@
 import React from 'react';
 import type { LighthouseAIReport, SpecIndicator, SiteProfile } from '../../types';
 import { DiagnosticIndicatorRow } from './DiagnosticIndicatorRow';
-import { CategoryRadarChart } from './CategoryRadarChart';
+import { ReportHeading } from './ReportHeading';
 import { Card } from '../ui/Card';
 
 interface DiagnosticsReportProps {
@@ -48,7 +48,7 @@ export const DiagnosticsReport: React.FC<DiagnosticsReportProps> = ({
   return (
     <div className={`space-y-8 ${className}`}>
       {/* Category Radar Chart and Overall Score */}
-      <CategoryRadarChart report={report} />
+      <ReportHeading report={report} />
       
       {/* Required/Applicable Indicators */}
       {requiredIndicators.length > 0 && (
