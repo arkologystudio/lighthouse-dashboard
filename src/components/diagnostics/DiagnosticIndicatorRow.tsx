@@ -4,34 +4,48 @@ import { Badge } from '../ui/Badge';
 import { Card } from '../ui/Card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/Accordion';
 
-// Component for expandable content preview
-const ExpandableContentPreview: React.FC<{ value: string; fieldLabel: string }> = ({ value, fieldLabel }) => {
-  const truncateLength = 200;
+
+const ExpandableContent: React.FC<{ 
+  value: string; 
+  fieldLabel?: string; 
+  truncateLength?: number;
+  className?: string;
+}> = ({ value, fieldLabel, truncateLength = 200, className = '' }) => {
   const isTruncated = value.length > truncateLength;
   const [isExpanded, setIsExpanded] = React.useState(false);
   
-  return (
-    <div>
-      <span className="text-sm font-medium text-gray-700 block mb-2">{fieldLabel}</span>
-      <div className="bg-gray-50 border rounded-lg p-3">
-        <pre className="text-xs text-gray-600 whitespace-pre-wrap font-mono leading-relaxed">
-          {isExpanded || !isTruncated 
-            ? value 
-            : `${value.substring(0, truncateLength)}...`
-          }
-        </pre>
-        {isTruncated && (
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium"
-          >
-            {isExpanded ? 'Show less' : 'Show more'}
-          </button>
-        )}
-      </div>
+  const displayValue = isExpanded || !isTruncated 
+    ? value 
+    : `${value.substring(0, truncateLength)}...`;
+
+  const content = (
+    <div className={`bg-gray-50 border rounded-lg p-3 ${className}`}>
+      <pre className="text-xs text-gray-600 whitespace-pre-wrap font-mono leading-relaxed overflow-x-auto">
+        {displayValue}
+      </pre>
+      {isTruncated && (
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors"
+        >
+          {isExpanded ? 'Show less' : 'Show more'}
+        </button>
+      )}
     </div>
   );
+
+  if (fieldLabel) {
+    return (
+      <div>
+        <span className="text-sm font-medium text-gray-700 block mb-2">{fieldLabel}</span>
+        {content}
+      </div>
+    );
+  }
+
+  return content;
 };
+
 
 // Utility function to extract status and message from evidence
 const getIndicatorStatus = (indicator: SpecIndicator): 'pass' | 'warn' | 'fail' | 'not_applicable' => {
@@ -46,13 +60,6 @@ const getIndicatorStatus = (indicator: SpecIndicator): 'pass' | 'warn' | 'fail' 
   return 'fail';
 };
 
-const getIndicatorMessage = (indicator: SpecIndicator): string  => {
-  if (indicator.evidence?.aiFactors?.opportunities?.[0]) {
-    return indicator.evidence.aiFactors.opportunities[0];
-  } else {
-    return indicator.applicability.reason;
-  }
-};
 
 // User-friendly descriptions for each indicator
 const getIndicatorDescription = (indicatorName: string): string => {
@@ -451,7 +458,6 @@ const renderEvidenceDetails = (evidence: StandardEvidence) => {
     'score',
     'validation',
     'analysis',
-    'aiFactors',
     'metadata'
   ];
 
@@ -664,16 +670,14 @@ const renderEvidenceField = (field: string, value: unknown) => {
       );
     }
     
-    // Default object rendering
+    // Default object rendering - use expandable content for large JSON objects
+    const jsonString = JSON.stringify(value, null, 2);
     return (
-      <div>
-        <span className="text-sm font-medium text-gray-700 block mb-2">{fieldLabel}</span>
-        <div className="bg-gray-50 border rounded-lg p-3">
-          <pre className="text-xs text-gray-600 font-mono leading-relaxed overflow-x-auto">
-            {JSON.stringify(value, null, 2)}
-          </pre>
-        </div>
-      </div>
+      <ExpandableContent 
+        value={jsonString} 
+        fieldLabel={fieldLabel} 
+        truncateLength={300}
+      />
     );
   }
   
@@ -709,16 +713,24 @@ const renderEvidenceField = (field: string, value: unknown) => {
 
   // Content Preview - show truncated with expand option
   if (field === 'contentPreview' && typeof value === 'string') {
-    return <ExpandableContentPreview value={value} fieldLabel={fieldLabel} />;
+    return <ExpandableContent value={value} fieldLabel={fieldLabel} truncateLength={200} />;
   }
 
 
   // Default case for strings and other types
+  const stringValue = String(value);
+  
+  // For very long strings, use expandable content
+  if (stringValue.length > 100) {
+    return <ExpandableContent value={stringValue} fieldLabel={fieldLabel} truncateLength={100} />;
+  }
+  
+  // For shorter strings, use the original layout
   return (
     <div className="flex items-center justify-between">
       <span className="text-sm font-medium text-gray-700">{fieldLabel}</span>
       <span className="text-sm text-gray-600 break-all max-w-xs text-right">
-        {String(value)}
+        {stringValue}
       </span>
     </div>
   );
@@ -799,7 +811,6 @@ export const DiagnosticIndicatorRow: React.FC<DiagnosticIndicatorRowProps> = ({
   
   // Extract status and message from indicator using utility functions
   const indicatorStatus = getIndicatorStatus(indicator);
-  const indicatorMessage = getIndicatorMessage(indicator);
   
   const statusConfig = getStatusConfig(indicatorStatus);
   const isNotApplicable = indicator.applicability.status === 'not_applicable';
@@ -832,12 +843,14 @@ export const DiagnosticIndicatorRow: React.FC<DiagnosticIndicatorRowProps> = ({
                   .replace(/\bMcp\b/g, 'MCP')
                   .replace(/\bJson\b/g, 'JSON')
                   .replace(/\bLd\b/g, 'LD')
+                  .replace(/\Seo\b/g, 'SEO')
+                  .replace(/\Llms\b/g, 'LLMs')
                 }
               </h4>
-              <div className="flex items-start gap-2 text-sm text-gray-600">
+              {/* <div className="flex items-start gap-2 text-sm text-gray-600">
                 <span className="text-blue-500 mt-0.5">ℹ️</span>
                 <p>{getIndicatorDescription(indicator.name)}</p>
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -856,10 +869,14 @@ export const DiagnosticIndicatorRow: React.FC<DiagnosticIndicatorRowProps> = ({
         </div>
 
         {/* Message */}
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-          <p className="text-sm leading-relaxed text-gray-800 font-medium">
+        <div className="p-4 mb-4">
+          {/* <p className="text-sm leading-relaxed text-gray-800 font-medium">
             {indicatorMessage}
-          </p>
+          </p> */}
+          
+               
+                <p>{getIndicatorDescription(indicator.name)}</p>
+              
         </div>
 
         {/* Applicability Notice for not_applicable indicators */}

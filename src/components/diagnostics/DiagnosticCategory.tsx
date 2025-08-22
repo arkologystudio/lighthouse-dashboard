@@ -85,6 +85,28 @@ export const DiagnosticCategory: React.FC<DiagnosticCategoryProps> = ({
     return 'Poor';
   };
 
+  const getAIReadinessInsights = (indicators: SpecIndicator[]) => {
+    const strengths: string[] = [];
+    const opportunities: string[] = [];
+    
+    indicators.forEach(indicator => {
+      if (indicator.evidence?.aiFactors) {
+        if (indicator.evidence.aiFactors.strengths) {
+          strengths.push(...indicator.evidence.aiFactors.strengths);
+        }
+        if (indicator.evidence.aiFactors.opportunities) {
+          opportunities.push(...indicator.evidence.aiFactors.opportunities);
+        }
+      }
+    });
+    
+    // Remove duplicates
+    return {
+      strengths: [...new Set(strengths)],
+      opportunities: [...new Set(opportunities)]
+    };
+  };
+
   const getRecommendations = (categoryKey: string, indicators: SpecIndicator[]) => {
     const failedIndicators = indicators.filter(i => getIndicatorStatus(i) === 'fail' && i.applicability.included_in_category_math);
     const warningIndicators = indicators.filter(i => getIndicatorStatus(i) === 'warn' && i.applicability.included_in_category_math);
@@ -155,6 +177,7 @@ export const DiagnosticCategory: React.FC<DiagnosticCategoryProps> = ({
   const weightPercentage = Math.round(weight * 100);
   const contributionPoints = Math.round(score * weight * 100);
   const recommendations = getRecommendations(categoryKey, indicators);
+  const aiInsights = getAIReadinessInsights(indicators);
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -273,39 +296,78 @@ export const DiagnosticCategory: React.FC<DiagnosticCategoryProps> = ({
               value="recommendations"
               className="text-lg font-semibold px-6 py-4 text-white hover:bg-gray-800"
             >
-              📋 Recommendations for {title}
+              📋 Results & Recommendations for {title}
             </AccordionTrigger>
             <AccordionContent 
               value="recommendations"
               className="px-6 pb-6"
             >
-              <div className="space-y-3">
-                {recommendations.map((recommendation, index) => (
-                  <div 
-                    key={index}
-                    className="flex items-start gap-3 p-4 rounded-lg"
-                    style={{ 
-                      backgroundColor: 'var(--color-bg-surface)',
-                      border: '1px solid var(--color-border)'
-                    }}
-                  >
-                    <div 
-                      className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5"
-                      style={{ 
-                        backgroundColor: getCategoryColor(categoryKey),
-                        color: 'white'
-                      }}
-                    >
-                      {index + 1}
-                    </div>
-                    <p 
-                      className="text-sm leading-relaxed"
-                      style={{ color: 'var(--color-maritime-fog)' }}
-                    >
-                      {recommendation}
-                    </p>
+              <div className="space-y-6">
+                {/* AI Readiness Insights Section */}
+                {(aiInsights.strengths.length > 0 || aiInsights.opportunities.length > 0) && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">🤖 AI Readiness Insights</h3>
+                    
+                    {/* Strengths */}
+                    {aiInsights.strengths.length > 0 && (
+                      <div className="space-y-2">
+                        <div className="text-sm font-medium text-green-700 mb-2">✅ Strengths ({aiInsights.strengths.length})</div>
+                        {aiInsights.strengths.map((strength: string, index: number) => (
+                          <div key={index} className="flex items-start gap-2 text-sm p-3 rounded-lg bg-green-50 text-green-700">
+                            <span className="mt-0.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-green-400"></span>
+                            <span className="flex-1">{strength}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* Opportunities */}
+                    {aiInsights.opportunities.length > 0 && (
+                      <div className="space-y-2">
+                        <div className="text-sm font-medium text-blue-700 mb-2">💡 Opportunities ({aiInsights.opportunities.length})</div>
+                        {aiInsights.opportunities.map((opportunity: string, index: number) => (
+                          <div key={index} className="flex items-start gap-2 text-sm p-3 rounded-lg bg-blue-50 text-blue-700">
+                            <span className="mt-0.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-blue-400"></span>
+                            <span className="flex-1">{opportunity}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                ))}
+                )}
+
+                {/* Recommendations Section */}
+                {recommendations.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">📋 Recommendations</h3>
+                    {recommendations.map((recommendation, index) => (
+                      <div 
+                        key={index}
+                        className="flex items-start gap-3 p-4 rounded-lg"
+                        style={{ 
+                          backgroundColor: 'var(--color-bg-surface)',
+                          border: '1px solid var(--color-border)'
+                        }}
+                      >
+                        <div 
+                          className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5"
+                          style={{ 
+                            backgroundColor: getCategoryColor(categoryKey),
+                            color: 'white'
+                          }}
+                        >
+                          {index + 1}
+                        </div>
+                        <p 
+                          className="text-sm leading-relaxed"
+                          style={{ color: 'var(--color-maritime-fog)' }}
+                        >
+                          {recommendation}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </AccordionContent>
           </AccordionItem>
