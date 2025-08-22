@@ -2,7 +2,9 @@ import React from 'react';
 import type { LighthouseAIReport, SpecIndicator, SiteProfile } from '../../types';
 import { DiagnosticIndicatorRow } from './DiagnosticIndicatorRow';
 import { ReportHeading } from './ReportHeading';
+import { UpgradeCTABanner } from './UpgradeCTABanner';
 import { Card } from '../ui/Card';
+import { useAuth } from '../../lib/hooks/useAuth';
 
 interface DiagnosticsReportProps {
   report: LighthouseAIReport;
@@ -15,6 +17,7 @@ export const DiagnosticsReport: React.FC<DiagnosticsReportProps> = ({
   report,
   className = '' 
 }) => {
+  const { user } = useAuth();
   const categoryKeys = ['discovery', 'understanding', 'actions', 'trust'] as const;
 
   // Collect all indicators from the top-level indicators object and separate by applicability
@@ -44,6 +47,9 @@ export const DiagnosticsReport: React.FC<DiagnosticsReportProps> = ({
       }
     }
   });
+
+  // Check if user is unauthorized (free user or not logged in)
+  const isUnauthorizedUser = !user || user.subscription_tier !== 'pro';
 
   return (
     <div className={`space-y-8 ${className}`}>
@@ -136,6 +142,9 @@ export const DiagnosticsReport: React.FC<DiagnosticsReportProps> = ({
           </Card>
         </div>
       )}
+
+      {/* CTA Banner for unauthorized users */}
+      {isUnauthorizedUser && <UpgradeCTABanner />}
     </div>
   );
 };

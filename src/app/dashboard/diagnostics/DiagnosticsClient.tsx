@@ -266,47 +266,6 @@ const DiagnosticsClient: React.FC = () => {
         {/* Diagnostic Report - New Structure with Radar Chart */}
         <DiagnosticsReport report={reportData} />
 
-        {/* Action Buttons */}
-        <Card className="p-6">
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <div>
-              <h3 
-                className="text-lg font-medium mb-2"
-                style={{ color: 'var(--color-lighthouse-beam)' }}
-              >
-                Next Steps
-              </h3>
-              <p 
-                className="text-sm"
-                style={{ color: 'var(--color-maritime-fog)' }}
-              >
-                Review the recommendations above and take action to improve your AI readiness score.
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <Button
-                onClick={handleRetryDiagnostic}
-                variant="outline"
-                className="px-6 py-2"
-                style={{
-                  borderColor: 'var(--color-maritime-border)',
-                  color: 'var(--color-lighthouse-beam)',
-                }}
-              >
-                Re-scan Website
-              </Button>
-              <Button
-                className="px-6 py-2"
-                style={{
-                  backgroundColor: 'var(--color-navigation-blue)',
-                  color: 'white',
-                }}
-              >
-                {isPro ? 'Get Implementation Guide' : 'Upgrade for Detailed Fixes'}
-              </Button>
-            </div>
-          </div>
-        </Card>
 
         {/* New Diagnostic */}
         <Card className="p-8">
@@ -335,8 +294,8 @@ const DiagnosticsClient: React.FC = () => {
         className="text-lg mb-8"
         style={{ color: 'var(--color-maritime-fog)' }}
       >
-        Analyze any website&apos;s readiness for AI agents and get actionable insights 
-        to improve discoverability.
+        Analyze your website&apos;s AI Readiness according the Lighthouse AI Readiness Index and get actionable insights 
+        to improve discoverability, understanding, actionability and trust. 
       </p>
       
       <Card className="p-8">

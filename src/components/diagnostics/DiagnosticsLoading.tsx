@@ -147,8 +147,8 @@ export const DiagnosticsLoading: React.FC<DiagnosticsLoadingProps> = ({
   const getActivityLabel = () => {
     if (timedOut) return 'Something went wrong';
     if (isCompleting) return 'Wrapping up';
-    if (progress < 30) return 'Processing';
-    if (progress < 85) return 'Finalising';
+    if (progress > 0) return 'Processing';
+    if (progress > 80) return 'Finalising';
     return 'processing';
   };
 

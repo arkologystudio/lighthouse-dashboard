@@ -93,34 +93,40 @@ export const ReportHeading: React.FC<ReportHeadingProps> = ({
         </div>
         
         {/* Site Score Card */}
-        <Card className="bg-white dark:bg-gray-200 p-6 mb-6 max-w-md mx-auto border shadow-sm">
-          <div className="flex items-center justify-center gap-8">
-            <div 
-              className="text-6xl font-bold"
-              style={{ color: getScoreColor(overallScoreOutOf100) }}
-            >
-              {overallScoreOutOf100}%
-            </div>
-            <div className="text-left">
-              <div 
-                className="text-sm"
-                style={{ color: 'var(--color-maritime-fog)' }}
-              >
-                Site Score
+        <Card className="!bg-slate-100 dark:!bg-slate-700 p-8 mb-8 max-w-lg mx-auto border-0 shadow-xl relative overflow-hidden">
+          {/* Maritime accent line */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-blue-500"></div>
+          
+          <div className="relative z-10">
+            <div className="flex items-center justify-center gap-10 mb-6">
+              {/* Score circle */}
+              <div className="w-24 h-24 rounded-full bg-blue-500 flex items-center justify-center shadow-lg">
+                <div className="text-4xl font-bold text-white">
+                  {overallScoreOutOf100}%
+                </div>
               </div>
-              <div 
-                className="text-lg font-semibold"
-                style={{ color: getScoreColor(overallScoreOutOf100) }}
-              >
-                {getScoreLabel(overallScoreOutOf100)}
+              
+              <div className="text-left">
+                <div className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">
+                  Site Score
+                </div>
+                <div 
+                  className="text-xl font-bold"
+                  style={{ color: getScoreColor(overallScoreOutOf100) }}
+                >
+                  {getScoreLabel(overallScoreOutOf100)}
+                </div>
               </div>
             </div>
-          </div>
-          <div 
-            className="text-sm mt-4 break-all text-center"
-            style={{ color: 'var(--color-maritime-fog)' }}
-          >
-            {report.site.url}
+            
+            {/* URL with improved styling */}
+            <div className="text-center">
+              <div className="inline-block px-4 py-2 bg-blue-50 dark:bg-slate-600 rounded-lg border border-slate-200 dark:border-slate-500">
+                <div className="text-sm text-slate-600 dark:text-slate-300 break-all font-mono">
+                  {report.site.url}
+                </div>
+              </div>
+            </div>
           </div>
         </Card>
       </div>
