@@ -208,13 +208,13 @@ export const ReportHeading: React.FC<ReportHeadingProps> = ({
             >
               <div className="mb-3">
                 <div 
-                  className="font-semibold text-sm mb-1"
+                  className="font-semibold text-md mb-1"
                   style={{ color: 'var(--color-lighthouse-beam)' }}
                 >
                   {categoryDisplayNames[categoryKey]}
                 </div>
                 <div 
-                  className="text-xs leading-tight"
+                  className="text-sm leading-tight"
                   style={{ color: 'var(--color-maritime-fog)' }}
                 >
                   {categoryDescriptions[categoryKey]}
