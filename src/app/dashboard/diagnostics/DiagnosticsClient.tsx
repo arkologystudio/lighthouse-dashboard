@@ -260,7 +260,8 @@ const DiagnosticsClient: React.FC = () => {
   // Show results if we have report data
   if (reportData && targetUrl) {
     const isPro = user?.subscription_tier === 'pro';
-    
+    console.log('Has licence: ', isPro);
+
     return (
       <div className="max-w-6xl mx-auto p-6 space-y-8">
         {/* Diagnostic Report - New Structure with Radar Chart */}
