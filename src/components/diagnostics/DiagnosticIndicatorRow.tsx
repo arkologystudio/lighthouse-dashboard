@@ -153,11 +153,7 @@ ${evidence.aiFactors?.opportunities?.length ?
 • Include API documentation references if applicable
 • Specify content update schedules
 • Add contact information for AI-related queries
-• Include usage terms for AI systems
-
-${evidence?.aiFactors?.opportunities?.length ? 
-  `\nBased on your content:\n${evidence.aiFactors.opportunities?.map((opp: string) => `• ${opp}`).join('\n')}` : 
-  ''}`;
+• Include usage terms for AI systems`;
 };
 
 const getSitemapRecommendation = (indicator: SpecIndicator): string => {
@@ -611,39 +607,6 @@ const renderEvidenceField = (field: string, value: unknown) => {
       );
     }
     
-    if (field === 'aiFactors') {
-      const aiFactors = value as NonNullable<StandardEvidence['aiFactors']>;
-      return (
-        <div>
-          <span className="text-sm font-medium text-gray-700 block mb-2">{fieldLabel}</span>
-          <div className="space-y-2">
-            {aiFactors.strengths && aiFactors.strengths.length > 0 && (
-              <div>
-                <div className="text-xs font-medium text-green-700 mb-1">Strengths ({aiFactors.strengths.length})</div>
-                {aiFactors.strengths.slice(0, 3).map((strength: string, index: number) => (
-                  <div key={index} className="flex items-start gap-2 text-sm p-2 rounded bg-green-50 text-green-700">
-                    <span className="mt-0.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-green-400"></span>
-                    <span className="flex-1">{strength}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-            {aiFactors.opportunities && aiFactors.opportunities.length > 0 && (
-              <div>
-                <div className="text-xs font-medium text-blue-700 mb-1">Opportunities ({aiFactors.opportunities.length})</div>
-                {aiFactors.opportunities.slice(0, 3).map((opp: string, index: number) => (
-                  <div key={index} className="flex items-start gap-2 text-sm p-2 rounded bg-blue-50 text-blue-700">
-                    <span className="mt-0.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-blue-400"></span>
-                    <span className="flex-1">{opp}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    }
-    
     if (field === 'metadata') {
       const metadata = value as NonNullable<StandardEvidence['metadata']>;
       return (
@@ -897,6 +860,63 @@ export const DiagnosticIndicatorRow: React.FC<DiagnosticIndicatorRowProps> = ({
           </div>
         )}
 
+        {/* Results & Recommendations Section */}
+        {!isNotApplicable && (
+          <Accordion type="single" className="mt-4">
+            <AccordionItem value="results" className="border border-gray-200 rounded-lg overflow-hidden">
+              <AccordionTrigger value="results" className="px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-t-lg">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">📋</span>
+                  <span>Results & Recommendations</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent value="results" className="px-4 pb-4 bg-white">
+                <div className="space-y-8 mt-4">
+                  {/* AI Readiness Insights */}
+                  {indicator.evidence?.aiFactors && (
+                    <div className="space-y-3">
+                      <div className="text-md font-semibold text-gray-900 mb-3">Lighthouse AI Readiness Insights</div>
+                      {/* Strengths */}
+                      {indicator.evidence.aiFactors.strengths && indicator.evidence.aiFactors.strengths.length > 0 && (
+                        <div className="space-y-2">
+                          <div className="text-xs font-medium text-green-700 mb-2">✅ Strengths ({indicator.evidence.aiFactors.strengths.length})</div>
+                          {indicator.evidence.aiFactors.strengths.map((strength: string, index: number) => (
+                            <div key={index} className="flex items-start gap-2 text-sm p-2 rounded bg-green-50 text-green-700">
+                              <span className="mt-0.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-green-400"></span>
+                              <span className="flex-1">{strength}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* Opportunities */}
+                      {indicator.evidence.aiFactors.opportunities && indicator.evidence.aiFactors.opportunities.length > 0 && (
+                        <div className="space-y-2">
+                          <div className="text-xs font-medium text-blue-700 mb-2">Opportunities ({indicator.evidence.aiFactors.opportunities.length})</div>
+                          {indicator.evidence.aiFactors.opportunities.map((opportunity: string, index: number) => (
+                            <div key={index} className="flex items-start gap-2 text-sm p-2 rounded bg-blue-50 text-blue-700">
+                              <span className="mt-0.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-blue-400"></span>
+                              <span className="flex-1">{opportunity}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Recommendations */}
+                  <div>
+                    <h4 className="text-md font-semibold text-gray-900 mb-3">Recommendations</h4>
+                    <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                      {getIndicatorRecommendation(indicator)}
+                    </div>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        )}
+
         {/* Evidence Details in Accordion */}
         {!isNotApplicable && indicator.evidence && Object.keys(indicator.evidence).length > 0 && (
           <Accordion type="single" className="mt-4">
@@ -907,27 +927,8 @@ export const DiagnosticIndicatorRow: React.FC<DiagnosticIndicatorRowProps> = ({
                   <span>Scan Details</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent value="evidence" className="px-4 pb-4 bg-white">
+              <AccordionContent value="evidence" className="px-4 pb-4 pb-4 bg-white">
                 {renderEvidenceDetails(indicator.evidence)}
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        )}
-
-        {/* Recommendations Section */}
-        {!isNotApplicable && (
-          <Accordion type="single" className="mt-4">
-            <AccordionItem value="recommendations" className="border border-gray-200 rounded-lg overflow-hidden">
-              <AccordionTrigger value="recommendations" className="px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-t-lg">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">💡</span>
-                  <span>Recommendations</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent value="recommendations" className="px-4 pb-4 bg-white">
-                <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
-                  {getIndicatorRecommendation(indicator)}
-                </div>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
