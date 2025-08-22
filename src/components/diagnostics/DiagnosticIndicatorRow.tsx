@@ -1,8 +1,37 @@
 import React from 'react';
-import type { SpecIndicator, SiteProfile } from '../../types';
+import type { SpecIndicator, SiteProfile, StandardEvidence, AgentJsonAnalysisData, ValidationFindings } from '../../types';
 import { Badge } from '../ui/Badge';
 import { Card } from '../ui/Card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/Accordion';
+
+// Component for expandable content preview
+const ExpandableContentPreview: React.FC<{ value: string; fieldLabel: string }> = ({ value, fieldLabel }) => {
+  const truncateLength = 200;
+  const isTruncated = value.length > truncateLength;
+  const [isExpanded, setIsExpanded] = React.useState(false);
+  
+  return (
+    <div>
+      <span className="text-sm font-medium text-gray-700 block mb-2">{fieldLabel}</span>
+      <div className="bg-gray-50 border rounded-lg p-3">
+        <pre className="text-xs text-gray-600 whitespace-pre-wrap font-mono leading-relaxed">
+          {isExpanded || !isTruncated 
+            ? value 
+            : `${value.substring(0, truncateLength)}...`
+          }
+        </pre>
+        {isTruncated && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium"
+          >
+            {isExpanded ? 'Show less' : 'Show more'}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
 
 // Utility function to extract status and message from evidence
 const getIndicatorStatus = (indicator: SpecIndicator): 'pass' | 'warn' | 'fail' | 'not_applicable' => {
@@ -18,8 +47,8 @@ const getIndicatorStatus = (indicator: SpecIndicator): 'pass' | 'warn' | 'fail' 
 };
 
 const getIndicatorMessage = (indicator: SpecIndicator): string  => {
-  if (indicator.evidence && typeof indicator.evidence.aiOptimizationOpportunities === 'string') {
-    return indicator.evidence.aiOptimizationOpportunities;
+  if (indicator.evidence?.aiFactors?.opportunities?.[0]) {
+    return indicator.evidence.aiFactors.opportunities[0];
   } else {
     return indicator.applicability.reason;
   }
@@ -78,7 +107,7 @@ const getLlmsTxtRecommendation = (indicator: SpecIndicator): string => {
   const evidence = indicator.evidence;
   const score = Math.round(indicator.score * 100);
   
-  if (score === 0 || !evidence?.contentFound) {
+  if (score === 0 || !evidence?.found) {
     return `Create an llms.txt file at your site's root directory to help AI agents understand your content and services.
 
 Create the file at: ${new URL('/llms.txt', window.location.origin).href}
@@ -95,19 +124,19 @@ Basic llms.txt template:
 - Update frequency: [how often content changes]
 
 ## API Access
-${evidence?.specificData?.hasApi ? '- API available at: [your-api-endpoint]' : '- No public API available'}
+${(evidence?.analysis as AgentJsonAnalysisData)?.hasApi ? '- API available at: [your-api-endpoint]' : '- No public API available'}
 
 ## Contact
 - Support: [contact information for AI-related queries]`;
   }
   
-  if (evidence?.validationIssues?.length) {
+  if (evidence?.validation?.errors?.length) {
     return `Your llms.txt file has validation issues that need attention:
 
-${evidence.validationIssues.map(issue => `• ${issue}`).join('\n')}
+${evidence.validation.errors?.map((issue: string) => `• ${issue}`).join('\n')}
 
-${evidence.aiOptimizationOpportunities?.length ? 
-  `\nOptimization opportunities:\n${evidence.aiOptimizationOpportunities.map(opp => `• ${opp}`).join('\n')}` : 
+${evidence.aiFactors?.opportunities?.length ? 
+  `\nOptimization opportunities:\n${evidence.aiFactors.opportunities?.map((opp: string) => `• ${opp}`).join('\n')}` : 
   ''}`;
   }
   
@@ -119,8 +148,8 @@ ${evidence.aiOptimizationOpportunities?.length ?
 • Add contact information for AI-related queries
 • Include usage terms for AI systems
 
-${evidence?.aiOptimizationOpportunities?.length ? 
-  `\nBased on your content:\n${evidence.aiOptimizationOpportunities.map(opp => `• ${opp}`).join('\n')}` : 
+${evidence?.aiFactors?.opportunities?.length ? 
+  `\nBased on your content:\n${evidence.aiFactors.opportunities?.map((opp: string) => `• ${opp}`).join('\n')}` : 
   ''}`;
 };
 
@@ -128,7 +157,7 @@ const getSitemapRecommendation = (indicator: SpecIndicator): string => {
   const evidence = indicator.evidence;
   const score = Math.round(indicator.score * 100);
   
-  if (score === 0 || !evidence?.contentFound) {
+  if (score === 0 || !evidence?.found) {
     return `Create an XML sitemap to help AI agents discover and understand your site structure.
 
 Create the file at: ${new URL('/sitemap.xml', window.location.origin).href}
@@ -149,10 +178,10 @@ Don't forget to reference it in your robots.txt:
 Sitemap: ${new URL('/sitemap.xml', window.location.origin).href}`;
   }
   
-  if (evidence?.validationIssues?.length) {
+  if (evidence?.validation?.errors?.length) {
     return `Your sitemap has validation issues:
 
-${evidence.validationIssues.map(issue => `• ${issue}`).join('\n')}
+${evidence.validation.errors?.map((issue: string) => `• ${issue}`).join('\n')}
 
 Common fixes:
 • Ensure all URLs are absolute and valid
@@ -169,8 +198,8 @@ Common fixes:
 • Consider creating sitemap index files for large sites
 • Include all important content pages
 
-${evidence?.aiOptimizationOpportunities?.length ? 
-  `\nAI-specific optimizations:\n${evidence.aiOptimizationOpportunities.map(opp => `• ${opp}`).join('\n')}` : 
+${evidence?.aiFactors?.opportunities?.length ? 
+  `\nAI-specific optimizations:\n${evidence.aiFactors.opportunities?.map((opp: string) => `• ${opp}`).join('\n')}` : 
   ''}`;
 };
 
@@ -178,7 +207,7 @@ const getJsonLdRecommendation = (indicator: SpecIndicator): string => {
   const evidence = indicator.evidence;
   const score = Math.round(indicator.score * 100);
   
-  if (score === 0 || !evidence?.contentFound) {
+  if (score === 0 || !evidence?.found) {
     return `Add JSON-LD structured data to help AI agents understand your content better.
 
 Add to your HTML head section:
@@ -199,10 +228,10 @@ Consider adding specific schema types:
 • FAQ schema for support content`;
   }
   
-  if (evidence?.validationIssues?.length) {
+  if (evidence?.validation?.errors?.length) {
     return `Your JSON-LD structured data has validation issues:
 
-${evidence.validationIssues.map(issue => `• ${issue}`).join('\n')}
+${evidence.validation.errors?.map((issue: string) => `• ${issue}`).join('\n')}
 
 Common fixes:
 • Ensure all required properties are included
@@ -210,8 +239,8 @@ Common fixes:
 • Properly format dates and URLs
 • Validate JSON syntax
 
-${evidence?.missingFields?.length ? 
-  `\nMissing recommended fields:\n${evidence.missingFields.map(field => `• ${field}`).join('\n')}` : 
+${evidence.validation?.missing?.length ? 
+  `\nMissing recommended fields:\n${evidence.validation?.missing?.map((field: string) => `• ${field}`).join('\n')}` : 
   ''}`;
   }
   
@@ -222,8 +251,8 @@ ${evidence?.missingFields?.length ?
 • Event schema for upcoming activities
 • LocalBusiness schema if applicable
 
-${evidence?.aiOptimizationOpportunities?.length ? 
-  `\nAI-specific enhancements:\n${evidence.aiOptimizationOpportunities.map(opp => `• ${opp}`).join('\n')}` : 
+${evidence?.aiFactors?.opportunities?.length ? 
+  `\nAI-specific enhancements:\n${evidence.aiFactors.opportunities?.map((opp: string) => `• ${opp}`).join('\n')}` : 
   ''}`;
 };
 
@@ -243,8 +272,8 @@ Best practices:
 • Point to the primary version of duplicate content
 • Self-reference for unique pages
 
-${evidence?.validationIssues?.length ? 
-  `\nCurrent issues to fix:\n${evidence.validationIssues.map(issue => `• ${issue}`).join('\n')}` : 
+${evidence?.validation?.errors?.length ? 
+  `\nCurrent issues to fix:\n${evidence.validation.errors?.map((issue: string) => `• ${issue}`).join('\n')}` : 
   ''}`;
   }
   
@@ -255,8 +284,8 @@ ${evidence?.validationIssues?.length ?
 • Use canonical URLs in sitemaps
 • Monitor for canonical chain issues
 
-${evidence?.aiOptimizationOpportunities?.length ? 
-  `\nAI-specific improvements:\n${evidence.aiOptimizationOpportunities.map(opp => `• ${opp}`).join('\n')}` : 
+${evidence?.aiFactors?.opportunities?.length ? 
+  `\nAI-specific improvements:\n${evidence.aiFactors.opportunities?.map((opp: string) => `• ${opp}`).join('\n')}` : 
   ''}`;
 };
 
@@ -273,12 +302,12 @@ Essential elements to add/improve:
 • Header structure: Proper H1, H2, H3 hierarchy
 • Alt text: Descriptive text for all images
 
-${evidence?.missingFields?.length ? 
-  `\nMissing elements detected:\n${evidence.missingFields.map(field => `• ${field}`).join('\n')}` : 
+${evidence?.validation?.missing?.length ? 
+  `\nMissing elements detected:\n${evidence.validation?.missing?.map((field: string) => `• ${field}`).join('\n')}` : 
   ''}
 
-${evidence?.validationIssues?.length ? 
-  `\nIssues to fix:\n${evidence.validationIssues.map(issue => `• ${issue}`).join('\n')}` : 
+${evidence?.validation?.errors?.length ? 
+  `\nIssues to fix:\n${evidence.validation.errors?.map((issue: string) => `• ${issue}`).join('\n')}` : 
   ''}`;
   }
   
@@ -289,8 +318,8 @@ ${evidence?.validationIssues?.length ?
 • Improve header hierarchy for better content structure
 • Add descriptive alt text that explains image context
 
-${evidence?.aiOptimizationOpportunities?.length ? 
-  `\nAI-specific optimizations:\n${evidence.aiOptimizationOpportunities.map(opp => `• ${opp}`).join('\n')}` : 
+${evidence?.aiFactors?.opportunities?.length ? 
+  `\nAI-specific optimizations:\n${evidence.aiFactors.opportunities?.map((opp: string) => `• ${opp}`).join('\n')}` : 
   ''}`;
 };
 
@@ -298,7 +327,7 @@ const getMcpRecommendation = (indicator: SpecIndicator): string => {
   const evidence = indicator.evidence;
   const score = Math.round(indicator.score * 100);
   
-  if (score === 0 || !evidence?.contentFound) {
+  if (score === 0 || !evidence?.found) {
     return `Consider implementing Model Context Protocol (MCP) for direct AI agent integration.
 
 MCP enables AI agents to:
@@ -325,8 +354,8 @@ Note: MCP is an advanced feature most suitable for SaaS applications and service
 • Add usage examples and documentation
 • Monitor agent usage patterns
 
-${evidence?.aiOptimizationOpportunities?.length ? 
-  `\nOptimization opportunities:\n${evidence.aiOptimizationOpportunities.map(opp => `• ${opp}`).join('\n')}` : 
+${evidence?.aiFactors?.opportunities?.length ? 
+  `\nOptimization opportunities:\n${evidence.aiFactors.opportunities?.map((opp: string) => `• ${opp}`).join('\n')}` : 
   ''}`;
 };
 
@@ -334,7 +363,7 @@ const getAgentJsonRecommendation = (indicator: SpecIndicator): string => {
   const evidence = indicator.evidence;
   const score = Math.round(indicator.score * 100);
   
-  if (score === 0 || !evidence?.contentFound) {
+  if (score === 0 || !evidence?.found) {
     return `Create an agent.json configuration file to define how AI agents should interact with your site.
 
 Create the file at: ${new URL('/agent.json', window.location.origin).href}
@@ -359,10 +388,10 @@ Basic agent.json template:
 }`;
   }
   
-  if (evidence?.validationIssues?.length) {
+  if (evidence?.validation?.errors?.length) {
     return `Your agent.json file has validation issues:
 
-${evidence.validationIssues.map(issue => `• ${issue}`).join('\n')}
+${evidence.validation.errors?.map((issue: string) => `• ${issue}`).join('\n')}
 
 Common fixes:
 • Ensure valid JSON syntax
@@ -379,8 +408,8 @@ Common fixes:
 • Usage examples and documentation
 • Contact information for agent developers
 
-${evidence?.aiOptimizationOpportunities?.length ? 
-  `\nEnhancement suggestions:\n${evidence.aiOptimizationOpportunities.map(opp => `• ${opp}`).join('\n')}` : 
+${evidence?.aiFactors?.opportunities?.length ? 
+  `\nEnhancement suggestions:\n${evidence.aiFactors.opportunities?.map((opp: string) => `• ${opp}`).join('\n')}` : 
   ''}`;
 };
 
@@ -407,35 +436,31 @@ const getIndicatorRecommendation = (indicator: SpecIndicator): string => {
       return getAgentJsonRecommendation(indicator);
     default:
       // Fallback for any other indicators
-      return `Review this indicator to improve your site's AI readiness. ${indicator.evidence?.aiOptimizationOpportunities?.length ? 
-        `\n\nSuggested improvements:\n${indicator.evidence.aiOptimizationOpportunities.map(opp => `• ${opp}`).join('\n')}` : 
+      return `Review this indicator to improve your site's AI readiness. ${indicator.evidence?.aiFactors?.opportunities?.length ? 
+        `\n\nSuggested improvements:\n${indicator.evidence.aiFactors?.opportunities?.map((opp: string) => `• ${opp}`).join('\n')}` : 
         ''}`;
   }
 };
 
 // Helper function to render evidence details in a compact, modern format
-const renderEvidenceDetails = (evidence: any) => {
+const renderEvidenceDetails = (evidence: StandardEvidence) => {
   const relevantFields = [
     'statusCode',
-    'contentFound', 
+    'found', 
     'contentPreview',
-    'validationScore',
-    'validationIssues',
-    'warnings',
-    'missingFields',
-    'specificData',
-    'aiReadinessFactors',
-    'aiOptimizationOpportunities',
-    'checkedUrl',
-    'responseTime',
-    'error'
+    'score',
+    'validation',
+    'analysis',
+    'aiFactors',
+    'metadata'
   ];
 
-  const availableFields = relevantFields.filter(field => 
-    evidence[field] !== undefined && evidence[field] !== null && 
-    !(Array.isArray(evidence[field]) && evidence[field].length === 0) &&
-    !(typeof evidence[field] === 'object' && Object.keys(evidence[field]).length === 0)
-  );
+  const availableFields = relevantFields.filter(field => {
+    const value = evidence[field as keyof StandardEvidence];
+    return value !== undefined && value !== null && 
+      !(Array.isArray(value) && value.length === 0) &&
+      !(typeof value === 'object' && value !== null && Object.keys(value).length === 0);
+  });
 
   if (availableFields.length === 0) {
     return (
@@ -448,7 +473,7 @@ const renderEvidenceDetails = (evidence: any) => {
   return (
     <div className="space-y-4">
       {availableFields.map(field => {
-        const value = evidence[field];
+        const value = evidence[field as keyof StandardEvidence];
         return (
           <div key={field} className="group">
             {renderEvidenceField(field, value)}
@@ -460,22 +485,17 @@ const renderEvidenceDetails = (evidence: any) => {
 };
 
 // Helper function to render individual evidence fields with appropriate styling
-const renderEvidenceField = (field: string, value: any) => {
+const renderEvidenceField = (field: string, value: unknown) => {
   const getFieldLabel = (field: string): string => {
     const labels: Record<string, string> = {
       statusCode: 'Status Code',
-      contentFound: 'Content Found',
+      found: 'Content Found',
       contentPreview: 'Content Preview',
-      validationScore: 'Validation Score',
-      validationIssues: 'Validation Issues',
-      warnings: 'Warnings', 
-      missingFields: 'Missing Fields',
-      specificData: 'Technical Details',
-      aiReadinessFactors: 'AI Readiness Factors',
-      aiOptimizationOpportunities: 'AI Optimization Opportunities',
-      checkedUrl: 'Checked URL',
-      responseTime: 'Response Time',
-      error: 'Error'
+      score: 'Validation Score',
+      validation: 'Validation Results',
+      analysis: 'Technical Details',
+      aiFactors: 'AI Readiness Insights',
+      metadata: 'Scan Metadata'
     };
     return labels[field] || field;
   };
@@ -483,7 +503,7 @@ const renderEvidenceField = (field: string, value: any) => {
   const fieldLabel = getFieldLabel(field);
 
   // Status Code - show with colored badge
-  if (field === 'statusCode') {
+  if (field === 'statusCode' && typeof value === 'number') {
     const statusColor = value >= 200 && value < 300 ? 'text-green-700 bg-green-100' : 
                        value >= 300 && value < 400 ? 'text-yellow-700 bg-yellow-100' :
                        'text-red-700 bg-red-100';
@@ -498,7 +518,7 @@ const renderEvidenceField = (field: string, value: any) => {
   }
 
   // Boolean values - show with colored indicators
-  if (field === 'contentFound' && typeof value === 'boolean') {
+  if (field === 'found' && typeof value === 'boolean') {
     return (
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-gray-700">{fieldLabel}</span>
@@ -511,7 +531,7 @@ const renderEvidenceField = (field: string, value: any) => {
   }
 
   // Validation Score - show with progress-like styling
-  if (field === 'validationScore' && typeof value === 'number') {
+  if (field === 'score' && typeof value === 'number') {
     const scoreColor = value >= 80 ? 'text-green-700' : value >= 50 ? 'text-yellow-700' : 'text-red-700';
     return (
       <div className="flex items-center justify-between">
@@ -539,11 +559,126 @@ const renderEvidenceField = (field: string, value: any) => {
     );
   }
 
-  // Arrays (issues, warnings, factors, etc.)
-  if (Array.isArray(value) && value.length > 0) {
-    const isErrorType = field === 'validationIssues' || field === 'warnings';
-    const isPositiveType = field === 'aiReadinessFactors';
+  // Handle nested objects like validation, aiFactors
+  if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+    if (field === 'validation') {
+      const validation = value as ValidationFindings;
+      return (
+        <div>
+          {/* <span className="text-sm font-medium text-gray-700 block mb-2">{fieldLabel}</span> */}
+          <div className="space-y-2">
+            {validation.errors && validation.errors.length > 0 && (
+              <div>
+                <div className="text-xs font-medium text-red-700 mb-1">Errors ({validation.errors.length})</div>
+                {validation.errors.slice(0, 3).map((error: string, index: number) => (
+                  <div key={index} className="flex items-start gap-2 text-sm p-2 rounded bg-red-50 text-red-700">
+                    <span className="mt-0.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-red-400"></span>
+                    <span className="flex-1">{error}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {validation.warnings && validation.warnings.length > 0 && (
+              <div>
+                <div className="text-xs font-medium text-yellow-700 mb-1">Warnings ({validation.warnings.length})</div>
+                {validation.warnings.slice(0, 3).map((warning: string, index: number) => (
+                  <div key={index} className="flex items-start gap-2 text-sm p-2 rounded bg-yellow-50 text-yellow-700">
+                    <span className="mt-0.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-yellow-400"></span>
+                    <span className="flex-1">{warning}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {validation.missing && validation.missing.length > 0 && (
+              <div>
+                <div className="text-xs font-medium text-blue-700 mb-1">Missing ({validation.missing.length})</div>
+                {validation.missing.slice(0, 3).map((missing: string, index: number) => (
+                  <div key={index} className="flex items-start gap-2 text-sm p-2 rounded bg-blue-50 text-blue-700">
+                    <span className="mt-0.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-blue-400"></span>
+                    <span className="flex-1">{missing}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
     
+    if (field === 'aiFactors') {
+      const aiFactors = value as NonNullable<StandardEvidence['aiFactors']>;
+      return (
+        <div>
+          <span className="text-sm font-medium text-gray-700 block mb-2">{fieldLabel}</span>
+          <div className="space-y-2">
+            {aiFactors.strengths && aiFactors.strengths.length > 0 && (
+              <div>
+                <div className="text-xs font-medium text-green-700 mb-1">Strengths ({aiFactors.strengths.length})</div>
+                {aiFactors.strengths.slice(0, 3).map((strength: string, index: number) => (
+                  <div key={index} className="flex items-start gap-2 text-sm p-2 rounded bg-green-50 text-green-700">
+                    <span className="mt-0.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-green-400"></span>
+                    <span className="flex-1">{strength}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {aiFactors.opportunities && aiFactors.opportunities.length > 0 && (
+              <div>
+                <div className="text-xs font-medium text-blue-700 mb-1">Opportunities ({aiFactors.opportunities.length})</div>
+                {aiFactors.opportunities.slice(0, 3).map((opp: string, index: number) => (
+                  <div key={index} className="flex items-start gap-2 text-sm p-2 rounded bg-blue-50 text-blue-700">
+                    <span className="mt-0.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-blue-400"></span>
+                    <span className="flex-1">{opp}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+    
+    if (field === 'metadata') {
+      const metadata = value as NonNullable<StandardEvidence['metadata']>;
+      return (
+        <div>
+          <span className="text-sm font-medium text-gray-700 block mb-2">{fieldLabel}</span>
+          <div className="space-y-1">
+            {metadata.checkedUrl && (
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-600">Checked URL</span>
+                <a href={metadata.checkedUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline break-all max-w-xs text-right">{metadata.checkedUrl}</a>
+              </div>
+            )}
+            {metadata.responseTime && (
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-600">Response Time</span>
+                <span className="text-xs font-mono">{metadata.responseTime < 1000 ? `${metadata.responseTime}ms` : `${(metadata.responseTime / 1000).toFixed(2)}s`}</span>
+              </div>
+            )}
+            {metadata.error && (
+              <div className="text-xs text-red-600 bg-red-50 p-2 rounded">{metadata.error}</div>
+            )}
+          </div>
+        </div>
+      );
+    }
+    
+    // Default object rendering
+    return (
+      <div>
+        <span className="text-sm font-medium text-gray-700 block mb-2">{fieldLabel}</span>
+        <div className="bg-gray-50 border rounded-lg p-3">
+          <pre className="text-xs text-gray-600 font-mono leading-relaxed overflow-x-auto">
+            {JSON.stringify(value, null, 2)}
+          </pre>
+        </div>
+      </div>
+    );
+  }
+  
+  // Arrays (for top-level arrays) 
+  if (Array.isArray(value) && value.length > 0) {
     return (
       <div>
         <div className="flex items-center gap-2 mb-2">
@@ -556,18 +691,10 @@ const renderEvidenceField = (field: string, value: any) => {
           {value.slice(0, 5).map((item: string, index: number) => (
             <div 
               key={index}
-              className={`flex items-start gap-2 text-sm p-2 rounded ${
-                isErrorType ? 'bg-red-50 text-red-700' :
-                isPositiveType ? 'bg-green-50 text-green-700' :
-                'bg-blue-50 text-blue-700'
-              }`}
+              className="flex items-start gap-2 text-sm p-2 rounded bg-blue-50 text-blue-700"
             >
-              <span className={`mt-0.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                isErrorType ? 'bg-red-400' :
-                isPositiveType ? 'bg-green-400' :
-                'bg-blue-400'
-              }`}></span>
-              <span className="flex-1">{item}</span>
+              <span className="mt-0.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-blue-400"></span>
+              <span className="flex-1">{String(item)}</span>
             </div>
           ))}
           {value.length > 5 && (
@@ -580,78 +707,11 @@ const renderEvidenceField = (field: string, value: any) => {
     );
   }
 
-  // URLs - show with link styling
-  if (field === 'checkedUrl' && typeof value === 'string') {
-    return (
-      <div>
-        <span className="text-sm font-medium text-gray-700 block mb-1">{fieldLabel}</span>
-        <a 
-          href={value}
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 hover:underline break-all"
-        >
-          <span>{value}</span>
-          <span className="text-xs">↗</span>
-        </a>
-      </div>
-    );
-  }
-
   // Content Preview - show truncated with expand option
   if (field === 'contentPreview' && typeof value === 'string') {
-    const truncateLength = 200;
-    const isTruncated = value.length > truncateLength;
-    const [isExpanded, setIsExpanded] = React.useState(false);
-    
-    return (
-      <div>
-        <span className="text-sm font-medium text-gray-700 block mb-2">{fieldLabel}</span>
-        <div className="bg-gray-50 border rounded-lg p-3">
-          <pre className="text-xs text-gray-600 whitespace-pre-wrap font-mono leading-relaxed">
-            {isExpanded || !isTruncated 
-              ? value 
-              : value.substring(0, truncateLength) + '...'
-            }
-          </pre>
-          {isTruncated && (
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium"
-            >
-              {isExpanded ? 'Show less' : 'Show more'}
-            </button>
-          )}
-        </div>
-      </div>
-    );
+    return <ExpandableContentPreview value={value} fieldLabel={fieldLabel} />;
   }
 
-  // Error messages - show with error styling
-  if (field === 'error' && typeof value === 'string') {
-    return (
-      <div>
-        <span className="text-sm font-medium text-gray-700 block mb-1">{fieldLabel}</span>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-          <span className="text-sm text-red-700">{value}</span>
-        </div>
-      </div>
-    );
-  }
-
-  // Objects (specificData) - show formatted JSON
-  if (typeof value === 'object' && value !== null) {
-    return (
-      <div>
-        <span className="text-sm font-medium text-gray-700 block mb-2">{fieldLabel}</span>
-        <div className="bg-gray-50 border rounded-lg p-3">
-          <pre className="text-xs text-gray-600 font-mono leading-relaxed overflow-x-auto">
-            {JSON.stringify(value, null, 2)}
-          </pre>
-        </div>
-      </div>
-    );
-  }
 
   // Default case for strings and other types
   return (

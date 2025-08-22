@@ -295,7 +295,7 @@ export const DiagnosticsLoading: React.FC<DiagnosticsLoadingProps> = ({
           className="text-sm mb-4"
           style={{ color: 'var(--color-maritime-fog)' }}
         >
-          We&apos;re analyzing your website against the latest AI readiness standards.
+          We&apos;re analyzing your website against the Lighthouse AI Readiness Index, the standard for AI readiness.
         </p>
       </div>
     </div>

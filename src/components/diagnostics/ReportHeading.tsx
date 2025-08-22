@@ -133,7 +133,7 @@ export const ReportHeading: React.FC<ReportHeadingProps> = ({
           <ChartTooltip 
             cursor={false} 
             content={<ChartTooltipContent 
-              formatter={(value, name) => [
+              formatter={(value) => [
                 `${value}%`
               ]}
             />} 

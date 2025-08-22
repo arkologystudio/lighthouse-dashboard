@@ -565,6 +565,13 @@ export const diagnosticsApi = {
       
       if (isAnonymous) {
         // Anonymous scan using /api/v1/diagnostics/scan-url
+        if (!request.url) {
+          return {
+            success: false,
+            error: { message: 'URL is required for anonymous scans' }
+          };
+        }
+        
         const url = `${API_BASE_URL}${ENDPOINTS.DIAGNOSTICS.SCAN_URL}`;
         const requestBody: { url: string; site_category?: string } = { url: request.url };
         
@@ -582,6 +589,13 @@ export const diagnosticsApi = {
         });
       } else {
         // Authenticated scan using /api/v1/diagnostics/scan
+        if (!request.siteId) {
+          return {
+            success: false,
+            error: { message: 'Site ID is required for authenticated scans' }
+          };
+        }
+        
         const requestBody: { siteId: string; options?: object } = { siteId: request.siteId };
         
         // Add options if provided (including site_category)

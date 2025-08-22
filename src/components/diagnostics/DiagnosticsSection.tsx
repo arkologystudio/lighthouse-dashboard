@@ -55,11 +55,11 @@ const DiagnosticsSection: React.FC = () => (
             className="text-lg max-w-3xl mx-auto leading-relaxed mb-12"
             style={{ color: 'var(--color-maritime-fog)' }}
           >
-            Dermine your site's AI Readiness by running our free diagnostics scan. 
-            We'll audit your site based on the Lighthouse AI Readiness Index, 
+            Dermine your site&apos;s AI Readiness by running our free diagnostics scan. 
+            We&apos;ll audit your site based on the Lighthouse AI Readiness Index, 
             identifying key indicators that make discoverable, understandable, and trusted 
             by AI Agents and services. Receive actionable insights and recommendations to  
-            improve your site's AI Readiness.
+            improve your site&apos;s AI Readiness.
           </p>
         </div>
 

@@ -6,13 +6,12 @@ import { Card } from '../ui/Card';
 
 // Utility function to extract status from evidence
 const getIndicatorStatus = (indicator: SpecIndicator): 'pass' | 'warn' | 'fail' | 'not_applicable' => {
-  if (indicator.evidence && typeof indicator.evidence.status === 'string') {
-    return indicator.evidence.status as 'pass' | 'warn' | 'fail' | 'not_applicable';
-  }
-  // Fallback logic based on applicability and score
+  // Check applicability first - if not applicable, always return not_applicable
   if (indicator.applicability.status === 'not_applicable') {
     return 'not_applicable';
   }
+  
+  // Fallback logic based on score
   if (indicator.score >= 0.8) return 'pass';
   if (indicator.score >= 0.5) return 'warn';
   return 'fail';

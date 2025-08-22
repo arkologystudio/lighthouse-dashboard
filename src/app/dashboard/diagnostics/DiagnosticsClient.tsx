@@ -11,7 +11,7 @@ import { useAuth } from '../../../lib/hooks/useAuth';
 import { diagnosticsApi } from '../../../lib/api';
 import { matchResult } from '../../../lib/api';
 import toast from 'react-hot-toast';
-import type { LighthouseAIReport, AIReadinessScanRequest, SiteCategory } from '../../../types';
+import type { LighthouseAIReport, AIReadinessScanRequest, SiteProfile } from '../../../types';
 
 
 const DiagnosticsClient: React.FC = () => {
@@ -47,7 +47,7 @@ const DiagnosticsClient: React.FC = () => {
 
   const runDiagnostics = async (url: string, siteCategoryParam?: string | null) => {
     try {
-      console.log('Starting diagnostics scan for:', url);
+      // Starting diagnostics scan
       setIsRunningDiagnostics(true);
       setError(null);
       setShouldCompleteSteps(false);
@@ -58,7 +58,7 @@ const DiagnosticsClient: React.FC = () => {
       // Add site_category to options if provided
       if (siteCategoryParam) {
         scanRequest.options = {
-          site_category: siteCategoryParam as unknown as SiteCategory
+          site_category: siteCategoryParam as SiteProfile
         };
       }
       
@@ -70,11 +70,11 @@ const DiagnosticsClient: React.FC = () => {
         success: (aiReport: LighthouseAIReport) => {
           // Only process if this is still the current URL
           if (scanInitiatedRef.current !== url) {
-            console.log('Ignoring result for outdated scan:', url);
+            // Ignoring result for outdated scan
             return;
           }
           
-          console.log('Scan successful, received report:', aiReport);
+          // Scan successful, processing report
           
           // Validate the report structure
           if (!aiReport.site || !aiReport.categories || !aiReport.overall) {
@@ -101,7 +101,7 @@ const DiagnosticsClient: React.FC = () => {
         error: (apiError) => {
           // Only process errors if this is still the current URL
           if (scanInitiatedRef.current !== url) {
-            console.log('Ignoring error for outdated scan:', url);
+            // Ignoring error for outdated scan
             return;
           }
           
@@ -128,7 +128,7 @@ const DiagnosticsClient: React.FC = () => {
     } catch (unexpectedError) {
       // Only process errors if this is still the current URL
       if (scanInitiatedRef.current !== url) {
-        console.log('Ignoring unexpected error for outdated scan:', url);
+        // Ignoring unexpected error for outdated scan
         return;
       }
       
