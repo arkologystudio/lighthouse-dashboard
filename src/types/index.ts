@@ -268,10 +268,10 @@ export interface License {
   license_key: string;
   license_type:
     | 'trial'
+    | 'free'
     | 'standard'
-    | 'standard_plus'
+    | 'pro'
     | 'premium'
-    | 'premium_plus'
     | 'enterprise';
   status: 'active' | 'expired' | 'revoked' | 'suspended';
   is_active: boolean;
@@ -355,10 +355,10 @@ export interface SimulatePurchaseRequest {
   product_slug: string;
   license_type?:
     | 'trial'
+    | 'free'
     | 'standard'
-    | 'standard_plus'
+    | 'pro'
     | 'premium'
-    | 'premium_plus'
     | 'enterprise';
   billing_period?: 'monthly' | 'annual';
   additional_sites?: number;
@@ -430,9 +430,8 @@ export interface PricingTier {
 export interface PricingCalculationRequest {
   license_type:
     | 'standard'
-    | 'standard_plus'
+    | 'pro'
     | 'premium'
-    | 'premium_plus'
     | 'enterprise';
   billing_period?: 'monthly' | 'annual';
   additional_sites?: number;
@@ -481,10 +480,10 @@ export interface PricingCalculationResponse {
 // License type definitions
 export type LicenseType =
   | 'trial'
+  | 'free'
   | 'standard'
-  | 'standard_plus'
+  | 'pro'
   | 'premium'
-  | 'premium_plus'
   | 'enterprise';
 export type BillingPeriod = 'monthly' | 'annual';
 export type LicenseStatus = 'active' | 'expired' | 'revoked' | 'suspended';

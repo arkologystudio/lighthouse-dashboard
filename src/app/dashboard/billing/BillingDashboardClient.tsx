@@ -17,7 +17,7 @@ const BillingDashboardClient: React.FC = () => {
 
   const [selectedProduct, setSelectedProduct] = useState<string>('');
   const [selectedLicenseType, setSelectedLicenseType] = useState<
-    'trial' | 'standard' | 'standard_plus' | 'premium' | 'premium_plus' | 'enterprise'
+    'trial' | 'free' | 'standard' | 'pro' | 'premium' | 'enterprise'
   >('standard');
   const [selectedBillingPeriod, setSelectedBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -259,14 +259,14 @@ const BillingDashboardClient: React.FC = () => {
                 </label>
                 <select
                   value={selectedLicenseType}
-                  onChange={(e) => setSelectedLicenseType(e.target.value as 'trial' | 'standard' | 'standard_plus' | 'premium' | 'premium_plus' | 'enterprise')}
+                  onChange={(e) => setSelectedLicenseType(e.target.value as 'trial' | 'free' | 'standard' | 'pro' | 'premium' | 'enterprise')}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="trial">Trial (Free)</option>
+                  <option value="free">Free ({getLicenseTypePrice('free', selectedBillingPeriod)})</option>
                   <option value="standard">Standard ({getLicenseTypePrice('standard', selectedBillingPeriod)})</option>
-                  <option value="standard_plus">Standard+ ({getLicenseTypePrice('standard_plus', selectedBillingPeriod)})</option>
+                  <option value="pro">Pro ({getLicenseTypePrice('pro', selectedBillingPeriod)})</option>
                   <option value="premium">Premium ({getLicenseTypePrice('premium', selectedBillingPeriod)})</option>
-                  <option value="premium_plus">Premium+ ({getLicenseTypePrice('premium_plus', selectedBillingPeriod)})</option>
                   <option value="enterprise">Enterprise ({getLicenseTypePrice('enterprise', selectedBillingPeriod)})</option>
                 </select>
               </div>

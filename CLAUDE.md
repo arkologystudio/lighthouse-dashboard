@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 ```bash
-# Development server (runs on port 3333)
+# Development server (runs on port 4444)
 npm run dev
 
 # Production build and start

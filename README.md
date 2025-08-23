@@ -49,7 +49,7 @@ A modern dashboard for managing WordPress plugins and AI-powered features. Built
    ```
 
 5. **Open your browser**
-   Visit [http://localhost:3000](http://localhost:3000)
+   Visit [http://localhost:4444](http://localhost:4444)
 
 ## Environment Variables
 
