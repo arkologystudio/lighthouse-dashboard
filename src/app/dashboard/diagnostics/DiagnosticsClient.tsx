@@ -7,7 +7,6 @@ import { DiagnosticsUrlInput } from '../../../components/diagnostics/Diagnostics
 import { DiagnosticsReport } from '../../../components/diagnostics/DiagnosticsReport';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
-import { useAuth } from '../../../lib/hooks/useAuth';
 import { diagnosticsApi } from '../../../lib/api';
 import { matchResult } from '../../../lib/api';
 import toast from 'react-hot-toast';
@@ -18,7 +17,6 @@ const DiagnosticsClient: React.FC = () => {
   const searchParams = useSearchParams();
   const urlParam = searchParams.get('url');
   const siteCategoryParam = searchParams.get('site_category');
-  const { user } = useAuth();
   
   const [targetUrl, setTargetUrl] = useState<string | null>(urlParam);
   const [siteCategory] = useState<string | null>(siteCategoryParam);
@@ -259,9 +257,7 @@ const DiagnosticsClient: React.FC = () => {
 
   // Show results if we have report data
   if (reportData && targetUrl) {
-    const isPro = user?.subscription_tier === 'pro';
-    console.log('Has licence: ', isPro);
-
+    
     return (
       <div className="max-w-6xl mx-auto p-6 space-y-8">
         {/* Diagnostic Report - New Structure with Radar Chart */}
