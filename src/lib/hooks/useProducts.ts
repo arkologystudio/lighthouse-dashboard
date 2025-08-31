@@ -139,13 +139,7 @@ export const useProducts = (initialProducts?: EcosystemProduct[]): UseProductsRe
         products: EcosystemProduct[];
       }>(
         '/ecosystem/products',
-        {
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            Pragma: 'no-cache',
-            Expires: '0',
-          },
-        },
+        {},
         forceLogout
       );
 

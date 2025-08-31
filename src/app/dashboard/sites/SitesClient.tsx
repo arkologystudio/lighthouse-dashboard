@@ -5,7 +5,6 @@ import { useSites } from '../../../lib/hooks/useSites';
 import { validateData, createSiteSchema } from '../../../lib/validators';
 import { PRODUCTS } from '../../../lib/constants';
 import { Card, CardHeader, CardContent } from '../../../components/ui/Card';
-import { Button } from '../../../components/ui/Button';
 import { TextField } from '../../../components/forms/TextField';
 import type { CreateSiteRequest, Site } from '../../../types';
 import SiteCredentialsModal from './SiteCredentialsModal';
@@ -145,7 +144,7 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
             Manage your websites and their Lighthouse plugins.
           </p>
         </div>
-        <Button onClick={() => setIsAddModalOpen(true)}>Add Site</Button>
+        <button className="lh-btn lh-btn-primary" onClick={() => setIsAddModalOpen(true)}>Add Site</button>
       </div>
 
       {/* Sites table */}
@@ -154,9 +153,9 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
           <CardHeader>
             <div className="lh-flex-between">
               <h3 className="lh-title-small">Your Sites ({sites.length})</h3>
-              <Button variant="ghost" size="sm" onClick={refreshSites}>
+              <button className="lh-btn lh-btn-ghost lh-btn-sm" onClick={refreshSites}>
                 <svg
-                  className="lh-icon-sm mr-2"
+                  className="lh-icon-sm"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -169,7 +168,7 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
                   />
                 </svg>
                 Refresh
-              </Button>
+              </button>
             </div>
           </CardHeader>
 
@@ -194,9 +193,9 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
                   Get started by adding your first website.
                 </p>
                 <div className="mt-6">
-                  <Button onClick={() => setIsAddModalOpen(true)}>
+                  <button className="lh-btn lh-btn-primary" onClick={() => setIsAddModalOpen(true)}>
                     Add Your First Site
-                  </Button>
+                  </button>
                 </div>
               </div>
             ) : (
@@ -237,7 +236,7 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
                             {PRODUCTS.map(product => (
                               <span
                                 key={product.id}
-                                className="lh-badge lh-badge-gray"
+                                className="lh-product-badge lh-product-badge-inactive"
                               >
                                 {product.name}
                               </span>
@@ -249,23 +248,20 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
                         </td>
                         <td className="lh-table-cell text-right text-sm font-medium">
                           <div className="flex items-center space-x-2">
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
+                            <button 
+                              className="lh-btn lh-btn-ghost lh-btn-sm"
                               onClick={() => setProductsModal({ isOpen: true, site })}
                             >
                               Products
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
+                            </button>
+                            <button 
+                              className="lh-btn lh-btn-ghost lh-btn-sm"
                               onClick={() => setCredentialsModal({ isOpen: true, site })}
                             >
                               Credentials
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
+                            </button>
+                            <button
+                              className="lh-btn lh-btn-ghost lh-btn-sm"
                               onClick={() => handleDelete(site.id)}
                               disabled={deletingId === site.id}
                               style={{ color: 'var(--color-text-error)' }}
@@ -273,7 +269,7 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
                               {deletingId === site.id
                                 ? 'Deleting...'
                                 : 'Delete'}
-                            </Button>
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -331,20 +327,20 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
               </div>
 
               <div className="lh-form-actions">
-                <Button
+                <button
                   type="button"
-                  variant="ghost"
+                  className="lh-btn lh-btn-ghost"
                   onClick={() => setIsAddModalOpen(false)}
                 >
                   Cancel
-                </Button>
-                <Button
+                </button>
+                <button
                   type="submit"
-                  isLoading={isSubmitting}
+                  className="lh-btn lh-btn-primary"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? 'Adding Site...' : 'Add Site'}
-                </Button>
+                </button>
               </div>
             </form>
           </Modal>

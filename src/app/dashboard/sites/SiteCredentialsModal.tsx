@@ -4,9 +4,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useSites } from '../../../lib/hooks/useSites';
 import { useLicenses } from '../../../lib/hooks/useLicenses';
 import { Modal } from '../../../components/ui/Modal';
-import { Button } from '../../../components/ui/Button';
-import { Card, CardHeader, CardContent } from '../../../components/ui/Card';
 import { Site } from '../../../types';
+import { API_BASE_URL } from '../../../lib/constants';
+import Cookies from 'js-cookie';
 
 interface SiteCredentialsModalProps {
   site: Site;
@@ -46,75 +46,103 @@ const SiteCredentialsModal: React.FC<SiteCredentialsModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { getSiteCredentials } = useSites();
+  const { getSiteCredentials, deleteApiKey } = useSites();
   const { assignLicense, licenses } = useLicenses();
   const [credentialsData, setCredentialsData] =
     useState<CredentialsData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [newApiKey, setNewApiKey] = useState<string | null>(null);
 
-  const loadCredentials = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+  const loadCredentials = useCallback(
+    async (preserveNewKey = false) => {
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const result = await getSiteCredentials(site.id);
-
-      if (result.success && result.data) {
-        // Enhance the backend data with client-side license assignment data
-        const assignedLicense = licenses.find(
-          license =>
-            license.status === 'active' &&
-            license.metadata?.assigned_site_id === site.id
-        );
-
-        const enhancedData = {
-          ...result.data,
-          credentials: {
-            ...result.data.credentials,
-            license: assignedLicense
-              ? {
-                  id: assignedLicense.id,
-                  license_key: assignedLicense.license_key,
-                  license_type: assignedLicense.license_type,
-                  max_queries: assignedLicense.max_queries ?? null,
-                  query_count: assignedLicense.query_count,
-                  assigned_at: (assignedLicense.metadata?.assigned_at ||
-                    assignedLicense.updated_at) as string,
-                }
-              : result.data.credentials.license,
-          },
-        };
-
-        // Update setup status based on actual assigned license
-        enhancedData.setup_complete = !!(
-          enhancedData.credentials.api_key && assignedLicense
-        );
-
-        // Update next steps based on what's missing
-        enhancedData.next_steps = [];
-        if (!enhancedData.credentials.api_key) {
-          enhancedData.next_steps.push('Create an API key for this site');
-        }
-        if (!assignedLicense) {
-          enhancedData.next_steps.push('Assign a license to this site');
-        }
-
-        setCredentialsData(enhancedData);
-      } else {
-        setError(result.error || 'Failed to load credentials');
+      // Only clear the new key if not preserving it
+      if (!preserveNewKey) {
+        setNewApiKey(null);
       }
-    } catch {
-      setError('Failed to load credentials');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [site.id, getSiteCredentials, licenses]);
+
+      try {
+        const result = await getSiteCredentials(site.id);
+
+        if (result.success && result.data) {
+          // First check if backend returned a license
+          let assignedLicense = result.data.credentials.license;
+
+          // If backend doesn't have license info, try to find it from client-side licenses
+          if (!assignedLicense) {
+            // Check for site-specific license assignment by ID
+            let clientLicense = licenses.find(
+              license =>
+                license.status === 'active' &&
+                license.metadata?.assigned_site_id === site.id
+            );
+
+            // If no site-specific license, check for any active product license
+            // (Product licenses like Neural Search can be used across all sites)
+            if (!clientLicense) {
+              clientLicense = licenses.find(
+                license =>
+                  license.status === 'active' &&
+                  license.product?.slug && // Has a product association
+                  !license.metadata?.assigned_site_id // Not assigned to a specific site
+              );
+            }
+
+            if (clientLicense) {
+              assignedLicense = {
+                id: clientLicense.id,
+                license_key: clientLicense.license_key,
+                license_type: clientLicense.license_type,
+                max_queries: clientLicense.max_queries ?? null,
+                query_count: clientLicense.query_count,
+                assigned_at: (clientLicense.metadata?.assigned_at ||
+                  clientLicense.updated_at) as string,
+              };
+            }
+          }
+
+          const enhancedData = {
+            ...result.data,
+            credentials: {
+              ...result.data.credentials,
+              license: assignedLicense,
+            },
+          };
+
+          // Update setup status based on actual assigned license
+          enhancedData.setup_complete = !!(
+            enhancedData.credentials.api_key && assignedLicense
+          );
+
+          // Update next steps based on what's missing
+          enhancedData.next_steps = [];
+          if (!enhancedData.credentials.api_key) {
+            enhancedData.next_steps.push('Create an API key for this site');
+          }
+          if (!assignedLicense) {
+            enhancedData.next_steps.push('Assign a license to this site');
+          }
+
+          setCredentialsData(enhancedData);
+        } else {
+          setError(result.error || 'Failed to load credentials');
+        }
+      } catch {
+        setError('Failed to load credentials');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [site.id, getSiteCredentials, licenses]
+  );
 
   useEffect(() => {
     if (isOpen) {
-      loadCredentials();
+      loadCredentials(false); // Don't preserve key when opening modal fresh
     }
   }, [isOpen, loadCredentials]);
 
@@ -131,7 +159,9 @@ const SiteCredentialsModal: React.FC<SiteCredentialsModalProps> = ({
   const getAvailableLicenses = () =>
     licenses.filter(
       license =>
-        license.status === 'active' && !license.metadata?.assigned_site_id
+        license.status === 'active' &&
+        !license.metadata?.assigned_site_id &&
+        !license.product?.slug // Exclude product-specific licenses as they don't need assignment
     );
 
   const handleAssignLicense = async (licenseId: string) => {
@@ -140,7 +170,8 @@ const SiteCredentialsModal: React.FC<SiteCredentialsModalProps> = ({
       const result = await assignLicense(licenseId, site.id);
 
       if (result.success) {
-        await loadCredentials(); // Refresh data
+        // Refresh credentials immediately to get the updated license from backend
+        await loadCredentials();
       } else {
         setError(result.error || 'Failed to assign license');
       }
@@ -149,7 +180,55 @@ const SiteCredentialsModal: React.FC<SiteCredentialsModalProps> = ({
     }
   };
 
-  const generateSiteConfig = () => {
+  const handleGenerateApiKey = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      // If regenerating, delete the old key first
+      if (credentialsData?.credentials.api_key?.id) {
+        const deleteResult = await deleteApiKey(
+          credentialsData.credentials.api_key.id
+        );
+        if (!deleteResult.success) {
+          setError(deleteResult.error || 'Failed to delete old API key');
+          return;
+        }
+      }
+
+      // Make the API call directly to get the raw response
+      const response = await fetch(`${API_BASE_URL}/api/api-keys`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${Cookies.get('lighthouse_auth_token') || localStorage.getItem('lighthouse_auth_token')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: `${site.name} API Key`,
+          site_id: site.id,
+          scopes: ['search', 'embed'],
+        }),
+      });
+
+      const rawResult = await response.json();
+
+      // Extract the full key from the response
+      const fullKey = rawResult.data?.key;
+
+      if (response.ok && rawResult.success && fullKey) {
+        // Store the full key directly from the raw response
+        setNewApiKey(fullKey);
+        // Refresh credentials data while preserving the new key
+        await loadCredentials(true);
+      } else {
+        setError(rawResult.error || 'Failed to generate API key');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const generateWordPressConfig = () => {
     if (
       !credentialsData?.credentials.api_key ||
       !credentialsData?.credentials.license
@@ -157,10 +236,13 @@ const SiteCredentialsModal: React.FC<SiteCredentialsModalProps> = ({
       return '';
     }
 
-    return `// Add these configuration values to your site's wp-config.php file:
+    const apiKey =
+      newApiKey || `${credentialsData.credentials.api_key.key_prefix}...`;
+
+    return `// Add these configuration values to your WordPress wp-config.php file:
 
 // Lighthouse API Configuration
-define('LIGHTHOUSE_API_KEY', '${credentialsData.credentials.api_key.key_prefix}...');
+define('LIGHTHOUSE_API_KEY', '${apiKey}');
 define('LIGHTHOUSE_LICENSE_KEY', '${credentialsData.credentials.license.license_key}');
 define('LIGHTHOUSE_SITE_ID', '${site.id}');
 define('LIGHTHOUSE_API_URL', 'https://api.lighthousestudios.xyz');
@@ -191,326 +273,472 @@ define('LIGHTHOUSE_DEBUG', false);`;
       title={`Site Credentials: ${site.name}`}
       size="xl"
     >
-      <div className="space-y-6">
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
-            <div className="text-red-700 text-sm">{error}</div>
-          </div>
-        )}
+      <div className="lh-credentials-modal-content">
+        <div className="lh-credentials-sections">
+          {error && (
+            <div className="lh-alert lh-alert-error">
+              <div className="lh-alert-content">{error}</div>
+            </div>
+          )}
 
-        {credentialsData ? (
-          <>
-            {/* Setup Status */}
-            <Card
-              className={
-                credentialsData.setup_complete
-                  ? 'bg-green-50 border-green-200'
-                  : 'bg-yellow-50 border-yellow-200'
-              }
-            >
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-3">
-                  <div
-                    className={`w-3 h-3 rounded-full ${
-                      credentialsData.setup_complete
-                        ? 'bg-green-500'
-                        : 'bg-yellow-500'
-                    }`}
-                  />
-                  <span className="font-medium">
-                    {credentialsData.setup_complete
-                      ? 'Setup Complete'
-                      : 'Setup Incomplete'}
-                  </span>
+          {credentialsData ? (
+            <>
+              {/* Site Information */}
+              <div className="lh-credentials-card">
+                <div className="lh-credentials-card-header">
+                  <h3 className="lh-credentials-card-title">
+                    <svg
+                      className="lh-icon-md"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"
+                      />
+                    </svg>
+                    Site Information
+                  </h3>
                 </div>
-                {!credentialsData.setup_complete &&
-                  credentialsData.next_steps.length > 0 && (
-                    <div className="mt-3">
-                      <div className="text-sm font-medium text-gray-700 mb-2">
-                        Next Steps:
-                      </div>
-                      <ul className="text-sm space-y-1">
-                        {credentialsData.next_steps.map((step, index) => (
-                          <li
-                            key={index}
-                            className="flex items-start space-x-2"
-                          >
-                            <span className="text-gray-400">•</span>
-                            <span>{step}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-              </CardContent>
-            </Card>
-
-            {/* API Key */}
-            <Card>
-              <CardHeader>
-                <h3 className="text-lg font-semibold">API Key</h3>
-              </CardHeader>
-              <CardContent>
-                {credentialsData.credentials.api_key ? (
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Key Name
-                      </label>
-                      <div className="text-sm bg-gray-100 px-3 py-2 rounded">
-                        {credentialsData.credentials.api_key.name}
+                <div className="lh-credentials-card-content">
+                  <div className="lh-site-info-grid">
+                    <div className="lh-site-info-item">
+                      <div className="lh-credential-field">
+                        <label className="lh-credential-label">Site Name</label>
+                        <div className="lh-credential-value">{site.name}</div>
                       </div>
                     </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        API Key (Prefix)
-                      </label>
-                      <div className="flex space-x-2">
-                        <div className="flex-1 text-sm bg-gray-100 px-3 py-2 rounded font-mono">
-                          {credentialsData.credentials.api_key.key_prefix}...
+                    <div className="lh-site-info-item">
+                      <div className="lh-credential-field">
+                        <label className="lh-credential-label">Site ID</label>
+                        <div className="lh-credential-value lh-credential-monospace">
+                          {site.id}
                         </div>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() =>
-                            copyToClipboard(
-                              credentialsData.credentials.api_key?.key_prefix ||
-                                '',
-                              'api_key'
-                            )
-                          }
-                        >
-                          {copiedField === 'api_key' ? 'Copied!' : 'Copy'}
-                        </Button>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Full API key is only shown once during creation
-                      </p>
                     </div>
+                    <div className="lh-site-info-item">
+                      <div className="lh-credential-field">
+                        <label className="lh-credential-label">Site URL</label>
+                        <div className="lh-credential-value">{site.url}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Scopes
-                      </label>
-                      <div className="flex flex-wrap gap-2">
-                        {credentialsData.credentials.api_key.scopes.map(
-                          (scope, index) => (
-                            <span
+              {/* Setup Status */}
+              <div
+                className={`lh-credentials-card ${
+                  credentialsData.setup_complete
+                    ? 'lh-setup-status-complete'
+                    : 'lh-setup-status-incomplete'
+                }`}
+              >
+                <div className="lh-credentials-card-content">
+                  <div className="lh-setup-status-header">
+                    <div
+                      className={`${
+                        credentialsData.setup_complete
+                          ? 'lh-setup-status-indicator-complete'
+                          : 'lh-setup-status-indicator-incomplete'
+                      }`}
+                    />
+                    <span className="lh-setup-status-text">
+                      {credentialsData.setup_complete
+                        ? 'Setup Complete'
+                        : 'Setup Incomplete'}
+                    </span>
+                  </div>
+                  {!credentialsData.setup_complete &&
+                    credentialsData.next_steps.length > 0 && (
+                      <div className="lh-setup-next-steps">
+                        <div className="lh-setup-next-steps-title">
+                          Next Steps:
+                        </div>
+                        <ul className="lh-setup-next-steps-list">
+                          {credentialsData.next_steps.map((step, index) => (
+                            <li
                               key={index}
-                              className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
+                              className="lh-setup-next-steps-item"
                             >
-                              {scope}
-                            </span>
-                          )
+                              <span className="lh-setup-next-steps-bullet"></span>
+                              <span>{step}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                </div>
+              </div>
+
+              {/* API Key */}
+              <div className="lh-credentials-card">
+                <div className="lh-credentials-card-header">
+                  <h3 className="lh-credentials-card-title">
+                    <svg
+                      className="lh-icon-md"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 7a2 2 0 012 2m0 0a2 2 0 012 2m0 0v6a2 2 0 01-2 2H9a2 2 0 01-2-2V9a2 2 0 012-2m0 0V7a2 2 0 012-2m3 6V7a2 2 0 00-2-2H9a2 2 0 00-2 2v2m6 2V9a2 2 0 00-2-2H9a2 2 0 00-2 2v6z"
+                      />
+                    </svg>
+                    API Key
+                  </h3>
+                </div>
+                <div className="lh-credentials-card-content">
+                  {credentialsData.credentials.api_key ? (
+                    <div className="lh-credential-fields">
+                      <div className="lh-credential-field">
+                        <label className="lh-credential-label">Key Name</label>
+                        <div className="lh-credential-value">
+                          {credentialsData.credentials.api_key.name}
+                        </div>
+                      </div>
+
+                      <div className="lh-credential-field">
+                        <label className="lh-credential-label">
+                          {newApiKey
+                            ? 'API Key (Full - Save Now!)'
+                            : 'API Key (Prefix)'}
+                        </label>
+                        <div className="lh-credential-value-with-copy">
+                          <div className="lh-credential-value lh-credential-monospace">
+                            {newApiKey ||
+                              `${credentialsData.credentials.api_key.key_prefix}...`}
+                          </div>
+                          <button
+                            className="lh-copy-button"
+                            onClick={() =>
+                              copyToClipboard(
+                                newApiKey ||
+                                  credentialsData.credentials.api_key
+                                    ?.key_prefix ||
+                                  '',
+                                'api_key'
+                              )
+                            }
+                          >
+                            {copiedField === 'api_key' ? 'Copied!' : 'Copy'}
+                          </button>
+                        </div>
+                        {newApiKey ? (
+                          <div
+                            className="lh-credential-help"
+                            style={{ color: '#f59e0b', fontWeight: 'bold' }}
+                          >
+                            ⚠️ Copy this key now! It won&apos;t be shown again
+                            after closing this modal.
+                          </div>
+                        ) : (
+                          <p className="lh-credential-help">
+                            Full API key is only shown once during creation
+                          </p>
                         )}
                       </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-6 text-gray-500">
-                    <div className="text-sm">No API key generated</div>
-                    <div className="text-xs mt-1">
-                      Generate an API key to connect your site
-                    </div>
-                    <Button className="mt-3" size="sm">
-                      Generate API Key
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
 
-            {/* License */}
-            <Card>
-              <CardHeader>
-                <h3 className="text-lg font-semibold">License</h3>
-              </CardHeader>
-              <CardContent>
-                {credentialsData.credentials.license ? (
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        License Type
-                      </label>
-                      <div className="text-sm bg-gray-100 px-3 py-2 rounded">
-                        {credentialsData.credentials.license.license_type
-                          .replace('_', ' ')
-                          .toUpperCase()}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        License Key
-                      </label>
-                      <div className="flex space-x-2">
-                        <div className="flex-1 text-sm bg-gray-100 px-3 py-2 rounded font-mono">
-                          {credentialsData.credentials.license.license_key}
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() =>
-                            copyToClipboard(
-                              credentialsData.credentials.license
-                                ?.license_key || '',
-                              'license_key'
+                      <div className="lh-credential-field">
+                        <label className="lh-credential-label">Scopes</label>
+                        <div className="lh-credential-scopes">
+                          {credentialsData.credentials.api_key.scopes.map(
+                            (scope, index) => (
+                              <span
+                                key={index}
+                                className="lh-credential-scope-tag"
+                              >
+                                {scope}
+                              </span>
                             )
-                          }
-                        >
-                          {copiedField === 'license_key' ? 'Copied!' : 'Copy'}
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Query Usage
-                        </label>
-                        <div className="text-sm">
-                          {credentialsData.credentials.license.query_count.toLocaleString()}
-                          {credentialsData.credentials.license.max_queries && (
-                            <>
-                              {' / '}
-                              {credentialsData.credentials.license.max_queries.toLocaleString()}
-                            </>
                           )}
                         </div>
                       </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Assigned
-                        </label>
-                        <div className="text-sm">
-                          {new Date(
-                            credentialsData.credentials.license.assigned_at
-                          ).toLocaleDateString()}
+                      {!newApiKey && (
+                        <div className="lh-credential-field">
+                          <button
+                            className="lh-credentials-regenerate-button"
+                            onClick={handleGenerateApiKey}
+                            disabled={isLoading}
+                          >
+                            {isLoading
+                              ? 'Regenerating...'
+                              : 'Regenerate API Key'}
+                          </button>
+                          <p className="lh-credential-help">
+                            Regenerating will invalidate the current key
+                          </p>
                         </div>
-                      </div>
+                      )}
                     </div>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="text-center py-6 text-gray-500">
-                      <div className="text-sm">No license assigned</div>
-                      <div className="text-xs mt-1">
-                        Assign a license to enable search functionality
+                  ) : (
+                    <div className="lh-credentials-empty-state">
+                      <div className="lh-credentials-empty-title">
+                        No API key generated
                       </div>
+                      <div className="lh-credentials-empty-description">
+                        Generate an API key to connect your site
+                      </div>
+                      <button
+                        className="lh-credentials-empty-action"
+                        onClick={handleGenerateApiKey}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? 'Generating...' : 'Generate API Key'}
+                      </button>
                     </div>
+                  )}
+                </div>
+              </div>
 
-                    {getAvailableLicenses().length > 0 && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Available Licenses
-                        </label>
-                        <div className="space-y-2">
-                          {getAvailableLicenses().map(license => (
-                            <div
-                              key={license.id}
-                              className="flex items-center justify-between p-3 border rounded"
-                            >
-                              <div>
-                                <div className="font-medium">
-                                  {license.license_type
-                                    .replace('_', ' ')
-                                    .toUpperCase()}
-                                </div>
-                                <div className="text-sm text-gray-600">
-                                  {license.max_queries
-                                    ? `${license.max_queries.toLocaleString()} queries/month`
-                                    : 'Unlimited queries'}
-                                </div>
-                              </div>
-                              <Button
-                                size="sm"
-                                onClick={() => handleAssignLicense(license.id)}
-                                disabled={isLoading}
-                              >
-                                Assign
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Site Configuration */}
-            {credentialsData.setup_complete && (
-              <Card>
-                <CardHeader>
-                  <h3 className="text-lg font-semibold">
-                    Site Configuration
+              {/* License */}
+              <div className="lh-credentials-card">
+                <div className="lh-credentials-card-header">
+                  <h3 className="lh-credentials-card-title">
+                    <svg
+                      className="lh-icon-md"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m5-6a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    License
                   </h3>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        wp-config.php Settings
-                      </label>
-                      <div className="relative">
-                        <pre className="text-xs bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto">
-                          {generateSiteConfig()}
-                        </pre>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="absolute top-2 right-2 text-gray-300 hover:text-white"
-                          onClick={() =>
-                            copyToClipboard(
-                              generateSiteConfig(),
-                              'wp_config'
-                            )
-                          }
-                        >
-                          {copiedField === 'wp_config' ? 'Copied!' : 'Copy'}
-                        </Button>
+                </div>
+                <div className="lh-credentials-card-content">
+                  {credentialsData.credentials.license ? (
+                    <div className="lh-credential-fields">
+                      <div className="lh-credential-field">
+                        <label className="lh-credential-label">
+                          License Type
+                        </label>
+                        <div className="lh-credential-value">
+                          {credentialsData.credentials.license.license_type
+                            .replace('_', ' ')
+                            .toUpperCase()}
+                        </div>
+                      </div>
+
+                      <div className="lh-credential-field">
+                        <label className="lh-credential-label">
+                          License Key
+                        </label>
+                        <div className="lh-credential-value-with-copy">
+                          <div className="lh-credential-value lh-credential-monospace">
+                            {credentialsData.credentials.license.license_key}
+                          </div>
+                          <button
+                            className="lh-copy-button"
+                            onClick={() =>
+                              copyToClipboard(
+                                credentialsData.credentials.license
+                                  ?.license_key || '',
+                                'license_key'
+                              )
+                            }
+                          >
+                            {copiedField === 'license_key' ? 'Copied!' : 'Copy'}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="lh-credential-stats-grid">
+                        <div className="lh-credential-field">
+                          <label className="lh-credential-label">
+                            Query Usage
+                          </label>
+                          <div className="lh-credential-value">
+                            {credentialsData.credentials.license.query_count.toLocaleString()}
+                            {credentialsData.credentials.license
+                              .max_queries && (
+                              <>
+                                {' / '}
+                                {credentialsData.credentials.license.max_queries.toLocaleString()}
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="lh-credential-field">
+                          <label className="lh-credential-label">
+                            Assigned
+                          </label>
+                          <div className="lh-credential-value">
+                            {new Date(
+                              credentialsData.credentials.license.assigned_at
+                            ).toLocaleDateString()}
+                          </div>
+                        </div>
                       </div>
                     </div>
+                  ) : (
+                    <div className="lh-credential-fields">
+                      <div className="lh-credentials-empty-state">
+                        <div className="lh-credentials-empty-title">
+                          No license assigned
+                        </div>
+                        <div className="lh-credentials-empty-description">
+                          Assign a license to enable search functionality
+                        </div>
+                      </div>
 
-                    <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                      <div className="text-blue-800 text-sm">
-                        <strong>Setup Instructions:</strong>
-                        <ol className="mt-2 space-y-1 list-decimal list-inside">
-                          <li>
-                            Install the Lighthouse plugin on your website
-                          </li>
-                          <li>
-                            Add the configuration above to your wp-config.php
-                            file
-                          </li>
-                          <li>Activate the plugin and verify the connection</li>
-                        </ol>
+                      {getAvailableLicenses().length > 0 && (
+                        <div className="lh-credential-field">
+                          <label className="lh-credential-label">
+                            Available Licenses
+                          </label>
+                          <div className="lh-license-assignment-list">
+                            {getAvailableLicenses().map(license => (
+                              <div
+                                key={license.id}
+                                className="lh-license-assignment-item"
+                              >
+                                <div className="lh-license-assignment-info">
+                                  <div className="lh-license-assignment-type">
+                                    {license.license_type
+                                      .replace('_', ' ')
+                                      .toUpperCase()}
+                                  </div>
+                                  <div className="lh-license-assignment-description">
+                                    {license.max_queries
+                                      ? `${license.max_queries.toLocaleString()} queries/month`
+                                      : 'Unlimited queries'}
+                                  </div>
+                                </div>
+                                <button
+                                  className="lh-license-assignment-button"
+                                  onClick={() =>
+                                    handleAssignLicense(license.id)
+                                  }
+                                  disabled={isLoading}
+                                >
+                                  Assign
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* WordPress Configuration */}
+              {credentialsData.setup_complete && (
+                <div className="lh-credentials-card">
+                  <div className="lh-credentials-card-header">
+                    <h3 className="lh-credentials-card-title">
+                      <svg
+                        className="lh-icon-md"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                        />
+                      </svg>
+                      WordPress Configuration
+                    </h3>
+                  </div>
+                  <div className="lh-credentials-card-content">
+                    <div className="lh-credential-fields">
+                      <div className="lh-credential-field">
+                        <label className="lh-credential-label">
+                          wp-config.php Settings
+                        </label>
+                        <div className="lh-wordpress-config-container">
+                          <pre className="lh-wordpress-config-code">
+                            {generateWordPressConfig()}
+                          </pre>
+                          <button
+                            className="lh-wordpress-config-copy"
+                            onClick={() =>
+                              copyToClipboard(
+                                generateWordPressConfig(),
+                                'wp_config'
+                              )
+                            }
+                          >
+                            {copiedField === 'wp_config' ? 'Copied!' : 'Copy'}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="lh-wordpress-setup-instructions">
+                        <div className="lh-wordpress-setup-content">
+                          <strong>Setup Instructions:</strong>
+                          <ol className="lh-wordpress-setup-list">
+                            <li>
+                              Install the Lighthouse plugin on your WordPress
+                              site
+                            </li>
+                            <li>
+                              Add the configuration above to your wp-config.php
+                              file
+                            </li>
+                            <li>
+                              Activate the plugin and verify the connection
+                            </li>
+                          </ol>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            )}
-          </>
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            No credentials data available
-          </div>
-        )}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="lh-credentials-empty-state">
+              <div className="lh-credentials-empty-title">
+                No credentials data available
+              </div>
+            </div>
+          )}
 
-        {/* Actions */}
-        <div className="flex justify-end space-x-3">
-          <Button
-            variant="ghost"
-            onClick={loadCredentials}
-            disabled={isLoading}
-          >
-            Refresh
-          </Button>
-          <Button onClick={onClose}>Close</Button>
+          {/* Actions */}
+          <div className="lh-credentials-actions">
+            <button
+              className="lh-credentials-refresh-button"
+              onClick={() => loadCredentials(false)}
+              disabled={isLoading}
+            >
+              <svg
+                className={`lh-icon-sm ${isLoading ? 'animate-spin' : ''}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              {isLoading ? 'Refreshing...' : 'Refresh'}
+            </button>
+            <button className="lh-credentials-close-button" onClick={onClose}>
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </Modal>

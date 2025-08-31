@@ -2294,50 +2294,1148 @@ a {
 }
 
 /* ==========================================================================
-   SITE CREDENTIALS MODAL STYLES
+   DASHBOARD ENHANCEMENT STYLES
    ========================================================================== */
 
-/* Setup Status Card */
-.lh-setup-status-complete {
+/* Dashboard Stat Cards */
+.lh-stat-card {
+  background-color: var(--color-bg-card);
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.lh-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: var(--color-border-light);
+}
+
+.lh-stat-card-header {
+  padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+  border-bottom: none;
+}
+
+.lh-stat-card-content {
+  padding: 0.5rem 1.5rem 1.5rem 1.5rem;
+}
+
+.lh-stat-trend-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
   background: rgba(81, 207, 102, 0.1);
+  color: var(--color-text-success);
   border: 1px solid rgba(81, 207, 102, 0.2);
-  border-radius: 0.75rem;
-  padding: 1rem;
 }
 
-.lh-setup-status-incomplete {
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.2);
-  border-radius: 0.75rem;
-  padding: 1rem;
+.lh-stat-trend-badge-negative {
+  background: rgba(255, 107, 107, 0.1);
+  color: var(--color-text-error);
+  border: 1px solid rgba(255, 107, 107, 0.2);
 }
 
-.lh-setup-status-indicator {
+/* Activity Items */
+.lh-activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color 0.2s ease;
+}
+
+.lh-activity-item:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.lh-activity-item:last-child {
+  border-bottom: none;
+}
+
+.lh-activity-icon {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: center;
+  border: 1px solid;
+}
+
+.lh-activity-icon-login {
+  background: rgba(81, 207, 102, 0.1);
+  color: #51cf66;
+  border-color: rgba(81, 207, 102, 0.2);
+}
+
+.lh-activity-icon-site {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.lh-activity-icon-search {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+.lh-activity-icon-update {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--color-signal-amber);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.lh-activity-icon-default {
+  background: rgba(107, 114, 128, 0.1);
+  color: var(--color-text-muted);
+  border-color: rgba(107, 114, 128, 0.2);
+}
+
+.lh-activity-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.lh-activity-title {
+  color: var(--color-text-primary);
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.lh-activity-description {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.lh-activity-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* Quick Action Cards */
+.lh-quick-action-card {
+  background-color: var(--color-bg-card);
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.lh-quick-action-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: var(--color-border-light);
+}
+
+.lh-quick-action-header {
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  border-bottom: none;
+}
+
+.lh-quick-action-content {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.lh-quick-action-icon-container {
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-right: 1rem;
+  transition: all 0.3s ease;
+}
+
+.lh-quick-action-description {
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  flex: 1;
+}
+
+/* Welcome Section */
+.lh-welcome-section {
+  background-color: var(--color-bg-card);
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border);
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+  margin-bottom: 2rem;
+}
+
+.lh-welcome-icon-container {
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  background-color: var(--color-dashboard-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+}
+
+.lh-welcome-content {
+  flex: 1;
+}
+
+/* Enhanced Button Styles */
+.lh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  font-family: 'Raleway', sans-serif;
+  gap: 0.5rem;
+}
+
+.lh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lh-btn-primary {
+  background-color: var(--color-accent);
+  color: white;
+  border: 1px solid var(--color-accent);
+}
+
+.lh-btn-primary:hover:not(:disabled) {
+  background-color: var(--color-accent-light);
+  border-color: var(--color-accent-light);
+  transform: translateY(-1px);
+}
+
+.lh-btn-outline {
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.lh-btn-outline:hover:not(:disabled) {
+  background-color: var(--color-bg-surface);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.lh-btn-ghost {
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid transparent;
+}
+
+.lh-btn-ghost:hover:not(:disabled) {
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-primary);
+}
+
+.lh-btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+}
+
+.lh-btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1rem;
+}
+
+.lh-btn-full-width {
+  width: 100%;
+}
+
+/* Enhanced Table Styles */
+.lh-table-enhanced {
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.lh-table-enhanced thead {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.lh-table-enhanced-header {
+  background-color: var(--color-bg-surface);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.lh-table-enhanced-header-cell {
+  padding: 1rem 1.5rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: var(--color-bg-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.lh-table-enhanced tbody {
+  background-color: var(--color-bg-card);
+}
+
+.lh-table-enhanced-row {
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color 0.2s ease;
+}
+
+.lh-table-enhanced-row:hover {
+  background-color: var(--color-bg-surface);
+}
+
+.lh-table-enhanced-cell {
+  padding: 1.25rem 1.5rem;
+  vertical-align: top;
+  font-size: 0.875rem;
+}
+
+.lh-table-enhanced-cell-primary {
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.lh-table-enhanced-cell-secondary {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Product Badge Styles */
+.lh-product-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.lh-product-badge-inactive {
+  background-color: rgba(107, 114, 128, 0.1);
+  color: var(--color-text-muted);
+  border-color: rgba(107, 114, 128, 0.2);
+}
+
+.lh-product-badge-active {
+  background-color: rgba(81, 207, 102, 0.1);
+  color: var(--color-text-success);
+  border-color: rgba(81, 207, 102, 0.2);
+}
+
+/* Skeleton Loading */  
+.lh-skeleton {
+  background: linear-gradient(90deg, var(--color-bg-surface) 25%, var(--color-bg-card) 50%, var(--color-bg-surface) 75%);
+  background-size: 200% 100%;
+  animation: lh-skeleton-loading 1.5s infinite;
+  border-radius: 0.25rem;
+}
+
+@keyframes lh-skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.lh-skeleton-text {
+  height: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.lh-skeleton-text-lg {
+  height: 1.5rem;
   margin-bottom: 0.75rem;
 }
 
-.lh-setup-status-dot-complete {
-  width: 0.75rem;
-  height: 0.75rem;
+.lh-skeleton-avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+}
+
+.lh-skeleton-button {
+  height: 2.5rem;
+  width: 100%;
+  border-radius: 0.5rem;
+}
+
+/* Enhanced Modal Styles */
+.lh-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 1rem;
+  animation: lh-modal-fade-in 0.2s ease-out;
+}
+
+@keyframes lh-modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.lh-modal-container {
+  background-color: var(--color-bg-card);
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(20px);
+  max-width: 32rem;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: lh-modal-slide-in 0.2s ease-out;
+}
+
+@keyframes lh-modal-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lh-modal-header {
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lh-modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-family: 'Raleway', sans-serif;
+}
+
+.lh-modal-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.lh-modal-close-btn:hover {
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+}
+
+.lh-modal-content {
+  padding: 1.5rem;
+}
+
+/* Responsive Grid Enhancements */
+.lh-grid-auto-fit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+@media (max-width: 640px) {
+  .lh-grid-auto-fit {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+/* Status Indicators */
+.lh-status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.lh-status-dot-active {
+  background-color: var(--color-text-success);
+}
+
+.lh-status-dot-inactive {
+  background-color: var(--color-text-muted);
+}
+
+.lh-status-dot-error {
+  background-color: var(--color-text-error);
+}
+
+.lh-status-dot-warning {
+  background-color: var(--color-signal-amber);
+}
+
+/* Dashboard Container */
+.lh-dashboard-container {
+  background: var(--color-bg-main);
+}
+
+/* Sidebar Enhancements */
+.lh-sidebar-container {
+  background-color: var(--color-bg-card);
+  border-right: 1px solid var(--color-border);
+}
+
+/* Layout improvements */
+.lh-main-content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease;
+}
+
+/* Spacing Consistency */
+.lh-section-spacing {
+  margin-bottom: 2rem;
+}
+
+.lh-section-spacing-sm {
+  margin-bottom: 1rem;
+}
+
+.lh-section-spacing-lg {
+  margin-bottom: 3rem;
+}
+
+.lh-element-spacing {
+  margin-bottom: 1rem;
+}
+
+.lh-element-spacing-sm {
+  margin-bottom: 0.5rem;
+}
+
+.lh-no-spacing {
+  margin-bottom: 0;
+}
+
+/* Responsive padding improvements */
+.lh-responsive-padding {
+  padding: 1rem;
+}
+
+@media (min-width: 640px) {
+  .lh-responsive-padding {
+    padding: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lh-responsive-padding {
+    padding: 2rem;
+  }
+}
+
+/* Typography Consistency */
+.lh-heading-spacing {
+  margin-bottom: 0.5rem;
+}
+
+.lh-heading-spacing-lg {
+  margin-bottom: 1rem;
+}
+
+.lh-paragraph-spacing {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+/* Component Consistency */
+.lh-component-border {
+  border: 1px solid var(--color-border);
+}
+
+.lh-component-radius {
+  border-radius: 0.75rem;
+}
+
+.lh-component-shadow {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.lh-component-shadow-hover {
+  transition: box-shadow 0.3s ease;
+}
+
+.lh-component-shadow-hover:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Interactive States */
+.lh-interactive {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.lh-interactive:hover {
+  transform: translateY(-1px);
+}
+
+.lh-interactive:active {
+  transform: translateY(0);
+}
+
+.lh-interactive:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+
+/* Focus States Enhancement */
+.lh-focus-enhanced:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--color-accent);
+}
+
+/* ==========================================================================
+   SITE CREDENTIALS MODAL STYLES - ENHANCED PROFESSIONAL DESIGN
+   ========================================================================== */
+
+/* Credentials Modal Layout */
+.lh-credentials-modal-content {
+  max-width: 56rem;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.lh-credentials-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 0.5rem;
+}
+
+/* Professional Card System */
+.lh-credentials-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.lh-credentials-card-header {
+  background: linear-gradient(135deg, var(--color-bg-surface) 0%, var(--color-bg-card) 100%);
+  border-bottom: 1px solid var(--color-border);
+  padding: 1.25rem 1.5rem;
+}
+
+.lh-credentials-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-family: 'Raleway', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.lh-credentials-card-content {
+  padding: 1.5rem;
+}
+
+/* Site Information Grid */
+.lh-site-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.lh-site-info-item {
+  background: var(--color-bg-surface);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+}
+
+/* Setup Status Enhancement */
+.lh-setup-status-complete {
+  border-left: 4px solid var(--color-text-success);
+  background: linear-gradient(135deg, rgba(81, 207, 102, 0.05) 0%, rgba(81, 207, 102, 0.02) 100%);
+}
+
+.lh-setup-status-incomplete {
+  border-left: 4px solid var(--color-signal-amber);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, rgba(245, 158, 11, 0.02) 100%);
+}
+
+.lh-setup-status-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.lh-setup-status-indicator-complete {
+  width: 1rem;
+  height: 1rem;
   border-radius: 50%;
   background-color: var(--color-text-success);
+  position: relative;
   flex-shrink: 0;
 }
 
-.lh-setup-status-dot-incomplete {
-  width: 0.75rem;
-  height: 0.75rem;
+.lh-setup-status-indicator-complete::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.lh-setup-status-indicator-incomplete {
+  width: 1rem;
+  height: 1rem;
   border-radius: 50%;
   background-color: var(--color-signal-amber);
+  position: relative;
   flex-shrink: 0;
+}
+
+.lh-setup-status-indicator-incomplete::after {
+  content: '!';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
 }
 
 .lh-setup-status-text {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--color-text-primary);
+}
+
+.lh-setup-next-steps {
+  background: rgba(59, 130, 246, 0.05);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  margin-top: 1rem;
+}
+
+.lh-setup-next-steps-title {
   font-weight: 600;
   color: var(--color-text-primary);
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.lh-setup-next-steps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.lh-setup-next-steps-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.lh-setup-next-steps-bullet {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background-color: #3b82f6;
+  margin-top: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Enhanced Field System */
+.lh-credential-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.lh-credential-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lh-credential-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: 'Raleway', sans-serif;
+}
+
+.lh-credential-value {
+  padding: 0.875rem 1rem;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.lh-credential-monospace {
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-size: 0.8125rem;
+  letter-spacing: 0.025em;
+}
+
+.lh-credential-value-with-copy {
+  display: flex;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+.lh-credential-value-with-copy .lh-credential-value {
+  flex: 1;
+  margin: 0;
+}
+
+.lh-copy-button {
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-card);
+  color: var(--color-text-secondary);
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.lh-copy-button:hover {
+  background: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+}
+
+.lh-credential-help {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
+/* Scopes and Tags */
+.lh-credential-scopes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.lh-credential-scope-tag {
+  padding: 0.375rem 0.75rem;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* Statistics Grid */
+.lh-credential-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  background: var(--color-bg-main);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+}
+
+/* Empty States */
+.lh-credentials-empty-state {
+  text-align: center;
+  padding: 2rem;
+  background: var(--color-bg-surface);
+  border-radius: 0.5rem;
+  border: 2px dashed var(--color-border);
+}
+
+.lh-credentials-empty-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.lh-credentials-empty-description {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.lh-credentials-empty-action {
+  background: var(--color-accent);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lh-credentials-empty-action:hover {
+  background: var(--color-accent-light);
+  transform: translateY(-1px);
+}
+
+/* License Assignment */
+.lh-license-assignment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.lh-license-assignment-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.lh-license-assignment-item:hover {
+  background: var(--color-bg-card);
+  border-color: var(--color-accent);
+}
+
+.lh-license-assignment-info {
+  flex: 1;
+}
+
+.lh-license-assignment-type {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.lh-license-assignment-description {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.lh-license-assignment-button {
+  background: var(--color-accent);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lh-license-assignment-button:hover {
+  background: var(--color-accent-light);
+}
+
+/* WordPress Configuration */
+.lh-wordpress-config-container {
+  position: relative;
+  background: var(--color-bg-main);
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.lh-wordpress-config-code {
+  padding: 1.5rem;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  overflow-x: auto;
+  white-space: pre;
+  margin: 0;
+  background: none;
+}
+
+.lh-wordpress-config-copy {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lh-wordpress-config-copy:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.lh-wordpress-setup-instructions {
+  background: rgba(59, 130, 246, 0.05);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  margin-top: 1rem;
+}
+
+.lh-wordpress-setup-content {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.lh-wordpress-setup-list {
+  margin: 0.75rem 0 0 1.5rem;
+  padding: 0;
+  color: var(--color-text-secondary);
+}
+
+.lh-wordpress-setup-list li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+/* Modal Actions */
+.lh-credentials-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+  margin-top: 1rem;
+}
+
+.lh-credentials-refresh-button {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lh-credentials-refresh-button:hover {
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+}
+
+.lh-credentials-close-button {
+  background: var(--color-accent);
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lh-credentials-close-button:hover {
+  background: var(--color-accent-light);
+  transform: translateY(-1px);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 767px) {
+  .lh-credentials-modal-content {
+    max-width: 100vw;
+    margin: 0.5rem;
+  }
+  
+  .lh-site-info-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .lh-credential-value-with-copy {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .lh-credential-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .lh-license-assignment-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .lh-credentials-actions {
+    flex-direction: column;
+  }
 }
 
 .lh-setup-next-steps {

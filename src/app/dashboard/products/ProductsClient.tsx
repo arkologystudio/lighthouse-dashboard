@@ -185,15 +185,13 @@ const ProductsClient: React.FC<ProductsClientProps> = ({
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <Button
+          <button
             onClick={handleRefreshProducts}
             disabled={productsLoading}
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-2"
+            className="lh-btn lh-btn-outline lh-btn-sm"
           >
             <svg
-              className={`w-4 h-4 ${productsLoading ? 'animate-spin' : ''}`}
+              className={`lh-icon-sm ${productsLoading ? 'animate-spin' : ''}`}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -206,7 +204,7 @@ const ProductsClient: React.FC<ProductsClientProps> = ({
               />
             </svg>
             {productsLoading ? 'Refreshing...' : 'Refresh'}
-          </Button>
+          </button>
           <div className="lh-text-muted">
             {Array.isArray(sites) ? sites.length : 0} {(Array.isArray(sites) ? sites.length : 0) === 1 ? 'site' : 'sites'} available
           </div>
@@ -235,13 +233,12 @@ const ProductsClient: React.FC<ProductsClientProps> = ({
       {/* Load More Button */}
       {Array.isArray(products) && loadedCount < products.length && (
         <div className="flex justify-center mt-8">
-          <Button
+          <button
             onClick={loadMoreProducts}
-            variant="outline"
-            className="flex items-center gap-2"
+            className="lh-btn lh-btn-outline"
           >
             <svg
-              className="w-4 h-4"
+              className="lh-icon-sm"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -254,7 +251,7 @@ const ProductsClient: React.FC<ProductsClientProps> = ({
               />
             </svg>
             Load More Products ({Array.isArray(products) ? products.length - loadedCount : 0} remaining)
-          </Button>
+          </button>
         </div>
       )}
 

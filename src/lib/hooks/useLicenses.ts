@@ -142,7 +142,7 @@ export const useLicenses = (): UseLicensesReturn => {
         {},
         forceLogout
       );
-
+      
       if (result.success && result.data) {
         setLicenses(Array.isArray(result.data.licenses) ? result.data.licenses : []);
       } else {
