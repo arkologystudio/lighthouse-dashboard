@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '../components/ui/Button';
 import { TypewriterText } from '../components/TypewriterText';
+import DiagnosticsSection from '../components/diagnostics/DiagnosticsSection';
 import {
   StructuredData,
   organizationSchema,
@@ -14,16 +15,16 @@ import {
 export const metadata = {
   title: 'Home',
   description:
-    'Navigate the AI-powered web with Lighthouse Studios. Discover AI WordPress plugins, agent discoverability tools, and neural search solutions for Web 4.0.',
+    'Navigate the AI-powered web with Lighthouse Studios. Discover AI website plugins, agent discoverability tools, and neural search solutions for Web 4.0.',
   keywords:
-    'AI WordPress plugins, Web 4.0, agent discoverability, neural search, semantic search, AI navigation tools, Lighthouse Studios',
+    'AI website plugins, Web 4.0, agent discoverability, neural search, semantic search, AI navigation tools, Lighthouse Studios',
   alternates: {
     canonical: 'https://lighthousestudios.xyz',
   },
   openGraph: {
     title: 'Lighthouse Studios | Navigate the AI-Powered Web',
     description:
-      'Navigate the AI-powered web with Lighthouse Studios. Discover AI WordPress plugins, agent discoverability tools, and neural search solutions for Web 4.0.',
+      'Navigate the AI-powered web with Lighthouse Studios. Discover AI website plugins, agent discoverability tools, and neural search solutions for Web 4.0.',
     type: 'website',
     url: 'https://lighthousestudios.xyz',
     images: [
@@ -39,7 +40,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Lighthouse Studios | Navigate the AI-Powered Web',
     description:
-      'Navigate the AI-powered web with Lighthouse Studios. Discover AI WordPress plugins, agent discoverability tools, and neural search solutions for Web 4.0.',
+      'Navigate the AI-powered web with Lighthouse Studios. Discover AI website plugins, agent discoverability tools, and neural search solutions for Web 4.0.',
     images: ['/og-home.png'],
   },
   other: {
@@ -172,7 +173,7 @@ const HomePage: React.FC = () => {
         {/* Technical lighthouse sketch - positioned behind content */}
         <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-[700px] h-[700px] opacity-15 pointer-events-none hidden lg:block">
           <Image
-            src="/lighthouse_sketch.png"
+            src="/lighthouse_sketch_med.png"
             alt="Lighthouse Technical Sketch - Navigation Infrastructure Diagram"
             width={700}
             height={700}
@@ -234,7 +235,7 @@ const HomePage: React.FC = () => {
                   Enable discovery, optimize visibility, guide intelligent
                   agents
                 </span>{' '}
-                to your WordPress sites with precision.
+                to your websites with precision.
               </p>
 
               <p
@@ -317,11 +318,14 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
+      {/* AI Readiness Diagnostics Section */}
+      <DiagnosticsSection />
+
       {/* Core Systems Section */}
       <section
         id="features"
         className="relative py-24"
-        style={{ backgroundColor: 'var(--color-ocean-surface)' }}
+        style={{ backgroundColor: 'var(--color-ocean-deep)' }}
       >
         <div className="max-w-7xl mx-auto px-6">
           {/* Section header */}
@@ -350,7 +354,7 @@ const HomePage: React.FC = () => {
               className="text-lg max-w-3xl mx-auto leading-relaxed"
               style={{ color: 'var(--color-maritime-fog)' }}
             >
-              Three integrated systems that make your WordPress sites visible
+              Three integrated systems that make your websites visible
               and navigable to intelligent agents across the evolving web
               infrastructure.
             </p>
@@ -412,7 +416,7 @@ const HomePage: React.FC = () => {
                   className="leading-relaxed mb-6 text-sm flex-grow"
                   style={{ color: 'var(--color-maritime-fog)' }}
                 >
-                  Automated deployment and configuration of AI-ready WordPress
+                  Automated deployment and configuration of AI-ready website
                   plugins. Transform existing sites into agent-discoverable
                   platforms without technical overhead.
                 </p>
@@ -665,7 +669,7 @@ const HomePage: React.FC = () => {
               style={{ color: 'var(--color-maritime-fog)' }}
             >
               Lighthouse Studios packages a comprehensive suite of tools to
-              transform your WordPress sites into navigable waypoints in the
+              transform your websites into navigable waypoints in the
               evolving AI-powered web ecosystem.
             </p>
           </div>
@@ -706,7 +710,7 @@ const HomePage: React.FC = () => {
                   style={{ color: 'var(--color-maritime-fog)' }}
                 >
                   Unified command center for monitoring and controlling multiple
-                  WordPress installations. Real-time diagnostics, performance
+                  website installations. Real-time diagnostics, performance
                   metrics, and automated maintenance protocols.
                 </p>
 
@@ -1204,7 +1208,7 @@ const HomePage: React.FC = () => {
               className="text-lg max-w-3xl mx-auto leading-relaxed"
               style={{ color: 'var(--color-maritime-fog)' }}
             >
-              Five-phase implementation protocol for establishing your WordPress
+              Five-phase implementation protocol for establishing your website
               sites as navigable waypoints in the AI-powered web infrastructure.
             </p>
           </div>
@@ -1235,7 +1239,7 @@ const HomePage: React.FC = () => {
                   phase: '01',
                   title: 'System Integration',
                   description:
-                    'Establish secure API connection between Lighthouse control center and your WordPress installations.',
+                    'Establish secure API connection between Lighthouse control center and your website installations.',
                   status: 'Initialize',
                 },
                 {
@@ -1375,7 +1379,7 @@ const HomePage: React.FC = () => {
               {
                 query: 'How does content indexing update with site changes?',
                 response:
-                  'The neural search infrastructure monitors content changes through WordPress hooks, automatically reprocessing and reindexing modified content. Updates propagate to the search layer without manual intervention or batch processing delays.',
+                  'The neural search infrastructure monitors content changes through site hooks, automatically reprocessing and reindexing modified content. Updates propagate to the search layer without manual intervention or batch processing delays.',
               },
               {
                 query: 'Which entities can utilize the search interfaces?',
@@ -1467,7 +1471,7 @@ const HomePage: React.FC = () => {
                 className="text-lg max-w-3xl mx-auto leading-relaxed"
                 style={{ color: 'var(--color-maritime-fog)' }}
               >
-                Deploy Lighthouse navigation systems across your WordPress
+                Deploy Lighthouse navigation systems across your website
                 network. Enable AI agent discovery and semantic search
                 capabilities.
               </p>
@@ -1623,7 +1627,7 @@ const HomePage: React.FC = () => {
                 style={{ color: 'var(--color-maritime-fog)' }}
               >
                 Navigation infrastructure for AI-powered web discovery.
-                Specialized tools for WordPress site optimization and agent
+                Specialized tools for website optimization and agent
                 discoverability protocols.
               </p>
               <div className="flex space-x-6 text-xs">

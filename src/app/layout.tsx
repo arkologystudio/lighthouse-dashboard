@@ -18,13 +18,13 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://lighthousestudios.xyz'),
   title: {
     default:
-      'Lighthouse Dashboard | AI WordPress Plugins & Web 4.0 Agent Discoverability',
+      'Lighthouse Dashboard | AI Website Plugins & Web 4.0 Agent Discoverability',
     template: '%s | Lighthouse Dashboard',
   },
   description:
-    'Discover Lighthouse Dashboard—your all-in-one AI-powered portal for managing WordPress sites, installing AI website plugins, billing, and unlocking advanced agent discoverability with neural & semantic search for Web 4.0.',
+    'Discover Lighthouse Dashboard—your all-in-one AI-powered portal for managing websites, installing AI website plugins, billing, and unlocking advanced agent discoverability with neural & semantic search for Web 4.0.',
   keywords: [
-    'AI WordPress plugins',
+    'AI website plugins',
     'AI website builder',
     'Agent discoverability',
     'Web 4.0 dashboard',
@@ -32,8 +32,8 @@ export const metadata: Metadata = {
     'Semantic search tools',
     'AI site management',
     'AI Plugin marketplace',
-    'AI WordPress plugins',
-    'WordPress AI optimization',
+    'AI website plugins',
+    'Website AI optimization',
     'Lighthouse Studios',
   ],
   authors: [{ name: 'Lighthouse Studios' }],
@@ -45,25 +45,25 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://lighthousestudios.xyz',
     title:
-      'Lighthouse Dashboard | AI WordPress Plugins & Web 4.0 Agent Discoverability',
+      'Lighthouse Dashboard | AI Website Plugins & Web 4.0 Agent Discoverability',
     description:
-      'Discover Lighthouse Dashboard—your all-in-one AI-powered portal for managing WordPress sites, installing AI website plugins, billing, and unlocking advanced agent discoverability with neural & semantic search for Web 4.0.',
+      'Discover Lighthouse Dashboard—your all-in-one AI-powered portal for managing websites, installing AI website plugins, billing, and unlocking advanced agent discoverability with neural & semantic search for Web 4.0.',
     siteName: 'Lighthouse Dashboard',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Lighthouse Dashboard - AI WordPress Plugins & Web 4.0 Agent Discoverability',
+        alt: 'Lighthouse Dashboard - AI Website Plugins & Web 4.0 Agent Discoverability',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
     title:
-      'Lighthouse Dashboard | AI WordPress Plugins & Web 4.0 Agent Discoverability',
+      'Lighthouse Dashboard | AI Website Plugins & Web 4.0 Agent Discoverability',
     description:
-      'Discover Lighthouse Dashboard—your all-in-one AI-powered portal for managing WordPress sites, installing AI website plugins, billing, and unlocking advanced agent discoverability with neural & semantic search for Web 4.0.',
+      'Discover Lighthouse Dashboard—your all-in-one AI-powered portal for managing websites, installing AI website plugins, billing, and unlocking advanced agent discoverability with neural & semantic search for Web 4.0.',
     images: ['/og-image.png'],
     creator: '@lighthousestudios',
   },

@@ -24,6 +24,14 @@ export const ENDPOINTS = {
     UPDATE_PROFILE: '/api/users/profile',
     SITES: '/api/users/sites',
   },
+  DIAGNOSTICS: {
+    SCAN_URL: '/api/v1/diagnostics/scan-url',  // Anonymous scan
+    SCAN: '/api/v1/diagnostics/scan',          // Authenticated scan
+    SITE_SCORE: (id: string) => `/api/v1/diagnostics/sites/${id}/score`,
+    PAGE_INDICATORS: (pageId: string) => `/api/v1/diagnostics/pages/${pageId}/indicators`,
+    TRIGGER_RESCORE: '/api/v1/diagnostics/trigger-rescore',
+    AUDIT_DETAILS: (auditId: string) => `/api/v1/diagnostics/audits/${auditId}`,
+  },
 } as const;
 
 // Navigation Items (Updated - Licenses removed)
@@ -44,7 +52,7 @@ export const PRODUCTS = [
     id: 'lumen-search-product',
     name: 'Lumen Search - Product',
     description:
-      'AI-powered product search functionality for your eCommerce WordPress site',
+      'AI-powered product search functionality for your eCommerce website',
     isInstalled: false,
     category: 'Search',
   },

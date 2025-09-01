@@ -1093,6 +1093,18 @@ body {
   border-radius: 0.5rem;
 }
 
+/* Disabled nav items for unauthenticated users */
+.lh-sidebar-nav-item-disabled {
+  color: var(--color-text-secondary);
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+.lh-sidebar-nav-item-disabled:hover {
+  background-color: transparent !important;
+  color: var(--color-text-secondary) !important;
+}
+
 /* Table Styles */
 .lh-table {
   min-width: 100%;
@@ -3672,19 +3684,19 @@ a {
   color: var(--color-text-muted);
 }
 
-/* WordPress Config */
-.lh-wp-config-container {
+/* Site Config */
+.lh-site-config-container {
   position: relative;
 }
 
-.lh-wp-config-label {
+.lh-site-config-label {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--color-text-primary);
   margin-bottom: 0.5rem;
 }
 
-.lh-wp-config-code {
+.lh-site-config-code {
   background: var(--color-bg-main);
   border: 1px solid var(--color-border);
   border-radius: 0.5rem;
@@ -3698,7 +3710,7 @@ a {
   position: relative;
 }
 
-.lh-wp-config-copy-btn {
+.lh-site-config-copy-btn {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
@@ -3712,7 +3724,7 @@ a {
   transition: all 0.2s ease;
 }
 
-.lh-wp-config-copy-btn:hover {
+.lh-site-config-copy-btn:hover {
   background: rgba(0, 0, 0, 0.9);
   color: var(--color-text-primary);
 }

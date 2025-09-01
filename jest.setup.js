@@ -1,5 +1,8 @@
 import '@testing-library/jest-dom'
 
+// Set environment variables for tests
+process.env.NEXT_PUBLIC_API_URL = 'https://api.lighthousestudios.xyz'
+
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
   useRouter() {

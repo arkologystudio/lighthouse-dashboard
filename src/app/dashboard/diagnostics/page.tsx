@@ -1,11 +1,13 @@
-import React from 'react';
-import { ComingSoon } from '../../../components/ui/ComingSoon';
+import React, { Suspense } from 'react';
+import DiagnosticsClient from './DiagnosticsClient';
+import { DiagnosticsErrorBoundary } from '../../../components/diagnostics/DiagnosticsErrorBoundary';
 
 const DiagnosticsPage: React.FC = () => (
-  <ComingSoon
-    title="Site Diagnostics"
-    description="Run comprehensive AI readiness checks, monitor site performance, and get actionable insights to optimize your WordPress sites for AI crawlers."
-  />
+  <DiagnosticsErrorBoundary>
+    <Suspense fallback={<div>Loading...</div>}>
+      <DiagnosticsClient />
+    </Suspense>
+  </DiagnosticsErrorBoundary>
 );
 
 export default DiagnosticsPage;

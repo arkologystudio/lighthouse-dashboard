@@ -5,6 +5,11 @@ const nextConfig = {
     optimizePackageImports: ['react-hot-toast', 'zod'],
   },
 
+  // Development optimizations
+  ...(process.env.NODE_ENV === 'development' && {
+    reactStrictMode: true,
+  }),
+
   // Image optimization settings
   images: {
     formats: ['image/webp', 'image/avif'],
@@ -19,8 +24,12 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
 
-  // Security headers
+  // Security headers (only apply in production)
   async headers() {
+    if (process.env.NODE_ENV !== 'production') {
+      return [];
+    }
+    
     return [
       {
         source: '/(.*)',

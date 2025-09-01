@@ -141,7 +141,7 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
         <div>
           <h1 className="lh-title-page">Sites</h1>
           <p className="lh-text-description">
-            Manage your WordPress sites and their Lighthouse plugins.
+            Manage your websites and their Lighthouse plugins.
           </p>
         </div>
         <button className="lh-btn lh-btn-primary" onClick={() => setIsAddModalOpen(true)}>Add Site</button>
@@ -190,7 +190,7 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
                 </svg>
                 <h3 className="lh-empty-state-title">No sites yet</h3>
                 <p className="lh-empty-state-description">
-                  Get started by adding your first WordPress site.
+                  Get started by adding your first website.
                 </p>
                 <div className="mt-6">
                   <button className="lh-btn lh-btn-primary" onClick={() => setIsAddModalOpen(true)}>
@@ -302,7 +302,7 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
                   value={formData.name}
                   onChange={handleInputChange('name')}
                   error={errors.name}
-                  placeholder="My WordPress Site"
+                  placeholder="My Website"
                   required
                 />
 
