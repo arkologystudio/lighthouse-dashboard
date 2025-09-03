@@ -1,3 +1,5 @@
+// Types for the Lighthouse Dashboard application
+
 // User types - matching backend exactly
 export interface User {
   id: string;
@@ -487,3 +489,7 @@ export type LicenseType =
   | 'enterprise';
 export type BillingPeriod = 'monthly' | 'annual';
 export type LicenseStatus = 'active' | 'expired' | 'revoked' | 'suspended';
+
+// Re-export diagnostics types
+export * from './diagnostics';
+

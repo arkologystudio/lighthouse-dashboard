@@ -11,7 +11,11 @@ import SiteCredentialsModal from './SiteCredentialsModal';
 import SiteProductsModal from './SiteProductsModal';
 
 // Lazy load the modal component to improve initial load
-const Modal = lazy(() => import('../../../components/ui/Modal').then(module => ({ default: module.Modal })));
+const Modal = lazy(() =>
+  import('../../../components/ui/Modal').then(module => ({
+    default: module.Modal,
+  }))
+);
 
 // Loading fallback for the modal
 const ModalLoading = () => (
@@ -28,7 +32,9 @@ interface SitesClientProps {
 
 const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
   // Initialize with server-side data but use hook for mutations
-  const { sites, isLoading, createSite, deleteSite, refreshSites } = useSites(initialSites.length > 0 ? initialSites : undefined);
+  const { sites, isLoading, createSite, deleteSite, refreshSites } = useSites(
+    initialSites.length > 0 ? initialSites : undefined
+  );
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -142,10 +148,15 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
         <div>
           <h1 className="lh-title-page">Sites</h1>
           <p className="lh-text-description">
-            Manage your WordPress sites and their Lighthouse plugins.
+            Manage your websites and their Lighthouse plugins.
           </p>
         </div>
-        <button className="lh-btn lh-btn-primary" onClick={() => setIsAddModalOpen(true)}>Add Site</button>
+        <button
+          className="lh-btn lh-btn-primary"
+          onClick={() => setIsAddModalOpen(true)}
+        >
+          Add Site
+        </button>
       </div>
 
       {/* Sites table */}
@@ -154,7 +165,10 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
           <CardHeader>
             <div className="lh-flex-between">
               <h3 className="lh-title-small">Your Sites ({sites.length})</h3>
-              <button className="lh-btn lh-btn-ghost lh-btn-sm" onClick={refreshSites}>
+              <button
+                className="lh-btn lh-btn-ghost lh-btn-sm"
+                onClick={refreshSites}
+              >
                 <svg
                   className="lh-icon-sm"
                   fill="none"
@@ -191,10 +205,13 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
                 </svg>
                 <h3 className="lh-empty-state-title">No sites yet</h3>
                 <p className="lh-empty-state-description">
-                  Get started by adding your first WordPress site.
+                  Get started by adding your first website.
                 </p>
                 <div className="mt-6">
-                  <button className="lh-btn lh-btn-primary" onClick={() => setIsAddModalOpen(true)}>
+                  <button
+                    className="lh-btn lh-btn-primary"
+                    onClick={() => setIsAddModalOpen(true)}
+                  >
                     Add Your First Site
                   </button>
                 </div>
@@ -249,15 +266,19 @@ const SitesClient: React.FC<SitesClientProps> = ({ initialSites = [] }) => {
                         </td>
                         <td className="lh-table-cell text-right text-sm font-medium">
                           <div className="flex items-center space-x-2">
-                            <button 
+                            <button
                               className="lh-btn lh-btn-ghost lh-btn-sm"
-                              onClick={() => setProductsModal({ isOpen: true, site })}
+                              onClick={() =>
+                                setProductsModal({ isOpen: true, site })
+                              }
                             >
                               Products
                             </button>
-                            <button 
+                            <button
                               className="lh-btn lh-btn-ghost lh-btn-sm"
-                              onClick={() => setCredentialsModal({ isOpen: true, site })}
+                              onClick={() =>
+                                setCredentialsModal({ isOpen: true, site })
+                              }
                             >
                               Credentials
                             </button>

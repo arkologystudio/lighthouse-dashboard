@@ -20,7 +20,7 @@ export const organizationSchema = {
   url: 'https://lighthousestudios.xyz',
   logo: 'https://lighthousestudios.xyz/logo.png',
   description:
-    'Navigation tools for the AI-powered web. Enable discovery, optimize visibility, guide intelligent agents to your WordPress sites with precision.',
+    'Navigation tools for the AI-powered web. Enable discovery, optimize visibility, guide intelligent agents to your websites with precision.',
   foundingDate: '2024',
   sameAs: [
     'https://twitter.com/lighthousestudios',
@@ -45,7 +45,7 @@ export const websiteSchema = {
   alternateName: 'Lighthouse Studios Dashboard',
   url: 'https://lighthousestudios.xyz',
   description:
-    'AI-powered portal for managing WordPress sites, installing AI website plugins, and unlocking advanced agent discoverability with neural & semantic search for Web 4.0.',
+    'AI-powered portal for managing websites, installing AI website plugins, and unlocking advanced agent discoverability with neural & semantic search for Web 4.0.',
   publisher: {
     '@type': 'Organization',
     name: 'Lighthouse Studios',
@@ -63,7 +63,7 @@ export const softwareApplicationSchema = {
   '@type': 'SoftwareApplication',
   name: 'Lighthouse Dashboard',
   description:
-    'AI-powered portal for managing WordPress sites, installing AI website plugins, and unlocking advanced agent discoverability with neural & semantic search for Web 4.0.',
+    'AI-powered portal for managing websites, installing AI website plugins, and unlocking advanced agent discoverability with neural & semantic search for Web 4.0.',
   url: 'https://lighthousestudios.xyz',
   applicationCategory: 'WebApplication',
   operatingSystem: 'Web Browser',
@@ -78,7 +78,7 @@ export const softwareApplicationSchema = {
     name: 'Lighthouse Studios',
   },
   featureList: [
-    'AI WordPress Plugin Management',
+    'AI Website Plugin Management',
     'Agent Discoverability Tools',
     'Neural Search Integration',
     'Semantic Search Tools',

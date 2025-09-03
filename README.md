@@ -1,11 +1,11 @@
 # Lighthouse Dashboard
 
-A modern dashboard for managing WordPress plugins and AI-powered features. Built with Next.js 15, TypeScript, and Tailwind CSS following functional programming principles.
+A modern dashboard for managing website plugins and AI-powered features. Built with Next.js 15, TypeScript, and Tailwind CSS following functional programming principles.
 
 ## Features
 
 - 🚀 **User Authentication** - Secure login/register with JWT tokens
-- 🏗️ **Site Management** - CRUD operations for WordPress sites
+- 🏗️ **Site Management** - CRUD operations for websites
 - 🎨 **Modern UI** - Responsive design with Lighthouse brand colors
 - 🔧 **Plugin Management** - Manage Neural Search and AI Readiness plugins
 - 📊 **Dashboard Analytics** - Overview of sites and plugin usage

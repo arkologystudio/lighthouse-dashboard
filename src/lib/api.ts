@@ -9,6 +9,19 @@ import type {
   CreateSiteRequest,
   ApiError,
   ApiResponse,
+  DiagnosticReport,
+  DiagnosticPageScore,
+  TriggerRescoreRequest,
+  TriggerRescoreResponse,
+  DiagnosticScanRequest,
+  DiagnosticScanResponse,
+  DiagnosticIndicator,
+  DiagnosticAuditDetails,
+  DiagnosticStatus,
+  IndicatorResult,
+  PageAggregation,
+  LighthouseAIReport,
+  AIReadinessScanRequest,
 } from '../types';
 import Cookies from 'js-cookie';
 
@@ -83,13 +96,36 @@ const apiRequest = async <T>(
     const apiResponse: ApiResponse<T> = await response.json();
 
     if (!response.ok || !apiResponse.success) {
+      // Map HTTP status codes to user-friendly error codes
+      let errorCode = response.status.toString();
+      const errorMessage = apiResponse.error || `HTTP ${response.status}: ${response.statusText}`;
+      
+      switch (response.status) {
+        case 400:
+          errorCode = 'INVALID_REQUEST';
+          break;
+        case 404:
+          errorCode = 'SITE_NOT_ACCESSIBLE';
+          break;
+        case 429:
+          errorCode = 'RATE_LIMIT_EXCEEDED';
+          break;
+        case 500:
+          errorCode = 'SERVER_ERROR';
+          break;
+        case 503:
+          errorCode = 'SERVICE_UNAVAILABLE';
+          break;
+        case 504:
+          errorCode = 'SCAN_TIMEOUT';
+          break;
+      }
+      
       return {
         success: false,
         error: {
-          message:
-            apiResponse.error ||
-            `HTTP ${response.status}: ${response.statusText}`,
-          code: response.status.toString(),
+          message: errorMessage,
+          code: errorCode,
           details: apiResponse,
         },
       };
@@ -300,3 +336,356 @@ export const matchResult = <T, U>(
   }
 ): U =>
   result.success ? handlers.success(result.data) : handlers.error(result.error);
+
+// Diagnostics API functions
+export const diagnosticsApi = {
+  // V2 API scan endpoint - handles both free and authenticated scans
+  scan: async (request: DiagnosticScanRequest): Promise<Result<DiagnosticScanResponse>> => {
+    const isFreeScan = !request.siteId && request.url;
+    
+    try {
+      let response: Response;
+      
+      if (isFreeScan) {
+        // Free scan - no authentication required
+        const url = `${API_BASE_URL}${ENDPOINTS.DIAGNOSTICS.SCAN}`;
+        response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(request),
+        });
+      } else {
+        // Authenticated scan for registered users
+        const result = await authenticatedRequest<DiagnosticScanResponse>(
+          ENDPOINTS.DIAGNOSTICS.SCAN, 
+          {
+            method: 'POST',
+            body: JSON.stringify(request),
+          }
+        );
+        return result;
+      }
+
+      // Handle free scan response
+      const responseBody = await response.json();
+
+      if (!response.ok) {
+        // Map HTTP status codes to user-friendly error codes
+        let errorCode = response.status.toString();
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        
+        switch (response.status) {
+          case 400:
+            errorCode = 'INVALID_REQUEST';
+            break;
+          case 404:
+            errorCode = 'SITE_NOT_ACCESSIBLE';
+            break;
+          case 429:
+            errorCode = 'RATE_LIMIT_EXCEEDED';
+            break;
+          case 500:
+            errorCode = 'SERVER_ERROR';
+            break;
+          case 503:
+            errorCode = 'SERVICE_UNAVAILABLE';
+            break;
+          case 504:
+            errorCode = 'SCAN_TIMEOUT';
+            break;
+        }
+
+        // Try to get error message from response body
+        if (responseBody.message) {
+          errorMessage = responseBody.message;
+        } else if (responseBody.error) {
+          errorMessage = responseBody.error;
+        }
+        
+        return {
+          success: false,
+          error: {
+            message: errorMessage,
+            code: errorCode,
+          },
+        };
+      }
+      
+             // V2 API Response validation - expect direct DiagnosticScanResponse format
+       if (responseBody.message && 
+           responseBody.status && 
+           responseBody.result && 
+           responseBody.duration !== undefined) {
+         
+         // Safely convert date strings to Date objects for metadata if present
+         if (responseBody.result.scanMetadata) {
+           // Only convert if the date string is valid
+           if (responseBody.result.scanMetadata.scanStartTime) {
+             const startDate = new Date(responseBody.result.scanMetadata.scanStartTime);
+             if (!isNaN(startDate.getTime())) {
+               responseBody.result.scanMetadata.scanStartTime = startDate;
+             } else {
+               console.warn('Invalid scanStartTime, keeping as string:', responseBody.result.scanMetadata.scanStartTime);
+             }
+           }
+           
+           if (responseBody.result.scanMetadata.scanEndTime) {
+             const endDate = new Date(responseBody.result.scanMetadata.scanEndTime);
+             if (!isNaN(endDate.getTime())) {
+               responseBody.result.scanMetadata.scanEndTime = endDate;
+             } else {
+               console.warn('Invalid scanEndTime, keeping as string:', responseBody.result.scanMetadata.scanEndTime);
+             }
+           }
+         }
+         
+         // Safely convert scannedAt strings to Date objects for all indicators
+         responseBody.result.pages?.forEach((page: PageAggregation) => {
+           page.indicators?.forEach((indicator: IndicatorResult) => {
+             if (indicator.scannedAt) {
+               const scannedDate = new Date(indicator.scannedAt);
+               if (!isNaN(scannedDate.getTime())) {
+                 indicator.scannedAt = scannedDate;
+               } else {
+                 console.warn('Invalid scannedAt date, keeping as string:', indicator.scannedAt);
+               }
+             }
+           });
+         });
+         
+         return { success: true, data: responseBody as DiagnosticScanResponse };
+       }
+      
+      // Handle legacy error wrapper format (backward compatibility)
+      if (responseBody.success === false && 
+          responseBody.error?.details?.status === "completed") {
+        
+        const scanResponse: DiagnosticScanResponse = {
+          message: responseBody.error.details.message,
+          status: responseBody.error.details.status,
+          duration: responseBody.error.details.duration,
+          result: responseBody.error.details.result
+        };
+        
+        return { success: true, data: scanResponse };
+      }
+      
+      // If response doesn't match expected format
+      return {
+        success: false,
+        error: {
+          message: responseBody.error || 'Unexpected response format from server',
+          code: responseBody.code || 'INVALID_RESPONSE',
+        },
+      };
+      
+    } catch (error) {
+      console.error('Network error in diagnostics scan:', error);
+      return {
+        success: false,
+        error: {
+          message: error instanceof Error ? error.message : 'Network error occurred',
+          code: 'NETWORK_ERROR',
+        },
+      };
+    }
+  },
+
+  getSiteScore: async (siteId: string): Promise<Result<DiagnosticReport>> => {
+    const result = await authenticatedRequest<DiagnosticReport>(
+      ENDPOINTS.DIAGNOSTICS.SITE_SCORE(siteId)
+    );
+
+    // No additional validation needed as the backend returns the correct format
+    return result;
+  },
+
+  getPageScores: async (siteId: string): Promise<Result<DiagnosticPageScore[]>> => {
+    // This is now handled by getPageIndicators for the new API structure
+    // Keeping this for backward compatibility but it may need to be updated
+    const result = await authenticatedRequest<DiagnosticPageScore[]>(
+      `${ENDPOINTS.DIAGNOSTICS.SITE_SCORE(siteId)}/pages`
+    );
+
+    return result;
+  },
+
+  triggerRescore: async (
+    siteId: string,
+    force?: boolean
+  ): Promise<Result<TriggerRescoreResponse>> => {
+    const requestData: TriggerRescoreRequest = {
+      site_id: siteId,
+      ...(force !== undefined && { force }),
+    };
+
+    const result = await authenticatedRequest<TriggerRescoreResponse>(
+      ENDPOINTS.DIAGNOSTICS.TRIGGER_RESCORE,
+      {
+        method: 'POST',
+        body: JSON.stringify(requestData),
+      }
+    );
+
+    return result;
+  },
+
+  getPageIndicators: async (
+    pageId: string,
+    params?: { 
+      category?: string; 
+      status?: DiagnosticStatus; 
+      limit?: number; 
+      offset?: number;
+    }
+  ): Promise<Result<{ indicators: DiagnosticIndicator[]; pagination: { total: number; limit: number; offset: number; hasMore: boolean } }>> => {
+    const queryParams = new URLSearchParams();
+    if (params?.category) queryParams.append('category', params.category);
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.offset) queryParams.append('offset', params.offset.toString());
+    
+    const url = `${ENDPOINTS.DIAGNOSTICS.PAGE_INDICATORS(pageId)}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return authenticatedRequest(url);
+  },
+
+  getAuditDetails: async (auditId: string): Promise<Result<DiagnosticAuditDetails>> => 
+    authenticatedRequest<DiagnosticAuditDetails>(
+      ENDPOINTS.DIAGNOSTICS.AUDIT_DETAILS(auditId)
+    ),
+
+  // New AI Readiness scan function that returns LighthouseAIReport
+  scanForAIReadiness: async (request: AIReadinessScanRequest): Promise<Result<LighthouseAIReport>> => {
+    const isAnonymous = !request.siteId;
+    
+    try {
+      let response: Response;
+      
+      if (isAnonymous) {
+        // Anonymous scan using /api/v1/diagnostics/scan-url
+        if (!request.url) {
+          return {
+            success: false,
+            error: { message: 'URL is required for anonymous scans' }
+          };
+        }
+        
+        const url = `${API_BASE_URL}${ENDPOINTS.DIAGNOSTICS.SCAN_URL}`;
+        const requestBody: { url: string; site_category?: string } = { url: request.url };
+        
+        // Add site_category if provided
+        if (request.options?.site_category) {
+          requestBody.site_category = request.options.site_category;
+        }
+        
+        response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+        });
+      } else {
+        // Authenticated scan using /api/v1/diagnostics/scan
+        if (!request.siteId) {
+          return {
+            success: false,
+            error: { message: 'Site ID is required for authenticated scans' }
+          };
+        }
+        
+        const requestBody: { siteId: string; options?: object } = { siteId: request.siteId };
+        
+        // Add options if provided (including site_category)
+        if (request.options) {
+          requestBody.options = request.options;
+        }
+        
+        const result = await authenticatedRequest<LighthouseAIReport>(
+          ENDPOINTS.DIAGNOSTICS.SCAN,
+          {
+            method: 'POST',
+            body: JSON.stringify(requestBody),
+          }
+        );
+        return result;
+      }
+
+      // Handle anonymous scan response
+      const responseBody = await response.json();
+
+      if (!response.ok) {
+        let errorCode = response.status.toString();
+        let errorMessage = responseBody.message || responseBody.error || `HTTP ${response.status}: ${response.statusText}`;
+        
+        switch (response.status) {
+          case 400:
+            errorCode = 'INVALID_REQUEST';
+            break;
+          case 404:
+            errorCode = 'SITE_NOT_ACCESSIBLE';
+            break;
+          case 429:
+            errorCode = 'RATE_LIMIT_EXCEEDED';
+            errorMessage = responseBody.message || 'You have reached your daily limit of free scans. Upgrade to Pro for unlimited scanning.';
+            break;
+          case 500:
+            errorCode = 'SERVER_ERROR';
+            break;
+          case 503:
+            errorCode = 'SERVICE_UNAVAILABLE';
+            break;
+          case 504:
+            errorCode = 'SCAN_TIMEOUT';
+            break;
+        }
+
+        return {
+          success: false,
+          error: {
+            message: errorMessage,
+            code: errorCode,
+          },
+        };
+      }
+
+      // Parse the response according to the schema
+      // Response format: { message: string, status: string, duration: number, result: LighthouseAIReport }
+      if (responseBody.result && typeof responseBody.result === 'object') {
+        // Extract the LighthouseAIReport from the wrapped response
+        return { success: true, data: responseBody.result as LighthouseAIReport };
+      } else if (responseBody.site && responseBody.categories && responseBody.overall) {
+        // Direct LighthouseAIReport format (fallback for different API versions)
+        return { success: true, data: responseBody as LighthouseAIReport };
+      } else {
+        // Unexpected response format
+        console.error('Unexpected API response format:', responseBody);
+        return {
+          success: false,
+          error: {
+            message: 'Invalid response format from server',
+            code: 'INVALID_RESPONSE',
+          },
+        };
+      }
+      
+    } catch (error) {
+      console.error('Network error in AI readiness scan:', error);
+      return {
+        success: false,
+        error: {
+          message: error instanceof Error ? error.message : 'Network error occurred',
+          code: 'NETWORK_ERROR',
+        },
+      };
+    }
+  },
+
+  // Get latest results for authenticated users
+  getLatestResults: async (siteId: string): Promise<Result<LighthouseAIReport>> => 
+    authenticatedRequest<LighthouseAIReport>(
+      ENDPOINTS.DIAGNOSTICS.SITE_SCORE(siteId)
+    ),
+};
