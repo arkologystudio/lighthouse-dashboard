@@ -361,7 +361,7 @@ const HomePage: React.FC = () => {
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Plugin Management System */}
+            {/* AI Readiness Diagnostics */}
             <div className="group relative h-full">
               <div
                 className="border rounded-lg p-8 transition-all duration-200 hover:shadow-lg h-full flex flex-col"
@@ -376,7 +376,7 @@ const HomePage: React.FC = () => {
                     className="text-xs font-mono tracking-wider uppercase"
                     style={{ color: 'var(--color-beacon-light)' }}
                   >
-                    01 • Plugin Management
+                    01 • Site Diagnostics
                   </div>
                   <div
                     className="w-2 h-2 rounded-full"
@@ -400,7 +400,7 @@ const HomePage: React.FC = () => {
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                     />
                   </svg>
                 </div>
@@ -409,16 +409,16 @@ const HomePage: React.FC = () => {
                   className="text-xl font-medium mb-4 leading-tight"
                   style={{ color: 'var(--color-lighthouse-beam)' }}
                 >
-                  AI Plugin Infrastructure
+                  AI Readiness Analysis
                 </h3>
 
                 <p
                   className="leading-relaxed mb-6 text-sm flex-grow"
                   style={{ color: 'var(--color-maritime-fog)' }}
                 >
-                  Automated deployment and configuration of AI-ready website
-                  plugins. Transform existing sites into agent-discoverable
-                  platforms without technical overhead.
+                  Comprehensive site analysis that identifies gaps in your agent 
+                  discoverability. Provides actionable insights on metadata, structure, 
+                  and configurations needed for the agentic web.
                 </p>
 
                 {/* Technical specs */}
@@ -427,28 +427,28 @@ const HomePage: React.FC = () => {
                   style={{ color: 'var(--color-maritime-fog)' }}
                 >
                   <div className="flex justify-between">
-                    <span>Deployment</span>
+                    <span>Analysis</span>
                     <span style={{ color: 'var(--color-navigation-green)' }}>
-                      Automated
+                      Real-time
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Configuration</span>
+                    <span>Coverage</span>
                     <span style={{ color: 'var(--color-navigation-green)' }}>
-                      Zero-touch
+                      Complete
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Updates</span>
+                    <span>Guidance</span>
                     <span style={{ color: 'var(--color-navigation-green)' }}>
-                      Continuous
+                      Actionable
                     </span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Discovery Registry */}
+            {/* Configuration Generator */}
             <div className="group relative h-full">
               <div
                 className="border rounded-lg p-8 transition-all duration-200 hover:shadow-lg h-full flex flex-col"
@@ -463,7 +463,7 @@ const HomePage: React.FC = () => {
                     className="text-xs font-mono tracking-wider uppercase"
                     style={{ color: 'var(--color-beacon-light)' }}
                   >
-                    02 • Discovery Registry
+                    02 • Config Generator
                   </div>
                   <div
                     className="w-2 h-2 rounded-full"
@@ -487,7 +487,12 @@ const HomePage: React.FC = () => {
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
                     />
                   </svg>
                 </div>
@@ -496,16 +501,16 @@ const HomePage: React.FC = () => {
                   className="text-xl font-medium mb-4 leading-tight"
                   style={{ color: 'var(--color-lighthouse-beam)' }}
                 >
-                  Agent Discovery Network
+                  Agent Configuration Files
                 </h3>
 
                 <p
                   className="leading-relaxed mb-6 text-sm flex-grow"
                   style={{ color: 'var(--color-maritime-fog)' }}
                 >
-                  Distributed registry system that indexes your AI services,
-                  making them discoverable to intelligent agents and partner
-                  networks across the web.
+                  Automatically generates essential files like llm.txt, robots.txt 
+                  extensions, and metadata configurations that enable intelligent 
+                  agents to understand and navigate your site effectively.
                 </p>
 
                 {/* Technical specs */}
@@ -514,21 +519,21 @@ const HomePage: React.FC = () => {
                   style={{ color: 'var(--color-maritime-fog)' }}
                 >
                   <div className="flex justify-between">
-                    <span>Network</span>
+                    <span>Generation</span>
                     <span style={{ color: 'var(--color-navigation-green)' }}>
-                      Global
+                      Automatic
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Indexing</span>
+                    <span>Standards</span>
                     <span style={{ color: 'var(--color-navigation-green)' }}>
-                      Real-time
+                      Compliant
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Protocol</span>
+                    <span>Updates</span>
                     <span style={{ color: 'var(--color-navigation-green)' }}>
-                      Open
+                      Dynamic
                     </span>
                   </div>
                 </div>
@@ -574,7 +579,7 @@ const HomePage: React.FC = () => {
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                     />
                   </svg>
                 </div>
@@ -590,9 +595,9 @@ const HomePage: React.FC = () => {
                   className="leading-relaxed mb-6 text-sm flex-grow"
                   style={{ color: 'var(--color-maritime-fog)' }}
                 >
-                  Advanced neural search infrastructure that enables contextual,
-                  semantic content discovery for both human users and AI agents
-                  navigating your site.
+                  Vector-based semantic search perfect for knowledge bases and 
+                  e-commerce sites. Understands context and intent, driving higher 
+                  conversions for both AI agents and human visitors.
                 </p>
 
                 {/* Technical specs */}
@@ -607,9 +612,9 @@ const HomePage: React.FC = () => {
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Context</span>
+                    <span>Conversion</span>
                     <span style={{ color: 'var(--color-navigation-green)' }}>
-                      Semantic
+                      Optimized
                     </span>
                   </div>
                   <div className="flex justify-between">
